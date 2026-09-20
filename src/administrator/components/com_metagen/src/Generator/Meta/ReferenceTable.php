@@ -23,7 +23,7 @@ use Yepr\Component\Metagen\Administrator\Generator\Model\Classifier;
  *
  * This is the half of step 3.2 that the plan calls "the JavaScript the 1.9
  * mechanism needs", and it is not JavaScript: it is the description
- * `<metagen-reference>` reads. `ReferenceIndex` carries two of these by hand -
+ * `<yepr-reference>` reads. `ReferenceIndex` carries two of these by hand -
  * one for ER1, one for LionCore M3 - and says in its own docblock why they are
  * a map rather than a method per type: *because Meta-gen generates this from a
  * concept model in stage 3, and a list is a thing that can be generated.*

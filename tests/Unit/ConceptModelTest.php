@@ -197,6 +197,74 @@ final class ConceptModelTest extends TestCase
         $this->assertSame([], $model->featuresOf($a));
     }
 
+    /**
+     * A label is what a person reads; the name is what everything else uses.
+     *
+     * Until 3.3 the only human text in a metalanguage was an identifier, so a
+     * generated form read `isValueObject` where it should read "Is this a value
+     * object?". Both are optional and fall back to the name, which is what keeps
+     * every model written before then rendering exactly as it did - `er1.json`
+     * is one of those, and it carries no label anywhere.
+     */
+    public function testALabelIsReadWhenThereIsOneAndTheNameWhenThereIsNot(): void
+    {
+        $model = ConceptModel::fromJson((string) json_encode([
+            'name'             => 'Labelled',
+            'languageEntities' => [
+                'languageEntities0' => [
+                    'name'                => 'Entity',
+                    'key'                 => 'c-entity',
+                    'label'               => 'Thing',
+                    'description'         => 'Something the model holds',
+                    'languageEntity_type' => 'Classifier',
+                    'classifier'          => [
+                        'classifier_type' => 'Concept',
+                        'concept'         => [],
+                        'feature'         => [
+                            'feature0' => [
+                                'name'         => 'isValueObject',
+                                'label'        => 'Is this a value object?',
+                                'feature_type' => 'Property',
+                                'property'     => ['type' => 'dt-string'],
+                            ],
+                            'feature1' => [
+                                'name'         => 'unlabelled',
+                                'feature_type' => 'Property',
+                                'property'     => ['type' => 'dt-string'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]));
+
+        $entity = $model->classifier('c-entity');
+
+        $this->assertNotNull($entity);
+        $this->assertSame('Thing', $entity->displayLabel());
+        $this->assertSame('Entity', $entity->name, 'the name is still what a reference resolves by');
+        $this->assertSame('Something the model holds', $entity->description);
+
+        $this->assertSame('Is this a value object?', $entity->features[0]->displayLabel());
+        $this->assertSame('unlabelled', $entity->features[1]->displayLabel());
+    }
+
+    /**
+     * And a model written before labels existed reads exactly as it did.
+     */
+    public function testAModelWithNoLabelsAnywhereFallsBackThroughout(): void
+    {
+        $model = $this->er1();
+
+        foreach ($model->classifiers() as $classifier) {
+            $this->assertSame($classifier->name, $classifier->displayLabel());
+
+            foreach ($classifier->features as $feature) {
+                $this->assertSame($feature->name, $feature->displayLabel());
+            }
+        }
+    }
+
     public function testSomethingThatIsNotAnObjectIsRefused(): void
     {
         $this->expectException(\InvalidArgumentException::class);

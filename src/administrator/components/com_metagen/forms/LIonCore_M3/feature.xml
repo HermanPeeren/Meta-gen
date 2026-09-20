@@ -22,6 +22,21 @@
 		/>
 
 		<field
+				name="label"
+				type="text"
+				label="COM_METAGEN_METALANGUAGE_FEATURE_FIELD_LABEL_LABEL"
+				description="COM_METAGEN_METALANGUAGE_FEATURE_FIELD_LABEL_DESC"
+				size="40"
+		/>
+		<field
+				name="description"
+				type="text"
+				label="COM_METAGEN_METALANGUAGE_FEATURE_FIELD_DESCRIPTION_LABEL"
+				description="COM_METAGEN_METALANGUAGE_FEATURE_FIELD_DESCRIPTION_DESC"
+				size="40"
+		/>
+
+		<field
 				name="is_optional"
 				type="checkbox"
 				label="COM_METAGEN_FEATURE_FIELD_ISOPTIONAL_LABEL"

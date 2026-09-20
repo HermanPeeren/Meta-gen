@@ -58,7 +58,7 @@ class HtmlView extends BaseHtmlView
 		$this->item = $model->getItem();
 
 		// Everything in this metalanguage that a reference field can point at,
-		// in the page once. <metagen-reference> reads it from here and adds
+		// in the page once. <yepr-reference> reads it from here and adds
 		// whatever the form holds that the server has not seen yet.
 		$this->getDocument()->addScriptOptions('yepr.references', $model->getReferenceIndex());
 

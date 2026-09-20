@@ -66,6 +66,8 @@ final class Feature
     /**
      * @param  string   $name        The feature's name, which is the form field's name.
      * @param  string   $key         Its LionWeb key.
+     * @param  string   $label       What a person reads instead of the name, if anybody set one.
+     * @param  string   $description How it is explained under the field, if anybody set one.
      * @param  bool     $optional    Whether it may be left empty.
      * @param  string   $kind        `Property` or `Link`.
      * @param  string   $linkKind    `Containment` or `Reference`, for a link.
@@ -77,6 +79,8 @@ final class Feature
     private function __construct(
         public readonly string $name,
         public readonly string $key,
+        public readonly string $label,
+        public readonly string $description,
         public readonly bool $optional,
         public readonly string $kind,
         public readonly string $linkKind,
@@ -103,6 +107,8 @@ final class Feature
         return new self(
             self::text($node, 'name'),
             self::text($node, 'key'),
+            self::text($node, 'label'),
+            self::text($node, 'description'),
             // A checkbox that was never ticked is absent rather than "0", so
             // the question is whether it is there and true, not what it holds.
             self::flag($node, 'is_optional'),
@@ -111,6 +117,20 @@ final class Feature
             $link !== null && self::flag($link, 'is_multiple'),
             $typeFrom === null ? '' : self::text($typeFrom, 'type')
         );
+    }
+
+    /**
+     * What a person should read for this feature.
+     *
+     * The label when somebody wrote one, and the name when nobody did. A
+     * metalanguage carried nothing but identifiers until 3.3, so falling back
+     * is what keeps every model written before then rendering as it did.
+     *
+     * @since  1.2.0
+     */
+    public function displayLabel(): string
+    {
+        return $this->label !== '' ? $this->label : $this->name;
     }
 
     /**

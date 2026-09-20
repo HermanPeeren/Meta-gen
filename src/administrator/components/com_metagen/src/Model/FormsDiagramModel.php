@@ -43,7 +43,6 @@ use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
 use Joomla\Registry\Registry;
 use Joomla\Utilities\ArrayHelper;
 
-use	Yepr\Component\Metagen\Administrator\Generator\LanguageStringUtil;
 
 
 /**

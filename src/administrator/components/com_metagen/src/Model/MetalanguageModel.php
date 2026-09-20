@@ -132,7 +132,7 @@ class MetalanguageModel extends AdminModel
 	 * It is the model's job rather than the view's because it reads the stored
 	 * model, and reading the stored model happens here and nowhere else.
 	 *
-	 * @return  array  index and types, as <metagen-reference> expects them.
+	 * @return  array  index and types, as <yepr-reference> expects them.
 	 *
 	 * @since   1.1.0
 	 */

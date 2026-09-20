@@ -95,14 +95,11 @@ final class ResolvableNamesTest extends TestCase
         }
 
         if (!str_starts_with($namespace, 'Yepr\\Component\\Metagen\\')) {
-            // Somebody else's code, vendored into src/ rather than required
-            // through composer, and reached by a `require_once` precisely
-            // because PSR-4 cannot find it. `phpstan.neon` excludes the same
-            // file for the same reason. Listing it here rather than skipping
-            // anything foreign means a *second* one would be a failure.
             // Nothing here is somebody else's. Exten-gen carries a vendored
-            // third-party class that PSR-4 cannot find; none of it came with
-            // the split, and an empty list means a first one would fail here.
+            // third-party class that PSR-4 cannot find and reaches it with a
+            // `require_once`; none of that came across in the split, so a file
+            // under a foreign namespace here is a mistake rather than an
+            // exception somebody decided on.
             $this->fail($relative . ' declares the foreign namespace ' . $namespace . '.');
         }
 
@@ -147,6 +144,45 @@ final class ResolvableNamesTest extends TestCase
             strtolower(basename($relative, '.php')),
             $declared,
             $relative . ' declares ' . implode(', ', $declared) . ', so nothing can load it by name.'
+        );
+    }
+
+    /**
+     * And every class it imports from this component is one that is there.
+     *
+     * The rules above read names the file *uses*. An unused `use` is invisible
+     * to them and harmless to PHP, which never resolves one - right up until
+     * somebody writes the call that needs it, and then it is a fatal naming a
+     * class that left the repository months earlier.
+     *
+     * The split left exactly one: `FormsDiagramModel` imported
+     * `Generator\\LanguageStringUtil`, which stayed in Exten-gen generating a
+     * component's language strings. Nothing here used it, so nothing here
+     * noticed.
+     */
+    #[DataProvider('componentClasses')]
+    public function testEveryImportFromThisComponentResolves(string $relative): void
+    {
+        $source  = (string) file_get_contents(self::sourceRoot() . '/' . $relative);
+        $prefix  = 'Yepr\\Component\\Metagen\\Administrator\\';
+        $dangling = [];
+
+        foreach ($this->importsOf($source) as $fqcn) {
+            if (!str_starts_with($fqcn, $prefix)) {
+                continue;
+            }
+
+            $path = str_replace('\\', '/', substr($fqcn, \strlen($prefix))) . '.php';
+
+            if (!is_file(self::sourceRoot() . '/' . $path)) {
+                $dangling[] = $fqcn;
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $dangling,
+            $relative . ' imports classes that are not here: ' . implode(', ', $dangling)
         );
     }
 

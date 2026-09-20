@@ -43,6 +43,8 @@ final class Classifier
     /**
      * @param  string     $name        The classifier's name, as somebody typed it.
      * @param  string     $key         Its key, which is what a reference to it stores.
+     * @param  string     $label       What a person reads instead of the name, if anybody set one.
+     * @param  string     $description How it is explained on screen, if anybody set one.
      * @param  string     $kind        `Concept`, `ConceptInterface` or `Annotation`.
      * @param  string     $extendsKey  The key of the classifier it extends, if any.
      * @param  string[]   $implements  Keys of the concept interfaces it implements.
@@ -55,6 +57,8 @@ final class Classifier
     private function __construct(
         public readonly string $name,
         public readonly string $key,
+        public readonly string $label,
+        public readonly string $description,
         public readonly string $kind,
         public readonly string $extendsKey,
         public readonly array $implements,
@@ -86,6 +90,8 @@ final class Classifier
         return new self(
             self::text($entity, 'name'),
             self::text($entity, 'key'),
+            self::text($entity, 'label'),
+            self::text($entity, 'description'),
             $kind,
             self::text($own, 'extends'),
             self::implementedKeys($own),
@@ -93,6 +99,16 @@ final class Classifier
             self::flag($own, 'partition'),
             self::features($classifier)
         );
+    }
+
+    /**
+     * What a person should read for this classifier.
+     *
+     * @since  1.2.0
+     */
+    public function displayLabel(): string
+    {
+        return $this->label !== '' ? $this->label : $this->name;
     }
 
     /**
