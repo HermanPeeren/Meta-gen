@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	Annotation in LIonCore-M3.
+
+	The third kind of Classifier, beside Concept and ConceptInterface.
+	`classifier.xml` has offered it as a choice since the model was first
+	written and pointed at this file, which was never there - so choosing
+	"Annotation" rendered an empty box. Joomla does not report a `formsource`
+	it cannot resolve; the subform simply comes up with no fields in it, which
+	looks like a feature somebody had not filled in yet.
+
+	What makes an Annotation an Annotation is `annotates`: the Classifier it
+	attaches to. The rest it shares with the other classifiers - it may extend
+	another Annotation, implement ConceptInterfaces, and carry features, which
+	`classifier.xml` holds for all three.
+-->
+<form>
+	<fieldset
+		addruleprefix="Yepr\Component\Metagen\Administrator\Rule"
+		addfieldprefix="Yepr\Gen\Joomla\Form\Field"
+	>
+		<field
+				name="annotates"
+				type="Reference"
+				objecttype="Classifier"
+				label="COM_METAGEN_METALANGUAGE_ANNOTATION_FIELD_ANNOTATES_LABEL"
+				description="COM_METAGEN_METALANGUAGE_ANNOTATION_FIELD_ANNOTATES_DESC"
+				id="annotates"
+				class="custom-select-color-state QualifierRef"
+				size="1"
+		/>
+
+		<field
+				name="multiple"
+				type="checkbox"
+				label="COM_METAGEN_METALANGUAGE_ANNOTATION_FIELD_MULTIPLE_LABEL"
+				description="COM_METAGEN_METALANGUAGE_ANNOTATION_FIELD_MULTIPLE_DESC"
+		/>
+
+		<field
+				name="extends"
+				type="Reference"
+				objecttype="Annotation"
+				label="COM_METAGEN_METALANGUAGE_CONCEPT_FIELD_EXTENDS_LABEL"
+				id="extends"
+				class="custom-select-color-state QualifierRef"
+				size="1"
+		/>
+
+		<field
+				name="implements"
+				type="subform"
+				formsource="administrator/components/com_metagen/forms/LIonCore_M3/conceptInterfaceReference.xml"
+				multiple="true"
+				buttons="add,remove"
+				label="COM_METAGEN_METALANGUAGE_CONCEPT_FIELD_IMPLEMENTS_LABEL"
+				id="implements"
+		/>
+
+		<field
+				name="LIonWeb_key"
+				value="LanguageEntity.Classifier.Annotation"
+				type="hidden"
+		/>
+	</fieldset>
+</form>

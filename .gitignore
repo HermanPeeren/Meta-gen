@@ -1,0 +1,24 @@
+/vendor/
+/node_modules/
+/build/*.zip
+/build/tmp/
+/build/generated/
+/.phpunit.cache/
+/.phpunit.result.cache
+/.php-cs-fixer.cache
+/composer.lock
+/.idea/
+/.vscode/
+/.iml
+
+# Joomla, unpacked as reference material for static analysis. See docs/development.md.
+/joomla/
+
+# Scratch: model dumps, notes, anything personal kept beside the repo.
+/xdiv/
+
+# Cypress: the env file holds a login, and the rest is run output.
+/cypress.env.json
+/cypress/screenshots/
+/cypress/videos/
+/cypress/downloads/

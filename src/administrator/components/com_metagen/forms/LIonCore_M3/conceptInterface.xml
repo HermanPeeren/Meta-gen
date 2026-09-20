@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset
+		addruleprefix="Yepr\Component\Metagen\Administrator\Rule"
+		addfieldprefix="Yepr\Gen\Joomla\Form\Field"
+	>
+
+		<field
+				name="extends"
+				type="Reference"
+				objecttype="ConceptInterface"
+				label="COM_METAGEN_METALANGUAGE_CONCEPT_FIELD_EXTENDS_LABEL"
+				id="extends"
+				class="custom-select-color-state QualifierRef"
+				size="1"
+		/><!--Todo: backupClassifierKey(event)-->
+
+		<field
+				name="LIonWeb_key"
+				value="LanguageEntity.Classifier.ConceptInterface"
+				type="hidden"
+		/>
+	</fieldset>
+</form>

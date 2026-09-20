@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset
+		addruleprefix="Yepr\Component\Metagen\Administrator\Rule"
+		addfieldprefix="Yepr\Gen\Joomla\Form\Field"
+	>
+
+		<field
+				name="extends"
+				value="Link"
+				type="hidden"
+		/>
+
+		<field
+				name="LIonWeb_key"
+				value="Feature.Link.Reference"
+				type="hidden"
+		/>
+
+	</fieldset>
+</form>

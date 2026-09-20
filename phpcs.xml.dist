@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<ruleset name="metagen">
+	<description>
+		PSR-12, minus the rules that contradict Joomla's own conventions.
+
+		The same ruleset Exten-gen and the core use, and for the same reason:
+		Joomla mandates tabs where PSR-12 forbids them, and a Joomla extension
+		whose files sit beside core's follows core.
+	</description>
+
+	<file>src/administrator/components/com_metagen/src</file>
+	<file>tests</file>
+	<file>tools</file>
+
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/joomla/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+
+	<rule ref="PSR12"/>
+
+	<!--
+		Joomla indents with tabs and PSR-12 forbids them. See the description.
+	-->
+	<rule ref="Generic.WhiteSpace.DisallowTabIndent">
+		<exclude-pattern>src/*</exclude-pattern>
+	</rule>
+	<rule ref="Generic.WhiteSpace.ScopeIndent">
+		<exclude-pattern>src/*</exclude-pattern>
+	</rule>
+	<rule ref="Generic.Files.LineEndings">
+		<exclude-pattern>src/*</exclude-pattern>
+	</rule>
+
+	<!--
+		Every Joomla source file opens with `defined('_JEXEC') or die;`. PSR-1
+		calls that a side effect beside a class declaration, and it is - it is
+		also mandatory, and the reason it is mandatory is that without it the
+		file does something when requested directly over the web.
+	-->
+	<rule ref="PSR1.Files.SideEffects">
+		<exclude-pattern>src/*</exclude-pattern>
+	</rule>
+
+	<!--
+		`$_supportNullValue`, `$_tbl`, `$_db`: Joomla's Table API names them,
+		and a subclass does not get to rename its parent's properties.
+	-->
+	<rule ref="PSR2.Classes.PropertyDeclaration.Underscore">
+		<exclude-pattern>src/*</exclude-pattern>
+	</rule>
+
+	<!--
+		A tool declares its helpers and then does its work in the same file,
+		which is what a script is. Its helpers are not in a namespace either,
+		for the same reason: nothing autoloads them, and a namespace on a
+		single-file script is ceremony.
+	-->
+	<rule ref="PSR1.Files.SideEffects">
+		<exclude-pattern>tools/*</exclude-pattern>
+	</rule>
+	<rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+		<exclude-pattern>tools/*</exclude-pattern>
+	</rule>
+	<!--
+		The component's own tree came from Exten-gen when Meta-gen was split out
+		of it, and it keeps the softer limit it was written to. Most of the long
+		lines are a view echoing a paragraph or a model building a query, and
+		breaking those makes the thing being built harder to read than the code
+		that builds it. New code - tests, tools, and everything written here
+		since - stays at 150.
+	-->
+	<rule ref="Generic.Files.LineLength">
+		<exclude-pattern>src/*</exclude-pattern>
+	</rule>
+
+	<rule ref="Generic.Files.LineLength">
+		<properties>
+			<property name="lineLimit" value="150"/>
+			<property name="absoluteLineLimit" value="0"/>
+		</properties>
+	</rule>
+</ruleset>

@@ -1,0 +1,170 @@
+{
+    "id": "0",
+    "name": "ER1",
+    "version": "0.1",
+    "LIonWeb_key": "Language",
+    "languageEntities": {
+        "languageEntities0": {
+            "name": "String",
+            "key": "dt-string",
+            "languageEntity_type": "DataType",
+            "datatype": {
+                "dataType_type": "PrimitiveType",
+                "primitiveType": {
+                    "LIonWeb_key": "DataType.PrimitiveType"
+                }
+            },
+            "LIonWeb_key": "LanguageEntity"
+        },
+        "languageEntities1": {
+            "name": "Boolean",
+            "key": "dt-boolean",
+            "languageEntity_type": "DataType",
+            "datatype": {
+                "dataType_type": "PrimitiveType",
+                "primitiveType": {
+                    "LIonWeb_key": "DataType.PrimitiveType"
+                }
+            },
+            "LIonWeb_key": "LanguageEntity"
+        },
+        "languageEntities2": {
+            "name": "INamed",
+            "key": "ci-inamed",
+            "languageEntity_type": "Classifier",
+            "classifier": {
+                "classifier_type": "ConceptInterface",
+                "conceptInterface": {
+                    "extends": "",
+                    "LIonWeb_key": "LanguageEntity.Classifier.ConceptInterface"
+                },
+                "feature": {
+                    "feature0": {
+                        "name": "name",
+                        "key": "f-inamed-name",
+                        "is_optional": "0",
+                        "feature_type": "Property",
+                        "property": {
+                            "type": "dt-string",
+                            "typeReference_key": "dt-string",
+                            "LIonWeb_key": "Feature.Property"
+                        },
+                        "classifier_key": "",
+                        "LIonWeb_key": "Feature"
+                    }
+                }
+            },
+            "LIonWeb_key": "LanguageEntity"
+        },
+        "languageEntities3": {
+            "name": "Entity",
+            "key": "c-entity",
+            "languageEntity_type": "Classifier",
+            "classifier": {
+                "classifier_type": "Concept",
+                "concept": {
+                    "abstract": "0",
+                    "partition": "0",
+                    "extends": "",
+                    "implements": {
+                        "implements0": {
+                            "conceptInterface": "ci-inamed"
+                        }
+                    },
+                    "LIonWeb_key": "LanguageEntity.Classifier.Concept"
+                },
+                "feature": {
+                    "feature0": {
+                        "name": "isValueObject",
+                        "key": "f-entity-vo",
+                        "is_optional": "0",
+                        "feature_type": "Property",
+                        "property": {
+                            "type": "dt-boolean",
+                            "typeReference_key": "dt-boolean",
+                            "LIonWeb_key": "Feature.Property"
+                        },
+                        "classifier_key": "",
+                        "LIonWeb_key": "Feature"
+                    }
+                }
+            },
+            "LIonWeb_key": "LanguageEntity"
+        },
+        "languageEntities4": {
+            "name": "Field",
+            "key": "c-field",
+            "languageEntity_type": "Classifier",
+            "classifier": {
+                "classifier_type": "Concept",
+                "concept": {
+                    "abstract": "0",
+                    "partition": "0",
+                    "extends": "c-entity",
+                    "implements": {
+                        "implements0": {
+                            "conceptInterface": "ci-inamed"
+                        }
+                    },
+                    "LIonWeb_key": "LanguageEntity.Classifier.Concept"
+                },
+                "feature": {
+                    "feature0": {
+                        "name": "owner",
+                        "key": "f-field-owner",
+                        "is_optional": "0",
+                        "feature_type": "Link",
+                        "link": {
+                            "type": "c-entity",
+                            "link_type": "Reference",
+                            "LIonWeb_key": "Feature.Link"
+                        },
+                        "classifier_key": "",
+                        "LIonWeb_key": "Feature"
+                    }
+                }
+            },
+            "LIonWeb_key": "LanguageEntity"
+        },
+        "languageEntities5": {
+            "name": "Deprecated",
+            "key": "a-deprecated",
+            "languageEntity_type": "Classifier",
+            "classifier": {
+                "classifier_type": "Annotation",
+                "annotation": {
+                    "annotates": "c-entity",
+                    "multiple": "0",
+                    "extends": "",
+                    "implements": {},
+                    "LIonWeb_key": "LanguageEntity.Classifier.Annotation"
+                },
+                "feature": {
+                    "feature0": {
+                        "name": "reason",
+                        "key": "f-deprecated-reason",
+                        "is_optional": "0",
+                        "feature_type": "Property",
+                        "property": {
+                            "type": "dt-string",
+                            "typeReference_key": "dt-string",
+                            "LIonWeb_key": "Feature.Property"
+                        },
+                        "classifier_key": "",
+                        "LIonWeb_key": "Feature"
+                    }
+                }
+            },
+            "LIonWeb_key": "LanguageEntity"
+        },
+        "languageEntities6": {
+            "name": "",
+            "key": "",
+            "languageEntity_type": "Classifier",
+            "classifier": {
+                "classifier_type": "Concept"
+            },
+            "LIonWeb_key": "LanguageEntity"
+        }
+    }
+}

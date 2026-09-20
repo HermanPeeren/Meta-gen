@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset
+		addruleprefix="Yepr\Component\Metagen\Administrator\Rule"
+		addfieldprefix="Yepr\Gen\Joomla\Form\Field"
+	>
+
+		<field
+			name="type"
+			type="Reference"
+				objecttype="DataType"
+			label="COM_METAGEN_METALANGUAGE_PROPERTY_FIELD_TYPE_LABEL"
+			id="type"
+			/>
+
+		<field
+				name="typeReference_key"
+				type="hidden"
+		/>
+
+		<field
+				name="LIonWeb_key"
+				value="Feature.Property"
+				type="hidden"
+		/>
+
+	</fieldset>
+</form>

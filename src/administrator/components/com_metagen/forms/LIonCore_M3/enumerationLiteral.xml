@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset
+		addruleprefix="Yepr\Component\Metagen\Administrator\Rule"
+		addfieldprefix="Yepr\Gen\Joomla\Form\Field"
+	>
+		<field
+				name="name"
+				type="text"
+				label="COM_METAGEN_METALANGUAGE_ENUMERATION_LITERAL_FIELD_NAME_LABEL"
+				size="40"
+				class="enumerationLiteralName"
+		/>
+
+		<field
+				name="key"
+				type="text"
+				label="COM_METAGEN_METALANGUAGE_ENUMERATION_LITERAL_FIELD_KEY_LABEL"
+				size="40"
+		/>
+
+		<field
+				name="LIonWeb_key"
+				value="EnumerationLiteral"
+				type="hidden"
+		/>
+
+	</fieldset>
+</form>

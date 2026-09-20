@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "Language" in LIonCore-M3-->
+<form>
+	<fieldset name="general"
+		addruleprefix="Yepr\Component\Metagen\Administrator\Rule"
+		addfieldprefix="Yepr\Gen\Joomla\Form\Field"
+	>
+		<field
+			name="id"
+			type="number"
+			label="JGLOBAL_FIELD_ID_LABEL"
+			default="0"
+			class="readonly"
+			readonly="true"
+		/>
+
+		<!-- General -->
+		<field
+			name="name"
+			type="text"
+			label="COM_METAGEN_METALANGUAGE_FIELD_NAME_LABEL"
+			description="COM_METAGEN_METALANGUAGE_FIELD_NAME_DESC"
+			size="40"
+			required="true"
+		 />
+
+		<field
+			name="version"
+			type="text"
+			label="COM_METAGEN_METALANGUAGE_FIELD_VERSION_LABEL"
+			description="COM_METAGEN_METALANGUAGE_FIELD_VERSION_DESC"
+			size="40"
+		 />
+
+		<field
+				name="LIonWeb_key"
+				value="Language"
+				type="hidden"
+		/>
+
+		<!-- /General -->
+
+		<field
+			name="alias"
+			type="text"
+			label="JFIELD_ALIAS_LABEL"
+			size="45"
+			hint="JFIELD_ALIAS_PLACEHOLDER"
+		/>
+
+		<field
+			name="published"
+			type="list"
+			label="JSTATUS"
+			default="1"
+			id="published"
+			class="custom-select-color-state"
+			size="1"
+			>
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+			<option value="2">JARCHIVED</option>
+			<option value="-2">JTRASHED</option>
+		</field>
+
+		<field
+			name="publish_up"
+			type="calendar"
+			label="COM_METAGEN_PROJECT_FIELD_PUBLISH_UP_LABEL"
+			translateformat="true"
+			showtime="true"
+			size="22"
+			filter="user_utc"
+		/>
+
+		<field
+			name="publish_down"
+			type="calendar"
+			label="COM_METAGEN_PROJECT_FIELD_PUBLISH_DOWN_LABEL"
+			translateformat="true"
+			showtime="true"
+			size="22"
+			filter="user_utc"
+		/>
+
+		<field
+			name="catid"
+			type="categoryedit"
+			label="JCATEGORY"
+			extension="COM_METAGEN"
+			addfieldprefix="Joomla\Component\Categories\Administrator\Field"
+			default=""
+		/>
+
+		<field
+			name="access"
+			type="accesslevel"
+			label="JFIELD_ACCESS_LABEL"
+			size="1"
+		/>
+
+		<field
+			name="checked_out"
+			type="hidden"
+			filter="unset"
+		/>
+
+		<field
+			name="checked_out_time"
+			type="hidden"
+			filter="unset"
+		/>
+
+		<field
+			name="ordering"
+			type="ordering"
+			label="JFIELD_ORDERING_LABEL"
+			content_type="COM_METAGEN.metagen"
+		/>
+	</fieldset>
+
+
+	<fieldset name="simple-top-down">
+
+		<field
+				name="languageEntities"
+				type="subform"
+				formsource="administrator/components/com_metagen/forms/LIonCore_M3/languageEntity.xml"
+				multiple="true"
+				buttons="add,remove,move"
+				label="COM_METAGEN_METALANGUAGE_LANGUAGEENTITY_LABEL"
+				id="languageEntities"
+		/>
+
+	</fieldset>
+
+
+	<fieldset name="tab-concept">
+
+		<field
+				name="concept"
+				type="subform"
+				formsource="administrator/components/com_metagen/forms/LIonCore_M3/x_concept.xml"
+				multiple="true"
+				buttons="add,remove"
+				label="Concept"
+				id="concept"
+		/>
+
+	</fieldset>
+
+	<fields name="params" label="JGLOBAL_FIELDSET_DISPLAY_OPTIONS">
+		<fieldset name="display" label="JGLOBAL_FIELDSET_DISPLAY_OPTIONS">
+			<field
+				name="show_name"
+				type="radio"
+				class="switcher"
+				label="COM_METAGEN_PROJECT_FIELD_PARAMS_NAME_LABEL"
+			>
+				<option value="0">JHIDE</option>
+				<option value="1">JSHOW</option>
+			</field>
+
+			<field
+				name="project_layout"
+				type="componentlayout"
+				label="JFIELD_ALT_LAYOUT_LABEL"
+				class="custom-select"
+				extension="COM_METAGEN"
+				view="project"
+				useglobal="true"
+			/>
+		</fieldset>
+	</fields>
+</form>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset
+		addruleprefix="Yepr\Component\Metagen\Administrator\Rule"
+		addfieldprefix="Yepr\Gen\Joomla\Form\Field"
+	>
+		<field
+			name="name"
+			type="text"
+			label="COM_METAGEN_METALANGUAGE_FEATURE_FIELD_NAME_LABEL"
+			id="feature_name"
+			size="20"
+			required="false"
+			class="featureName"
+		 />
+
+		<field
+				name="key"
+				type="text"
+				label="COM_METAGEN_METALANGUAGE_FEATURE_FIELD_KEY_LABEL"
+				size="40"
+		/>
+
+		<field
+				name="is_optional"
+				type="checkbox"
+				label="COM_METAGEN_FEATURE_FIELD_ISOPTIONAL_LABEL"
+				description="COM_METAGEN_FEATURE_FIELD_ISOPTIONAL_DESC"
+		/>
+
+		<!-- A feature is either a Property or a link to another Classifier -->
+		<field
+				name="feature_type"
+				type="radio"
+				default="property"
+				label="COM_METAGEN_FEATURE_FIELD_PROPERTY_OR_LINK_LABEL"
+				description="COM_METAGEN_FEATURE_FIELD_PROPERTY_OR_LINK_DESC"
+		>
+				<option value="Property">COM_METAGEN_FEATURE_FIELD_PROPERTY</option>
+				<option value="Link">COM_METAGEN_FEATURE_FIELD_LINK</option>
+		</field>
+
+		<field
+				name="property"
+				type="subform"
+				formsource="administrator/components/com_metagen/forms/LIonCore_M3/property.xml"
+				label="COM_METAGEN_FEATURE_FIELD_PROPERTY"
+			    id="property"
+				layout="joomla.form.field.subform.default"
+				showon="feature_type:Property"
+		/>
+
+		<field
+				name="link"
+				type="subform"
+				formsource="administrator/components/com_metagen/forms/LIonCore_M3/link.xml"
+				label="COM_METAGEN_FEATURE_FIELD_LINK"
+				id="link"
+				layout="joomla.form.field.subform.default"
+				showon="feature_type:Link"
+		/>
+		<!-- /feature_type-->
+
+		<!-- The key of the classifier this field belongs to -->
+		<field
+			name="classifier_key"
+			type="hidden"
+		/>
+
+		<field
+				name="LIonWeb_key"
+				value="Feature"
+				type="hidden"
+		/>
+
+	</fieldset>
+</form>

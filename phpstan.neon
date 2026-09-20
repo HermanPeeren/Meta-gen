@@ -1,0 +1,100 @@
+includes:
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+
+parameters:
+    # Level 5, the same as Exten-gen. There is no legacy tree here to hold it
+    # down, so this can rise once the component's MVC lands at 2.4 and there is
+    # something to raise it against.
+    level: 5
+
+    paths:
+        - src/administrator/components/com_metagen/src
+        - tests
+        - tools
+
+    # Joomla is reference material: it supplies the base classes the custom form
+    # fields extend. Unpack a Joomla 6 package into /joomla, which is
+    # git-ignored; CI fetches its own.
+    #
+    # Libraries only. A development machine's /joomla is usually a working site
+    # with extensions installed in it, and scanning those means the analysis
+    # resolves classes CI cannot see - which is not analysis, it is a local
+    # accident. It masked two failures before this line was narrowed.
+    scanDirectories:
+        - joomla/libraries
+
+    bootstrapFiles:
+        - tools/phpstan-bootstrap.php
+
+    excludePaths:
+        # The shared library is installed into the development site as well as
+        # required through composer, and the two are only the same version
+        # until one of them is updated. Scanning both means analysing against
+        # whichever copy the analyser happens to resolve first, which showed up
+        # as "undefined constant Binding::KINDS" against a constant that very
+        # much exists. Composer's copy is the one the tests run against, so it
+        # is the one that counts.
+        #
+        # A glob, not the directory: PHPStan errors on an excludePath that does
+        # not exist, and on CI it does not - a freshly fetched Joomla has no
+        # extensions installed in it. A wildcard that matches nothing is fine.
+        analyseAndScan:
+            - joomla/libraries/yepr_gen/*
+
+
+    treatPhpDocTypesAsCertain: false
+
+    # This tree came from Exten-gen when Meta-gen was split out of it, and
+    # these exceptions came with it. Each is Joomla's own shape rather than
+    # this project's mistake, and core writes every one of them itself.
+    # This tree came from Exten-gen when Meta-gen was split out of it, and
+    # these exceptions came with it. Each is Joomla's own shape rather than
+    # this project's mistake, and core writes every one of them itself.
+    ignoreErrors:
+        # setError() inside a Table's check() is not debt, it is the migration
+        # path. Joomla 6's LegacyErrorHandlingTrait::setError() reads
+        # `if ($this->useExceptions && is_string($error)) throw ...`, so whether
+        # a failed check reports or throws is the caller's choice, made with
+        # setUseExceptions(true) - which the list views here now do. A table
+        # that threw on its own would escape AdminModel::save(), which inspects
+        # `if (!$table->check())` and turns a refused save into a message on
+        # the form. Every core Joomla 6 table writes it this way: com_banners,
+        # com_contact, com_menus and com_newsfeeds all call setError() in
+        # check(). These go when Joomla's own tables do.
+        # And its counterpart. setUseExceptions() carries the deprecation notice
+        # of the trait it lives on - the whole legacy error mechanism goes in
+        # 7.0 - but calling it is how a caller opts out of that mechanism, and
+        # com_content's Articles view opens with exactly this line.
+        -
+            message: '#Call to deprecated method setUseExceptions\(\) of class Joomla\\CMS\\MVC\\Model\\BaseModel#'
+            path: src/administrator/components/com_metagen/src/View/*/HtmlView.php
+
+        -
+            message: '#Call to deprecated method setError\(\) of class Joomla\\CMS\\Table\\Table#'
+            path: src/administrator/components/com_metagen/src/Table/*.php
+
+        # Two entries, one cause: Joomla declares a method's return as the
+        # parent type and hands back the child, so a perfectly ordinary call
+        # looks undefined. Core writes both of these itself, which is the test
+        # of whether an exception here is the framework's shape or this
+        # project's mistake.
+        #
+        # An administrator view's document is an HtmlDocument - that is what
+        # renders the page - but AbstractView::getDocument() is typed to
+        # Document. com_content's Articles view writes
+        # `$this->getDocument()->getToolbar()`.
+        -
+            message: '#Call to an undefined method Joomla\\CMS\\Document\\Document::getToolbar\(\)#'
+
+        # Joomla docblocks that are narrower than the code beneath them.
+        # `Associations::getAssociations()` types $aliasField as string and
+        # says, in the same docblock, "Null to not use it" - and the body reads
+        # `if (!empty($aliasField))`. `getContentLanguages()` types
+        # $publishedStates as array and opens with `elseif ($publishedStates
+        # === false)`. Core passes exactly these values: com_content's
+        # ArticleModel calls `getContentLanguages(false, false, null, ...)`.
+        -
+            message: '#Parameter \#6 \$aliasField of static method Joomla\\CMS\\Language\\Associations::getAssociations\(\) expects string, null given#'
+        -
+            message: '#Parameter \#(1 \$publishedStates|3 \$pivot) of static method Joomla\\CMS\\Language\\LanguageHelper::getContentLanguages\(\) expects (array, false|string, null) given#'
+

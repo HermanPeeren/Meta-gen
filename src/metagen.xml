@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<extension type="component" method="upgrade">
+	<name>com_metagen</name>
+	<creationDate>20-09-2026</creationDate>
+	<author>Herman Peeren</author>
+	<authorEmail>herman@yepr.nl</authorEmail>
+	<authorUrl>https://yepr.nl</authorUrl>
+	<copyright>Yepr, Herman Peeren, 2026</copyright>
+	<license>GNU General Public License version 3 or later;</license>
+	<version>0.1.0</version>
+	<description>COM_METAGEN_XML_DESCRIPTION</description>
+	<namespace path="src">Yepr\Component\Metagen</namespace>
+	<scriptfile>script.php</scriptfile>
+	<install>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+		</sql>
+	</install>
+	<uninstall>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
+		</sql>
+	</uninstall>
+	<update>
+		<schemas>
+			<schemapath type="mysql">sql/updates/mysql</schemapath>
+		</schemas>
+	</update>
+	<administration>
+		<menu view="metalanguages">COM_METAGEN</menu>
+		<files folder="administrator/components/com_metagen">
+			<filename>access.xml</filename>
+			<filename>config.xml</filename>
+			<folder>forms</folder>
+			<folder>language</folder>
+			<folder>services</folder>
+			<folder>sql</folder>
+			<folder>src</folder>
+			<folder>tmpl</folder>
+		</files>
+	</administration>
+	<updateservers>
+		<server type="extension" name="Meta-gen Updates">https://raw.githubusercontent.com/HermanPeeren/Meta-gen/main/updates.xml</server>
+	</updateservers>
+</extension>

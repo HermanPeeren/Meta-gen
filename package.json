@@ -1,0 +1,13 @@
+{
+  "name": "meta-gen",
+  "private": true,
+  "type": "module",
+  "description": "Browser tests for the component: what needs a running Joomla to be true.",
+  "scripts": {
+    "cypress": "cypress run",
+    "cypress:open": "cypress open"
+  },
+  "devDependencies": {
+    "cypress": "^15.21.1"
+  }
+}
