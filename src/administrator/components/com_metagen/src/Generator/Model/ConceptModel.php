@@ -136,6 +136,38 @@ final class ConceptModel implements ModelInterface
     }
 
     /**
+     * The language's version, as somebody typed it on the root form.
+     *
+     * Free text rather than a checked semantic version, because that is what
+     * the field is. A language with none is `0.0.0` by the time it reaches a
+     * package; deciding that here would hide an empty field from the screen
+     * that could ask about it.
+     *
+     * @since  1.3.0
+     */
+    public function version(): string
+    {
+        $version = $this->data->version ?? '';
+
+        return \is_scalar($version) ? trim((string) $version) : '';
+    }
+
+    /**
+     * The language as it is stored, which is what a package carries.
+     *
+     * The same object `fromObject()` was given: a package holds the model it
+     * generated from so that a language which arrives somewhere can be
+     * regenerated there, and a model rebuilt from the parts would be a
+     * different thing wearing the same name.
+     *
+     * @since  1.3.0
+     */
+    public function stored(): object
+    {
+        return $this->data;
+    }
+
+    /**
      * Every classifier in the language, in the order it was modelled.
      *
      * @return array<string, Classifier>  Keyed by the classifier's key.

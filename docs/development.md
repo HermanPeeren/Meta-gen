@@ -27,6 +27,7 @@ src/
     src/Generator/Model/                  a metalanguage, as a type
     src/Generator/Meta/                   the forms generator
     src/Generator/Target/                 what runs
+    src/Package/                          what a metalanguage package is, and reading one
     src/Reference/LionCoreM3.php          what M3 offers a reference dropdown
     src/{Controller,Model,Table,View}/    the CRUD around a stored metalanguage
     tmpl/ language/ services/ sql/
@@ -109,6 +110,59 @@ without a word. No exception, no tag in the head — and every dropdown keeps
 whatever the server rendered, which looks like a working form until somebody
 adds a row. That is the same silent failure 3.1 spent a step on, arriving by a
 new route.
+
+## What a metalanguage package is
+
+A zip, produced by the Export button in the list and by the generate screen,
+holding one language and everything needed to edit a model written in it.
+
+```
+manifest.json                 the language, its version, its root classifier, a hash per file
+model.json                    the concept model it was generated from
+forms/<classifier>.xml        one form per classifier
+forms/references.json         the table the reference dropdowns read
+language/en-GB/<lang>.ini     every label on those forms
+```
+
+**Nothing in it names a component.** A package is consumed by com_extengen
+*and* by com_gengen, so a language key spelled `COM_EXTENGEN_*` is wrong
+whichever of the two loads it — and so is a path under
+`administrator/components/com_metagen/`, which is where 3.2 put every generated
+file. Constants are scoped by the language instead: `YEPR_LIONCORE_M3_*`.
+
+**It declares where it expects to live, and it has to.** Joomla resolves a
+subform's `formsource` as `JPATH_ROOT . '/' . $formsource`
+(`SubformField::__set()`) and nothing else — there is no package-relative
+spelling — so the install directory is baked into the XML at generation time.
+It is
+
+```
+media/yepr_metalanguages/<language>/<version>/
+```
+
+`media/` because it is the one shared site directory no single extension's
+uninstall owns; `<language>/<version>/` because from 3.4 on a project records
+both, which only means anything if two versions can sit side by side.
+Installing is then a plain unpack with no XML rewritten on the way in, which is
+what makes the round-trip worth proving: the forms that run are the bytes that
+were generated. The root is *recorded* in the manifest rather than assumed, so
+an importer that has to put a language elsewhere can see the mismatch and
+regenerate instead of unpacking a set of forms whose subforms all point at a
+directory that is not there.
+
+**The manifest hashes every other file**, which is the only way "the forms in
+it are the forms the generator produced" is a question with an answer. The
+failure it stands for is a truncated download: a form file missing its last
+bytes still parses far enough for Joomla to render a fieldset with nothing in
+it, and reports nothing anywhere.
+
+`PackageReader` reads one back, from a zip or from an unpacked tree, and
+`problems()` lists what is wrong with it rather than throwing on the first
+thing — a person choosing a file to import wants to be told what is wrong with
+the one they picked. It lives here for now and will not stay: Exten-gen and
+Gen-gen both read a package at 3.4, and a format two components read is a
+mechanism, which belongs in `Yepr\Gen\Core` by the same argument that moved
+the reference dropdown there.
 
 ## The development site
 

@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Yepr\Component\Metagen\Administrator\Generator\Target;
 
 use Yepr\Component\Metagen\Administrator\Generator\Meta\Forms;
+use Yepr\Component\Metagen\Administrator\Generator\Meta\PackageFiles;
 use Yepr\Gen\Core\GeneratorInterface;
 use Yepr\Gen\Core\Model\ValidatorInterface;
 use Yepr\Gen\Core\Target\TargetInterface;
@@ -78,12 +79,18 @@ final class MetaFormsTarget implements TargetInterface
     /**
      * The generators, in the order they run.
      *
+     * The order matters, which is not true of every target: `PackageFiles`
+     * writes a manifest hashing everything already in the collection, so it
+     * has to be last. First, it would describe an empty package and nothing
+     * would complain - every hash in the manifest would be correct, because
+     * there would be none of them.
+     *
      * @return GeneratorInterface[]
      *
      * @since  1.2.0
      */
     public function generators(): array
     {
-        return [new Forms()];
+        return [new Forms(), new PackageFiles()];
     }
 }

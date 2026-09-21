@@ -116,6 +116,9 @@ if ($saveOrder && !empty($this->items))
                                     <a class="btn btn-info dynbutton"  data-bs-toggle="modal"  href="#generationModal" data-href="<?php echo Uri::root(); ?>administrator/index.php?option=com_metagen&view=generateForms&tmpl=component&metalanguage_id=<?php echo $item->id; ?>">
 										<?php echo Text::_('COM_METAGEN_BUTTON_GENERATE'); ?>
                                     </a>
+                                    <a class="btn btn-secondary" href="<?php echo Route::_('index.php?option=com_metagen&task=metalanguage.export&id=' . (int) $item->id . '&' . Session::getFormToken() . '=1'); ?>">
+										<?php echo Text::_('COM_METAGEN_BUTTON_EXPORT'); ?>
+                                    </a>
                                 </td>
 								<td class="d-none d-md-table-cell">
 									<?php echo $item->id; ?>

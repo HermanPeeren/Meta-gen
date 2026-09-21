@@ -10,6 +10,7 @@ use Yepr\Component\Metagen\Administrator\Generator\Meta\FormXml;
 use Yepr\Component\Metagen\Administrator\Generator\Meta\LanguageStructure;
 use Yepr\Component\Metagen\Administrator\Generator\Meta\ReferenceTable;
 use Yepr\Component\Metagen\Administrator\Generator\Model\ConceptModel;
+use Yepr\Component\Metagen\Administrator\Package\MetalanguagePackage;
 use Yepr\Gen\Core\Output\FileCollection;
 
 /**
@@ -67,7 +68,7 @@ final class MetaFormsTest extends TestCase
      */
     private function form(string $name): \SimpleXMLElement
     {
-        $path  = FormXml::FORM_ROOT . 'LIonCore_M3/' . $name . '.xml';
+        $path  = MetalanguagePackage::FORMS . $name . '.xml';
         $files = $this->generate();
 
         $this->assertArrayHasKey($path, $files, $name . '.xml was not generated at all.');
@@ -139,6 +140,7 @@ final class MetaFormsTest extends TestCase
             'language.xml',
             'languageEntity.xml',
             'link.xml',
+            'lioncore_m3.ini',
             'primitiveType.xml',
             'property.xml',
             'reference.xml',
@@ -365,6 +367,7 @@ final class MetaFormsTest extends TestCase
     {
         $files   = $this->generate();
         $missing = [];
+        $root    = MetalanguagePackage::installRoot('LIonCore_M3', '2023.1');
 
         foreach ($files as $path => $contents) {
             if (!str_ends_with($path, '.xml')) {
@@ -376,7 +379,19 @@ final class MetaFormsTest extends TestCase
             foreach (($xml === false ? [] : $xml->xpath('//field[@formsource]')) ?: [] as $field) {
                 $source = (string) $field['formsource'];
 
-                if (!isset($files[$source])) {
+                // Joomla resolves a `formsource` against JPATH_ROOT and
+                // nothing else, so every one of these is the directory the
+                // package declares it will be unpacked into, plus a path
+                // inside it. A source that does not start with that root is a
+                // subform pointing outside its own package, which is the worse
+                // half of what this rule is for.
+                if (!str_starts_with($source, $root)) {
+                    $missing[] = basename($path) . ' -> ' . $source . ' (outside the package)';
+
+                    continue;
+                }
+
+                if (!isset($files[substr($source, \strlen($root))])) {
                     $missing[] = basename($path) . ' -> ' . $source;
                 }
             }
@@ -434,7 +449,7 @@ final class MetaFormsTest extends TestCase
      */
     public function testTheReferenceTableIsWrittenBesideTheForms(): void
     {
-        $path  = FormXml::FORM_ROOT . 'LIonCore_M3/' . Forms::TABLE_FILE;
+        $path  = Forms::TABLE_FILE;
         $files = $this->generate();
 
         $this->assertArrayHasKey($path, $files);
@@ -469,7 +484,10 @@ final class MetaFormsTest extends TestCase
 
         sort($names);
 
-        $this->assertSame(['deprecated.xml', 'entity.xml', 'field.xml', 'iNamed.xml', 'references.json'], $names);
+        $this->assertSame(
+            ['deprecated.xml', 'entity.xml', 'er1.ini', 'field.xml', 'iNamed.xml', 'references.json'],
+            $names
+        );
 
         // And it says what it could not do, rather than producing it silently.
         $this->assertNotEmpty(

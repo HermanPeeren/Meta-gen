@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Yepr\Component\Metagen\Administrator\Generator\Meta;
 
 use Yepr\Component\Metagen\Administrator\Generator\Model\ConceptModel;
+use Yepr\Component\Metagen\Administrator\Package\MetalanguagePackage;
 use Yepr\Gen\Core\GeneratorInterface;
 use Yepr\Gen\Core\Model\ModelInterface;
 use Yepr\Gen\Core\Output\FileCollection;
@@ -55,7 +56,7 @@ final class Forms implements GeneratorInterface
      *
      * @since  1.2.0
      */
-    public const TABLE_FILE = 'references.json';
+    public const TABLE_FILE = MetalanguagePackage::REFERENCES;
 
     /**
      * What this generator produced, in the words shown to the user.
@@ -92,7 +93,13 @@ final class Forms implements GeneratorInterface
         $structure = LanguageStructure::of($model);
         $table     = new ReferenceTable($structure);
         $built     = $table->build();
-        $forms     = new FormXml($structure, $this->directoryName($model));
+        $strings   = new LanguageStrings();
+        $forms     = new FormXml(
+            $structure,
+            MetalanguagePackage::slug($model->name()),
+            MetalanguagePackage::installRoot($model->name(), $model->version()),
+            $strings
+        );
 
         $this->log = ['<b>=== FORMS FOR ' . $model->name() . ' ===</b>'];
 
@@ -103,7 +110,7 @@ final class Forms implements GeneratorInterface
         }
 
         $files->add(
-            FormXml::FORM_ROOT . $this->directoryName($model) . '/' . self::TABLE_FILE,
+            self::TABLE_FILE,
             // Pretty-printed and with slashes left alone: this is read by a
             // person as often as by the component, and an escaped path in a
             // `formsource` is unreadable for no gain.
@@ -112,7 +119,17 @@ final class Forms implements GeneratorInterface
 
         $this->log[] = self::TABLE_FILE . ' generated, describing ' . \count($built) . ' reference types';
 
+        // Last, because every constant it holds was collected while the forms
+        // above were built. Before 3.3 there was no file here at all, and so
+        // every generated label rendered as its own constant name.
+        $language = MetalanguagePackage::languagePath($model->name());
+
+        $files->add($language, $strings->render($model->name() . ' ' . $model->version()));
+
+        $this->log[] = $language . ' generated, holding ' . $strings->count() . ' strings';
+
         $this->reportGaps($structure, $table);
+        $this->reportClashes($strings);
     }
 
     /**
@@ -155,17 +172,20 @@ final class Forms implements GeneratorInterface
     }
 
     /**
-     * The directory a language's generated forms are filed under.
+     * Say out loud where one constant was asked for two different labels.
      *
-     * The language's own name, with anything that is not a plain name taken
-     * out: it becomes a path, and a model may be called anything at all.
+     * Two features of one classifier sharing a name is the only way to get
+     * here, and `featuresOf()` already lets a redeclared feature win - so this
+     * is the case it cannot resolve: one of the two labels ends up on screen
+     * and which one is not decidable from the model.
      *
-     * @since  1.2.0
+     * @since  1.3.0
      */
-    private function directoryName(ConceptModel $model): string
+    private function reportClashes(LanguageStrings $strings): void
     {
-        $name = (string) preg_replace('/[^A-Za-z0-9_-]+/', '', $model->name());
-
-        return $name === '' ? 'unnamed' : $name;
+        foreach ($strings->clashes() as $constant => $texts) {
+            $this->log[] = 'warning: ' . $constant . ' was given more than one label ("'
+                . implode('", "', $texts) . '"); the first is the one on screen';
+        }
     }
 }

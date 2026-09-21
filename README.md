@@ -57,8 +57,11 @@ too.
 
 ## Status
 
-0.1.0, and early. It generates; it does not yet export. What is missing is the
-package a generated language travels in — see the shared
+0.1.0, and unreleased. It generates a language's forms and exports them as a
+package — a zip holding the concept model, the forms, the reference table, a
+language file and a manifest naming the language, its version and its root
+classifier. Nothing imports one yet: that is Exten-gen's and Gen-gen's side,
+and it is the next step in the shared
 [rework plan](https://github.com/HermanPeeren/Exten-gen/blob/main/docs/rework-plan.md),
 stage 3.
 

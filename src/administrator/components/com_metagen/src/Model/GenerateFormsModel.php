@@ -16,6 +16,7 @@ use Joomla\CMS\MVC\Model\AdminModel;
 use Yepr\Component\Metagen\Administrator\Generator\Meta\Forms;
 use Yepr\Component\Metagen\Administrator\Generator\Model\ConceptModel;
 use Yepr\Component\Metagen\Administrator\Generator\Target\MetaFormsTarget;
+use Yepr\Component\Metagen\Administrator\Package\MetalanguagePackage;
 use Yepr\Component\Metagen\Administrator\Repository\MetalanguageRepository;
 use Yepr\Gen\Core\Output\FileCollection;
 use Yepr\Gen\Core\Output\ZipWriter;
@@ -77,9 +78,29 @@ class GenerateFormsModel extends AdminModel
      */
     public function generate(): void
     {
-        $model  = $this->loadConceptModel();
-        $target = new MetaFormsTarget();
+        $model = $this->loadConceptModel();
 
+        $this->write($this->package($model), $model);
+    }
+
+    /**
+     * The package for this language, in memory.
+     *
+     * Separated from `generate()` at 3.3 because exporting and generating are
+     * the same run with a different destination - one writes the archive under
+     * the component and hands back a log, the other hands the bytes to a
+     * browser. Two code paths producing "the package" would be two package
+     * formats the day one of them changed.
+     *
+     * @param   ConceptModel|null  $model  The language, when the caller has already read it.
+     *
+     * @return  FileCollection
+     */
+    public function package(?ConceptModel $model = null): FileCollection
+    {
+        $model ??= $this->loadConceptModel();
+
+        $target     = new MetaFormsTarget();
         $generators = $target->generators();
 
         $files = (new Pipeline())->run($model, new Target(
@@ -98,7 +119,34 @@ class GenerateFormsModel extends AdminModel
             }
         }
 
-        $this->write($files, $model);
+        return $files;
+    }
+
+    /**
+     * What a downloaded package is called.
+     *
+     * The language and its version, which is what identifies one - 3.4 has a
+     * project record both - so two exports of one language are two files in a
+     * downloads folder rather than one overwriting the other.
+     *
+     * @param   ConceptModel  $model  The language.
+     *
+     * @return  string
+     */
+    public function packageName(ConceptModel $model): string
+    {
+        return MetalanguagePackage::slug($model->name())
+            . '-' . MetalanguagePackage::versionSlug($model->version()) . '.zip';
+    }
+
+    /**
+     * The stored metalanguage, as a language, for a caller that needs it too.
+     *
+     * @return  ConceptModel
+     */
+    public function conceptModel(): ConceptModel
+    {
+        return $this->loadConceptModel();
     }
 
     /**
@@ -119,8 +167,10 @@ class GenerateFormsModel extends AdminModel
      */
     private function write(FileCollection $files, ConceptModel $model): void
     {
-        $name      = preg_replace('/[^A-Za-z0-9_-]+/', '', $model->name()) ?: 'unnamed';
-        $generated = JPATH_ROOT . '/administrator/components/com_metagen/generated/metalanguages/' . $name;
+        $name      = MetalanguagePackage::slug($model->name());
+        $version   = MetalanguagePackage::versionSlug($model->version());
+        $generated = JPATH_ROOT . '/administrator/components/com_metagen/generated/metalanguages/'
+            . $name . '/' . $version;
 
         // The tree, not its parent: `ZipWriter::writeToDirectory()` refuses a
         // root that is not there rather than creating one, which is what keeps
@@ -132,7 +182,7 @@ class GenerateFormsModel extends AdminModel
         }
 
         $writer  = new ZipWriter();
-        $archive = $generated . '/' . $name . '-forms.zip';
+        $archive = $generated . '/' . $this->packageName($model);
 
         $writer->write($files, $archive);
         $writer->writeToDirectory($files, $tree);

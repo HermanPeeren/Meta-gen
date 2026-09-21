@@ -16,6 +16,7 @@ use DOMDocument;
 use DOMElement;
 use Yepr\Component\Metagen\Administrator\Generator\Model\Classifier;
 use Yepr\Component\Metagen\Administrator\Generator\Model\Feature;
+use Yepr\Component\Metagen\Administrator\Package\MetalanguagePackage;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -41,13 +42,6 @@ use Yepr\Component\Metagen\Administrator\Generator\Model\Feature;
 final class FormXml
 {
     /**
-     * Where a form for a modelled language lives on a Joomla site.
-     *
-     * @since  1.2.0
-     */
-    public const FORM_ROOT = 'administrator/components/com_metagen/forms/generated/';
-
-    /**
      * The prefix the generated forms register for custom field types and rules.
      *
      * Generated forms use `type="Reference"`, which is the shared library's
@@ -63,13 +57,6 @@ final class FormXml
      * @since  1.2.0
      */
     public const FIELD_PREFIX = 'Yepr\\Gen\\Joomla\\Form\\Field';
-
-    /**
-     * The prefix for validation rules.
-     *
-     * @since  1.2.0
-     */
-    public const RULE_PREFIX = 'Yepr\\Component\\Metagen\\Administrator\\Rule';
 
     /**
      * How a primitive type's name becomes a Joomla input.
@@ -106,12 +93,16 @@ final class FormXml
     /**
      * @param  LanguageStructure  $structure     The language, laid out as forms.
      * @param  string             $languageName  What the generated set is filed under.
+     * @param  string             $installRoot   Where the package expects to be unpacked, from the site root.
+     * @param  LanguageStrings    $strings       Collects the text behind every constant emitted here.
      *
      * @since  1.2.0
      */
     public function __construct(
         private readonly LanguageStructure $structure,
-        private readonly string $languageName
+        private readonly string $languageName,
+        private readonly string $installRoot,
+        private readonly LanguageStrings $strings
     ) {
     }
 
@@ -122,7 +113,24 @@ final class FormXml
      */
     public function pathFor(Classifier $classifier): string
     {
-        return self::FORM_ROOT . $this->languageName . '/' . lcfirst($classifier->name) . '.xml';
+        return MetalanguagePackage::formPath($classifier->name);
+    }
+
+    /**
+     * The same form, spelled the way a `formsource` attribute has to spell it.
+     *
+     * Joomla resolves a `formsource` ending in `.xml` as
+     * `JPATH_ROOT . '/' . $formsource` and nothing else, so a subform cannot
+     * point at a sibling by a package-relative path. Every one of these is the
+     * directory the package declares it will be unpacked into, plus the path
+     * inside it - which is why `MetalanguagePackage` has to decide that
+     * directory at all, and why the manifest records it.
+     *
+     * @since  1.3.0
+     */
+    public function formSourceFor(Classifier $classifier): string
+    {
+        return $this->installRoot . $this->pathFor($classifier);
     }
 
     /**
@@ -142,7 +150,14 @@ final class FormXml
 
         $fieldset = $document->createElement('fieldset');
 
-        $fieldset->setAttribute('addruleprefix', self::RULE_PREFIX);
+        // No `addruleprefix`. 3.2 emitted one naming this component's own
+        // `Rule` namespace, and there are two things wrong with that: a
+        // package is loaded by com_extengen and com_gengen, where that prefix
+        // resolves to nothing, and there is no such namespace in *this*
+        // component either - the directory has never existed. A modelled
+        // language cannot name a validation rule at all; that is one of the
+        // three model gaps 4.2 names, and an attribute pointing at an empty
+        // namespace is not a head start on closing it.
         $fieldset->setAttribute('addfieldprefix', self::FIELD_PREFIX);
 
         $form->appendChild($fieldset);
@@ -194,7 +209,7 @@ final class FormXml
         // why `classifier_type` in the hand-written meta-model offers Concept,
         // ConceptInterface and Annotation and not Classifier.
         $radio->setAttribute('default', $classifier->abstract ? $subtypes[0]->name : $classifier->name);
-        $radio->setAttribute('label', $this->label($classifier, $this->structure->discriminatorOf($classifier)));
+        $radio->setAttribute('label', $this->discriminatorLabel($classifier));
 
         if (!$classifier->abstract) {
             $own = $document->createElement('option', $this->typeLabel($classifier, $classifier));
@@ -220,8 +235,15 @@ final class FormXml
 
             $field->setAttribute('name', $group);
             $field->setAttribute('type', 'subform');
-            $field->setAttribute('formsource', $this->pathFor($subtype));
+            $field->setAttribute('formsource', $this->formSourceFor($subtype));
             $field->setAttribute('label', $this->typeLabel($classifier, $subtype));
+
+            $description = $this->description($classifier, $subtype->name, $subtype->description);
+
+            if ($description !== null) {
+                $field->setAttribute('description', $description);
+            }
+
             $field->setAttribute('id', $group);
             $field->setAttribute('layout', 'joomla.form.field.subform.default');
             $field->setAttribute('showon', $this->structure->discriminatorOf($classifier) . ':' . $subtype->name);
@@ -263,7 +285,13 @@ final class FormXml
             return null;
         }
 
-        $field->setAttribute('label', $this->label($owner, $feature->name));
+        $field->setAttribute('label', $this->featureLabel($owner, $feature));
+
+        $description = $this->description($owner, $feature->name, $feature->description);
+
+        if ($description !== null) {
+            $field->setAttribute('description', $description);
+        }
 
         if (!$feature->optional && $feature->isProperty()) {
             $field->setAttribute('required', 'true');
@@ -327,7 +355,7 @@ final class FormXml
         }
 
         $field->setAttribute('type', 'subform');
-        $field->setAttribute('formsource', $this->pathFor($target));
+        $field->setAttribute('formsource', $this->formSourceFor($target));
         $field->setAttribute('id', $feature->name);
 
         if ($feature->multiple) {
@@ -394,13 +422,21 @@ final class FormXml
     }
 
     /**
-     * The language string for a field's label.
+     * The language string for one feature's label, and the words behind it.
+     *
+     * The constant is returned and the text is handed to the collector in the
+     * same call, because this is the only place that has both. A generator
+     * that emitted constants here and gathered text somewhere else would have
+     * two lists that agree until somebody renames a feature.
      *
      * @since  1.2.0
      */
-    private function label(Classifier $owner, string $field): string
+    private function featureLabel(Classifier $owner, Feature $feature): string
     {
-        return $this->constantName([$this->languageName, $owner->name, 'FIELD', $field, 'LABEL']);
+        return $this->strings->add(
+            $this->constantName([$this->languageName, $owner->name, 'FIELD', $feature->name, 'LABEL']),
+            $feature->displayLabel()
+        );
     }
 
     /**
@@ -410,17 +446,73 @@ final class FormXml
      */
     private function typeLabel(Classifier $owner, Classifier $subtype): string
     {
-        return $this->constantName([$this->languageName, $owner->name, 'FIELD', $subtype->name, 'LABEL']);
+        return $this->strings->add(
+            $this->constantName([$this->languageName, $owner->name, 'FIELD', $subtype->name, 'LABEL']),
+            $subtype->displayLabel()
+        );
     }
 
     /**
+     * The language string on the radio that says which kind of thing a row is.
+     *
+     * `Classifier type`, the way the hand-written meta-model spells it - which
+     * matters because 3.5 compares the two sets as golden files, and a
+     * difference in wording is one more line of that table to argue about.
+     *
+     * @since  1.3.0
+     */
+    private function discriminatorLabel(Classifier $classifier): string
+    {
+        return $this->strings->add(
+            $this->constantName([
+                $this->languageName,
+                $classifier->name,
+                'FIELD',
+                $this->structure->discriminatorOf($classifier),
+                'LABEL',
+            ]),
+            $classifier->displayLabel() . ' type'
+        );
+    }
+
+    /**
+     * The language string for a description, or null when there is none.
+     *
+     * A description is optional in the model and optional on the form: an
+     * empty `description` attribute is not nothing, it is a tooltip that opens
+     * onto blank space.
+     *
+     * @since  1.3.0
+     */
+    private function description(Classifier $owner, string $field, string $text): ?string
+    {
+        if (trim($text) === '') {
+            return null;
+        }
+
+        return $this->strings->add(
+            $this->constantName([$this->languageName, $owner->name, 'FIELD', $field, 'DESC']),
+            $text
+        );
+    }
+
+    /**
+     * A constant naming the language rather than the component it came from.
+     *
+     * **Not `COM_METAGEN_`, and not `COM_EXTENGEN_` either.** 3.2 left this
+     * open and 3.3 settled it: a package is consumed by com_extengen *and* by
+     * com_gengen, so a key naming one of them is wrong whichever one it names.
+     * The language is what the strings belong to, so the language is what they
+     * are scoped by, and `YEPR_` in front keeps a modelled language called
+     * `Content` from overwriting somebody else's `CONTENT_*`.
+     *
      * @param  string[]  $parts
      *
      * @since  1.2.0
      */
     private function constantName(array $parts): string
     {
-        $constant = 'COM_METAGEN_' . strtoupper(implode('_', $parts));
+        $constant = 'YEPR_' . strtoupper(implode('_', $parts));
 
         return (string) preg_replace('/[^A-Z0-9_]/', '_', $constant);
     }
