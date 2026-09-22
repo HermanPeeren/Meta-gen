@@ -130,6 +130,7 @@ final class Forms implements GeneratorInterface
 
         $this->reportGaps($structure, $table);
         $this->reportClashes($strings);
+        $this->reportFeatureClashes($model);
     }
 
     /**
@@ -186,6 +187,32 @@ final class Forms implements GeneratorInterface
         foreach ($strings->clashes() as $constant => $texts) {
             $this->log[] = 'warning: ' . $constant . ' was given more than one label ("'
                 . implode('", "', $texts) . '"); the first is the one on screen';
+        }
+    }
+
+    /**
+     * Say out loud where one form field would have had to hold two features.
+     *
+     * `reportClashes()` catches the half of this that reaches a language file:
+     * two features of one name whose *labels* differ, which is visible because
+     * one constant was asked for two texts. This is the other half, and it left
+     * no trace at all - same name, same label or none on either - so the second
+     * feature simply stopped existing on the way to the form.
+     *
+     * Nobody has to write anything twice to cause it. A concept implementing
+     * several interfaces gathers every feature of all of them, and the language
+     * is the only place the collision is visible.
+     *
+     * @since  1.3.0
+     */
+    private function reportFeatureClashes(ConceptModel $model): void
+    {
+        foreach ($model->classifiers() as $classifier) {
+            foreach ($model->featureNameClashes($classifier) as $name => $keys) {
+                $this->log[] = 'warning: ' . $classifier->name . ' has ' . \count($keys)
+                    . ' different features named ' . $name . ' (' . implode(', ', $keys)
+                    . '); one field cannot hold them all, so the last is the one generated';
+            }
         }
     }
 }

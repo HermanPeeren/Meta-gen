@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yepr\Component\Metagen\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use Yepr\Component\Metagen\Administrator\Generator\Model\Classifier;
 use Yepr\Component\Metagen\Administrator\Generator\Model\ConceptModel;
 
 /**
@@ -270,5 +271,202 @@ final class ConceptModelTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         ConceptModel::fromJson('[]');
+    }
+
+    // -- one name, two features ----------------------------------------------
+
+    /**
+     * A language of interfaces and one concept implementing them.
+     *
+     * Written out rather than added to `er1.json`, because the fixtures are
+     * what a real metalanguage looks like and these are the shapes a real one
+     * should not have.
+     *
+     * @param  array<string, array{key: string, name: string}[]>  $interfaces
+     * @param  array{key: string, name: string}[]                 $own
+     */
+    private function implementing(array $interfaces, array $own = []): ConceptModel
+    {
+        // Keyed `feature0`, `feature1`, because that is how Joomla stores a
+        // repeating group and the reader insists on it.
+        $group = static function (array $features): array {
+            $rows = [];
+
+            foreach ($features as $position => $f) {
+                $rows['feature' . $position] = [
+                    'name'         => $f['name'],
+                    'key'          => $f['key'],
+                    'feature_type' => 'Property',
+                    'property'     => ['type' => 'dt-string'],
+                ];
+            }
+
+            return $rows;
+        };
+
+        $entities = [];
+        $index    = 0;
+
+        foreach ($interfaces as $key => $features) {
+            $entities['languageEntities' . $index++] = [
+                'name'                => ucfirst(ltrim($key, 'ci-')),
+                'key'                 => $key,
+                'languageEntity_type' => 'Classifier',
+                'classifier'          => [
+                    'classifier_type'  => 'ConceptInterface',
+                    'conceptInterface' => ['extends' => ''],
+                    'feature'          => $group($features),
+                ],
+            ];
+        }
+
+        $implements = [];
+
+        foreach (array_keys($interfaces) as $position => $key) {
+            $implements['implements' . $position] = ['conceptInterface' => $key];
+        }
+
+        $entities['languageEntities' . $index] = [
+            'name'                => 'Thing',
+            'key'                 => 'c-thing',
+            'languageEntity_type' => 'Classifier',
+            'classifier'          => [
+                'classifier_type' => 'Concept',
+                'concept'         => ['extends' => '', 'implements' => $implements],
+                'feature'         => $group($own),
+            ],
+        ];
+
+        return ConceptModel::fromJson(
+            (string) json_encode(['name' => 'Clash', 'languageEntities' => $entities])
+        );
+    }
+
+    private function thing(ConceptModel $model): Classifier
+    {
+        $thing = $model->classifier('c-thing');
+
+        $this->assertNotNull($thing);
+
+        return $thing;
+    }
+
+    /**
+     * A diamond is one feature, because one key is one feature.
+     *
+     * Two interfaces that both carry the same feature - the same key, because
+     * it is the same feature - meet on a concept implementing both. Reaching it
+     * twice does not make it two, and a form must not offer it twice.
+     */
+    public function testAFeatureReachedTwiceIsStillOneFeature(): void
+    {
+        $shared = [['key' => 'f-name', 'name' => 'name']];
+        $model  = $this->implementing(['ci-one' => $shared, 'ci-two' => $shared]);
+        $thing  = $this->thing($model);
+
+        $this->assertSame(
+            ['name'],
+            array_map(static fn ($f): string => $f->name, $model->featuresOf($thing))
+        );
+        $this->assertSame([], $model->featureNameClashes($thing));
+    }
+
+    /**
+     * Two genuinely different features under one name are reported.
+     *
+     * This is what deduplicating by name could not see: the keys differ, so
+     * these are two features, and a form has one field for them. Before the
+     * clash was recorded the second one simply stopped existing somewhere
+     * between the language and the form, and nothing said so.
+     */
+    public function testTwoDifferentFeaturesUnderOneNameAreReported(): void
+    {
+        $model = $this->implementing([
+            'ci-one' => [['key' => 'f-one-name', 'name' => 'name']],
+            'ci-two' => [['key' => 'f-two-name', 'name' => 'name']],
+        ]);
+        $thing = $this->thing($model);
+
+        $this->assertSame(
+            ['name' => ['f-one-name', 'f-two-name']],
+            $model->featureNameClashes($thing)
+        );
+
+        // Still one field per name: the generators are owed that, and which one
+        // wins is the same as it always was.
+        $features = $model->featuresOf($thing);
+
+        $this->assertCount(1, $features);
+        $this->assertSame('f-two-name', $features[0]->key);
+    }
+
+    /**
+     * A concept redeclaring an inherited name is a clash like any other.
+     *
+     * LionCore has no feature overriding - a redeclaration is a second feature
+     * with a second key - so the honest thing is to say two arrived. It still
+     * wins, and it still keeps the position the inherited one held, because
+     * that is what the form has always done and reporting is not refusing.
+     */
+    public function testARedeclaredFeatureWinsAndIsStillReported(): void
+    {
+        $model = $this->implementing(
+            ['ci-one' => [
+                ['key' => 'f-one-name', 'name' => 'name'],
+                ['key' => 'f-one-size', 'name' => 'size'],
+            ]],
+            [['key' => 'f-thing-name', 'name' => 'name']]
+        );
+        $thing = $this->thing($model);
+
+        $this->assertSame(
+            ['name' => ['f-one-name', 'f-thing-name']],
+            $model->featureNameClashes($thing)
+        );
+
+        $features = $model->featuresOf($thing);
+
+        $this->assertSame(
+            ['name', 'size'],
+            array_map(static fn ($f): string => $f->name, $features),
+            'the redeclared feature holds the place the inherited one had'
+        );
+        $this->assertSame('f-thing-name', $features[0]->key);
+    }
+
+    /**
+     * A row with no key yet identifies by name, as every feature once did.
+     *
+     * Somebody pressed add and started typing. There is nothing to identify it
+     * by, so it falls back to the name - and it is not reported, because a
+     * half-filled row is not a language with a problem in it.
+     */
+    public function testAFeatureWithNoKeyIdentifiesByNameAndIsNotReported(): void
+    {
+        $model = $this->implementing(
+            ['ci-one' => [['key' => '', 'name' => 'name']]],
+            [['key' => '', 'name' => 'name']]
+        );
+        $thing = $this->thing($model);
+
+        $this->assertCount(1, $model->featuresOf($thing));
+        $this->assertSame([], $model->featureNameClashes($thing));
+    }
+
+    /**
+     * And the fixtures, which are what a metalanguage should look like, have
+     * none - including LionCore M3, where eight classifiers inherit.
+     */
+    public function testTheFixtureLanguagesHaveNoClashes(): void
+    {
+        foreach ([$this->er1(), $this->m3()] as $model) {
+            foreach ($model->classifiers() as $classifier) {
+                $this->assertSame(
+                    [],
+                    $model->featureNameClashes($classifier),
+                    $classifier->name . ' gathers two features under one name'
+                );
+            }
+        }
     }
 }

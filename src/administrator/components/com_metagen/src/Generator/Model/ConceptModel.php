@@ -242,7 +242,9 @@ final class ConceptModel implements ModelInterface
      *
      * A feature the classifier redeclares wins over the inherited one of the
      * same name. Two fields with one name in a form is not a narrowed type, it
-     * is two inputs posting to the same key, and the later one wins silently.
+     * is two inputs posting to the same key, and one of them has to be the one
+     * generated - but which two features that was decided between is no longer
+     * lost, because `featureNameClashes()` says so.
      *
      * @return Feature[]
      *
@@ -250,17 +252,86 @@ final class ConceptModel implements ModelInterface
      */
     public function featuresOf(Classifier $classifier): array
     {
+        return array_values($this->resolveFeatures($classifier)['features']);
+    }
+
+    /**
+     * Names this classifier gathered more than one distinct feature under.
+     *
+     * A form has one field per name, so when two features that are genuinely
+     * different arrive under one name only one of them can be on screen and
+     * whatever the other one holds has nowhere to go. `featuresOf()` still has
+     * to pick, because it owes its callers one feature per name; this is how it
+     * says what it picked between, so the generator can report it instead of
+     * letting a value disappear without a word.
+     *
+     * Interfaces are why this is not hypothetical. A concept implementing ten
+     * of them gathers every feature of all ten, and nothing stops two of those
+     * interfaces from naming a feature the same - nobody has to write anything
+     * twice for it to happen.
+     *
+     * @return array<string, string[]>  Feature name => every key found under it.
+     *
+     * @since  1.3.0
+     */
+    public function featureNameClashes(Classifier $classifier): array
+    {
+        return $this->resolveFeatures($classifier)['clashes'];
+    }
+
+    /**
+     * Resolve a classifier's features, and note what could not be resolved.
+     *
+     * Two passes, because identity and presentation are different questions.
+     *
+     * The first indexes by **key**, which is what LionWeb says a feature *is*.
+     * One feature reached twice - two interfaces meeting at a common ancestor,
+     * which is a diamond and perfectly legal - is one feature, and it stays one
+     * because its key is one. Deduplicating that by name agreed only by luck.
+     *
+     * The second collapses to one feature per **name**, because a form has one
+     * field per name and that is what the generators are owed. Every name the
+     * two passes disagreed about is recorded rather than quietly resolved.
+     *
+     * A feature with no key is not an identity yet, for the same reason a
+     * classifier without one is not: there is nothing for anything else to name
+     * it by. Those identify by name, which is what every feature did before
+     * there were two passes, and they are never reported - a row with no key is
+     * somebody mid-edit, not a language with a problem in it.
+     *
+     * @return array{features: array<string, Feature>, clashes: array<string, string[]>}
+     *
+     * @since  1.3.0
+     */
+    private function resolveFeatures(Classifier $classifier): array
+    {
+        $byKey = [];
+
+        foreach ([...$this->inheritedFeatures($classifier, []), ...$classifier->features] as $feature) {
+            // A NUL cannot occur in a key somebody typed into a form, so a
+            // keyless feature can fall back to its name without colliding with
+            // a real key that happens to read the same.
+            $byKey[$feature->key !== '' ? $feature->key : "\0" . $feature->name] = $feature;
+        }
+
         $features = [];
+        $keys     = [];
 
-        foreach ($this->inheritedFeatures($classifier, []) as $feature) {
+        foreach ($byKey as $feature) {
+            if ($feature->key !== '') {
+                $keys[$feature->name][] = $feature->key;
+            }
+
+            // Last wins, and the position of the first is kept: a redeclared
+            // feature overrides the inherited one it names without moving to
+            // the end of the form.
             $features[$feature->name] = $feature;
         }
 
-        foreach ($classifier->features as $feature) {
-            $features[$feature->name] = $feature;
-        }
-
-        return array_values($features);
+        return [
+            'features' => $features,
+            'clashes'  => array_filter($keys, static fn (array $found): bool => \count($found) > 1),
+        ];
     }
 
     /**

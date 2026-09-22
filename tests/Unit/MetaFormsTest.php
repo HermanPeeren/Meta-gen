@@ -522,4 +522,80 @@ final class MetaFormsTest extends TestCase
 
         $this->assertSame(['name', 'isValueObject', 'owner'], $names);
     }
+
+    /**
+     * A field that would have had to hold two features is reported.
+     *
+     * The generator can write one field per name, so one of the two features
+     * stops existing on the way to the form. `reportClashes()` sees this when
+     * the two carry different labels, because one constant is then asked for
+     * two texts; when they carry the same label or none, this is the only thing
+     * that sees it at all.
+     *
+     * Nobody wrote anything twice to get here. Two interfaces named a feature
+     * the same and one concept implements both - which is a shape the JCB
+     * language reaches 44 concepts into, one of them implementing ten.
+     */
+    public function testTwoFeaturesUnderOneNameAreReported(): void
+    {
+        $interface = static fn (string $key, string $featureKey): array => [
+            'name'                => strtoupper($key),
+            'key'                 => $key,
+            'languageEntity_type' => 'Classifier',
+            'classifier'          => [
+                'classifier_type'  => 'ConceptInterface',
+                'conceptInterface' => ['extends' => ''],
+                'feature'          => ['feature0' => [
+                    'name'         => 'title',
+                    'key'          => $featureKey,
+                    'feature_type' => 'Property',
+                    'property'     => ['type' => 'dt-string'],
+                ]],
+            ],
+        ];
+
+        $model = ConceptModel::fromJson((string) json_encode([
+            'name'             => 'Twice',
+            'version'          => '1.0',
+            'languageEntities' => [
+                'languageEntities0' => $interface('ci-one', 'f-one-title'),
+                'languageEntities1' => $interface('ci-two', 'f-two-title'),
+                'languageEntities2' => [
+                    'name'                => 'Root',
+                    'key'                 => 'c-root',
+                    'languageEntity_type' => 'Classifier',
+                    'classifier'          => [
+                        'classifier_type' => 'Concept',
+                        'concept'         => [
+                            'partition'  => '1',
+                            'extends'    => '',
+                            'implements' => [
+                                'implements0' => ['conceptInterface' => 'ci-one'],
+                                'implements1' => ['conceptInterface' => 'ci-two'],
+                            ],
+                        ],
+                    ],
+                ],
+                'languageEntities3' => [
+                    'name'                => 'String',
+                    'key'                 => 'dt-string',
+                    'languageEntity_type' => 'DataType',
+                    'datatype'            => ['dataType_type' => 'PrimitiveType'],
+                ],
+            ],
+        ]));
+
+        $generator = new Forms();
+
+        $generator->generate($model, new FileCollection());
+
+        $warnings = array_values(array_filter(
+            $generator->log(),
+            static fn (string $line): bool => str_contains($line, 'features named title')
+        ));
+
+        $this->assertCount(1, $warnings, 'Nothing was said about the feature that was dropped.');
+        $this->assertStringContainsString('f-one-title', $warnings[0]);
+        $this->assertStringContainsString('f-two-title', $warnings[0]);
+    }
 }
