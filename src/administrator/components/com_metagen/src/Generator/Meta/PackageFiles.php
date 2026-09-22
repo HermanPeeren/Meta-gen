@@ -91,6 +91,37 @@ final class PackageFiles implements GeneratorInterface
     }
 
     /**
+     * Every classifier the language holds, by key and by name.
+     *
+     * A consumer that offers a language's concepts - Gen-gen, where a rule
+     * says which ones it applies to - would otherwise have to read the concept
+     * model and know how a language is stored. That is this component's
+     * business and not a thing to teach the other two, so the manifest says it.
+     *
+     * Both halves, because they answer different questions. The name is what a
+     * person picks out of a list; the key is what a rule stores, so renaming a
+     * concept here changes what that rule reads as rather than what it points
+     * at. The key is also what a LionWeb metapointer is made of.
+     *
+     * DataTypes are left out: a rule selects things a model can hold instances
+     * of, and a datatype is what a property is, not a thing to iterate over.
+     *
+     * @return array<int, array{key: string, name: string}>
+     *
+     * @since  1.4.0
+     */
+    private function concepts(ConceptModel $model): array
+    {
+        $concepts = [];
+
+        foreach ($model->classifiers() as $key => $classifier) {
+            $concepts[] = ['key' => (string) $key, 'name' => $classifier->name];
+        }
+
+        return $concepts;
+    }
+
+    /**
      * What this package says about itself.
      *
      * @since  1.3.0
@@ -119,6 +150,7 @@ final class PackageFiles implements GeneratorInterface
             MetalanguagePackage::installRoot($model->name(), $model->version()),
             MetalanguagePackage::languagePath($model->name()),
             MetalanguagePackage::TAG,
+            $this->concepts($model),
             $hashes,
             MetalanguagePackage::FORMAT,
             gmdate('c')

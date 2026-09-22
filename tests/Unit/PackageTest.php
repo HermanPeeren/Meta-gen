@@ -177,6 +177,44 @@ final class PackageTest extends TestCase
     }
 
     /**
+     * The manifest names every classifier, by key and by name.
+     *
+     * Gen-gen offers these when a rule says which concepts it applies to, and
+     * reads them out of the manifest rather than out of the model - because
+     * how a language is stored is this component's business and not a thing to
+     * teach the other two.
+     *
+     * DataType *entities* are not in it - a rule selects things a model holds
+     * instances of, and a datatype is what a property is rather than something
+     * to iterate over. Which is not the same as excluding the word: M3
+     * describing itself has concepts called `PrimitiveType` and `Enumeration`,
+     * because in that language they are kinds of thing a model can hold. The
+     * rule is about which half of the language an entity is in, not about its
+     * name.
+     */
+    public function testTheManifestNamesEveryClassifierByKeyAndName(): void
+    {
+        $manifest = PackageReader::fromZip($this->zip())->manifest();
+        $names    = array_column($manifest->concepts, 'name');
+        $keys     = array_column($manifest->concepts, 'key');
+
+        $this->assertContains('Concept', $names);
+        $this->assertContains('LanguageEntity', $names);
+        $this->assertContains('Containment', $names);
+
+        $this->assertSame(
+            [],
+            array_intersect(array_keys($this->metaModel()->dataTypes()), $keys),
+            'a datatype entity is not something a rule selects'
+        );
+
+        // Every key is the one the language itself uses, which is what a rule
+        // stores and what a LionWeb metapointer is made of.
+        $this->assertSame(array_keys($this->metaModel()->classifiers()), $keys);
+        $this->assertNotContains('', $keys);
+    }
+
+    /**
      * A language with no version at all is still a package.
      *
      * `0.0.0` rather than an empty path segment, because the version is half
