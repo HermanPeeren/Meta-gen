@@ -13,8 +13,8 @@ declare(strict_types=1);
 namespace Yepr\Component\Metagen\Administrator\Generator\Meta;
 
 use Yepr\Component\Metagen\Administrator\Generator\Model\ConceptModel;
-use Yepr\Component\Metagen\Administrator\Package\MetalanguagePackage;
-use Yepr\Component\Metagen\Administrator\Package\PackageManifest;
+use Yepr\Gen\Core\Package\MetalanguagePackage;
+use Yepr\Gen\Core\Package\PackageManifest;
 use Yepr\Gen\Core\GeneratorInterface;
 use Yepr\Gen\Core\Model\ModelInterface;
 use Yepr\Gen\Core\Output\FileCollection;

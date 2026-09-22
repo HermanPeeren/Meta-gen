@@ -7,8 +7,8 @@ namespace Yepr\Component\Metagen\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use Yepr\Component\Metagen\Administrator\Generator\Model\ConceptModel;
 use Yepr\Component\Metagen\Administrator\Generator\Target\MetaFormsTarget;
-use Yepr\Component\Metagen\Administrator\Package\MetalanguagePackage;
-use Yepr\Component\Metagen\Administrator\Package\PackageReader;
+use Yepr\Gen\Core\Package\MetalanguagePackage;
+use Yepr\Gen\Core\Package\PackageReader;
 use Yepr\Gen\Core\Output\FileCollection;
 use Yepr\Gen\Core\Output\ZipWriter;
 use Yepr\Gen\Core\Pipeline;
@@ -284,7 +284,12 @@ final class PackageTest extends TestCase
     public function testTheModelInThePackageRegeneratesThePackage(): void
     {
         $first  = $this->package();
-        $again  = $this->package(PackageReader::fromZip($this->zip($first))->model());
+        // `model()` hands back decoded JSON and stops - the library says
+        // what is in a package, and what a language *means* is this
+        // component's business. Reading it into a ConceptModel here is
+        // that seam, and is what an importer will do too.
+        $stored = PackageReader::fromZip($this->zip($first))->model();
+        $again  = $this->package(ConceptModel::fromObject($stored));
         $ignore = [MetalanguagePackage::MANIFEST];
 
         $this->assertSame(

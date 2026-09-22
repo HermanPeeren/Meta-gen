@@ -16,7 +16,7 @@ use DOMDocument;
 use DOMElement;
 use Yepr\Component\Metagen\Administrator\Generator\Model\Classifier;
 use Yepr\Component\Metagen\Administrator\Generator\Model\Feature;
-use Yepr\Component\Metagen\Administrator\Package\MetalanguagePackage;
+use Yepr\Gen\Core\Package\MetalanguagePackage;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;

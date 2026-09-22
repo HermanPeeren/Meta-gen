@@ -27,7 +27,6 @@ src/
     src/Generator/Model/                  a metalanguage, as a type
     src/Generator/Meta/                   the forms generator
     src/Generator/Target/                 what runs
-    src/Package/                          what a metalanguage package is, and reading one
     src/Reference/LionCoreM3.php          what M3 offers a reference dropdown
     src/{Controller,Model,Table,View}/    the CRUD around a stored metalanguage
     tmpl/ language/ services/ sql/
@@ -156,13 +155,17 @@ failure it stands for is a truncated download: a form file missing its last
 bytes still parses far enough for Joomla to render a fieldset with nothing in
 it, and reports nothing anywhere.
 
+**The format itself lives in the library**, as `Yepr\Gen\Core\Package\*`. It
+was written here at 3.3 and moved at 3.4, when Exten-gen and Gen-gen became
+readers too — a format three components agree on is a mechanism, which is
+where the reference dropdown went for the same reason.
+
 `PackageReader` reads one back, from a zip or from an unpacked tree, and
 `problems()` lists what is wrong with it rather than throwing on the first
 thing — a person choosing a file to import wants to be told what is wrong with
-the one they picked. It lives here for now and will not stay: Exten-gen and
-Gen-gen both read a package at 3.4, and a format two components read is a
-mechanism, which belongs in `Yepr\Gen\Core` by the same argument that moved
-the reference dropdown there.
+the one they picked. `model()` hands back decoded JSON and stops; turning that
+into a `ConceptModel` is this component's job, and that seam is the whole
+reason the format could move.
 
 ## The development site
 

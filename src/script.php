@@ -43,7 +43,7 @@ class Com_MetagenInstallerScript
     /**
      * The oldest library release that has everything this version calls.
      */
-    private const LIBRARY_MINIMUM = '0.4.0';
+    private const LIBRARY_MINIMUM = '0.5.0';
 
     /**
      * The oldest Joomla this runs on.

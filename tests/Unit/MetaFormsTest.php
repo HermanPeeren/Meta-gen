@@ -10,7 +10,7 @@ use Yepr\Component\Metagen\Administrator\Generator\Meta\FormXml;
 use Yepr\Component\Metagen\Administrator\Generator\Meta\LanguageStructure;
 use Yepr\Component\Metagen\Administrator\Generator\Meta\ReferenceTable;
 use Yepr\Component\Metagen\Administrator\Generator\Model\ConceptModel;
-use Yepr\Component\Metagen\Administrator\Package\MetalanguagePackage;
+use Yepr\Gen\Core\Package\MetalanguagePackage;
 use Yepr\Gen\Core\Output\FileCollection;
 
 /**

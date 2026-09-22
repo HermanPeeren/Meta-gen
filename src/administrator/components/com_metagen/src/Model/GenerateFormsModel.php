@@ -16,7 +16,7 @@ use Joomla\CMS\MVC\Model\AdminModel;
 use Yepr\Component\Metagen\Administrator\Generator\Meta\Forms;
 use Yepr\Component\Metagen\Administrator\Generator\Model\ConceptModel;
 use Yepr\Component\Metagen\Administrator\Generator\Target\MetaFormsTarget;
-use Yepr\Component\Metagen\Administrator\Package\MetalanguagePackage;
+use Yepr\Gen\Core\Package\MetalanguagePackage;
 use Yepr\Component\Metagen\Administrator\Repository\MetalanguageRepository;
 use Yepr\Gen\Core\Output\FileCollection;
 use Yepr\Gen\Core\Output\ZipWriter;
