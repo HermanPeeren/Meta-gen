@@ -100,7 +100,21 @@ describe('a metalanguage', () => {
    * in every list until the form was saved and reopened.
    */
   it('follows a rename without saving', () => {
-    cy.get('#jform_languageEntities__languageEntities3__name').clear().type('Thing').blur();
+    // Re-queried between commands rather than chained. Chained, this failed
+    // about two runs in three with "the page updated as a result of this
+    // command": the subject was detached between clear() and type(). It was
+    // worth ruling out something worse first - the screenshots showed the
+    // dashboard, which would have meant clearing a field threw away an
+    // unsaved model - and it is not that. It does not reproduce by hand, it
+    // does not reproduce in four consecutive runs, and the run straight after
+    // a reinstall took 19s for this one test against the usual three. A slow
+    // admin page re-rendering the subform under the command is what fits, and
+    // breaking the chain is what Cypress's own error says to do about it.
+    const name = '#jform_languageEntities__languageEntities3__name';
+
+    cy.get(name).clear();
+    cy.get(name).type('Thing');
+    cy.get(name).blur();
 
     options('#jform_languageEntities__languageEntities4__classifier__concept__extends').then((opts) => {
       const texts = opts.map((o) => o.text);
