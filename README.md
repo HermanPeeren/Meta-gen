@@ -55,6 +55,37 @@ the meta-model this component ships, written by hand. Generating from it
 reproduces that table exactly, and an ER1-shaped language reproduces Exten-gen's
 too.
 
+## A language can come from somewhere else
+
+**Import LionWeb language**, on the metalanguages list, reads a LionWeb
+serialization chunk and stores it as a metalanguage. From then on it is a
+metalanguage like any other - forms are generated from it, a package carries
+it, Exten-gen imports that - and nothing downstream can tell where it came
+from, which is the point.
+
+[LionWeb](https://lionweb.io) is how a model moves between tools that were not
+written for each other. Both it and this component model LionCore M3, but a
+chunk is a flat list of nodes addressed by metapointer while a stored
+metalanguage is a Joomla form's shape, so the two could not read each other
+until there was a translation. That lives in the shared library, as
+`Yepr\Gen\Core\Lionweb`, because Exten-gen needs the same reader for the models
+written in these languages and two implementations of one format drift.
+
+It reads a path under the site rather than an upload: JcbInOut writes JCB's
+language to disk on the same site, so the two components meet on the filesystem
+and the field is filled in for you when that file is there.
+
+Anything the stored shape has no room for is reported rather than dropped - an
+interface extending more than one interface, a datatype kind with no
+equivalent, a type from a language that is not in the chunk. The LionCore
+builtins are the exception: a property typed `String` points into *that*
+language, and since a stored metalanguage cannot depend on another one, the
+builtins a language uses are materialised as primitive types of its own.
+
+It is checked against JCB: 1082 nodes derived by reflection from a component
+nobody wrote for this family become 139 language entities with no diagnostics,
+and 126 forms are generated from them.
+
 ## Status
 
 0.1.0, and unreleased. It generates a language's forms and exports them as a

@@ -18,7 +18,7 @@
     ],
     "require": {
         "php": ">=8.3",
-        "yepr/generator-core": "^0.6"
+        "yepr/generator-core": "^0.7"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",

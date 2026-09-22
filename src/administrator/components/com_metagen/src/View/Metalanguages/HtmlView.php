@@ -148,6 +148,12 @@ class HtmlView extends BaseHtmlView
 
 		if ($canDo->get('core.create') || count($user->getAuthorisedCategories('com_metagen', 'core.create')) > 0) {
 			$toolbar->addNew('metalanguage.add');
+
+			// Creating a metalanguage, by reading one somebody else wrote
+			// rather than by typing it, so it belongs beside New.
+			$toolbar->standardButton('upload', 'COM_METAGEN_LIONWEB_IMPORT', 'metalanguages.importLionweb')
+				->icon('icon-download')
+				->listCheck(false);
 		}
 
 		if ($canDo->get('core.edit.state')) {

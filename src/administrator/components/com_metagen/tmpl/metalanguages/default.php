@@ -38,6 +38,26 @@ if ($saveOrder && !empty($this->items))
 		<?php endif; ?>
 		<div class="<?php if (!empty($this->sidebar)) {echo 'col-md-10'; } else { echo 'col-md-12'; } ?>">
 			<div id="j-main-container" class="j-main-container">
+				<?php
+				/*
+				 * A path on this site rather than an upload. JcbInOut writes its
+				 * language to disk here, so the two components meet on the
+				 * filesystem and there is no temporary file, no MIME guessing
+				 * and no second copy of a language to keep in step.
+				 */
+				$suggested = \Yepr\Component\Metagen\Administrator\Model\LionwebModel::JCBINOUT;
+				?>
+				<details class="mb-3" <?php echo is_file(JPATH_ROOT . '/' . $suggested) ? 'open' : ''; ?>>
+					<summary class="h5"><?php echo Text::_('COM_METAGEN_LIONWEB_IMPORT'); ?></summary>
+					<p class="mt-2"><?php echo Text::_('COM_METAGEN_LIONWEB_INTRO'); ?></p>
+					<label class="form-label" for="chunk"><?php echo Text::_('COM_METAGEN_LIONWEB_PATH'); ?></label>
+					<input class="form-control" type="text" id="chunk" name="chunk"
+						value="<?php echo is_file(JPATH_ROOT . '/' . $suggested)
+							? htmlspecialchars($suggested, ENT_QUOTES, 'UTF-8') : ''; ?>"
+						placeholder="<?php echo htmlspecialchars($suggested, ENT_QUOTES, 'UTF-8'); ?>">
+					<small class="form-text"><?php echo Text::_('COM_METAGEN_LIONWEB_PATH_HELP'); ?></small>
+				</details>
+
 				<?php echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this)); ?>
 				<?php if (empty($this->items)) : ?>
 					<div class="alert alert-warning">

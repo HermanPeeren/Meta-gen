@@ -21,6 +21,8 @@ use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\Input\Input;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 
 /**
  * Project forms list controller class.
@@ -54,5 +56,63 @@ class MetalanguagesController extends AdminController
 	public function getModel($name = 'Metalanguages', $prefix = '', $config = array('ignore_request' => true))
 	{
 		return parent::getModel($name, $prefix, $config);
+	}
+
+	/**
+	 * Read a metalanguage in from a LionWeb chunk.
+	 *
+	 * A language written anywhere that speaks LionWeb becomes a metalanguage
+	 * here, and from there it is a metalanguage like any other: forms are
+	 * generated from it, a package carries it, Exten-gen imports that. Nothing
+	 * downstream can tell where it came from, which is the point.
+	 *
+	 * @return  void
+	 */
+	public function importLionweb()
+	{
+		$this->checkToken();
+
+		$path = trim((string) $this->input->getString('chunk', ''));
+		$back = 'index.php?option=com_metagen&view=metalanguages';
+
+		if ($path === '') {
+			$this->setRedirect(
+				Route::_($back, false),
+				Text::_('COM_METAGEN_LIONWEB_NO_PATH'),
+				'warning'
+			);
+
+			return;
+		}
+
+		/** @var \Yepr\Component\Metagen\Administrator\Model\LionwebModel $model */
+		$model = $this->getModel('Lionweb', '', ['ignore_request' => true]);
+
+		try {
+			$converted = $model->convert($model->readChunk($path));
+			$id        = $model->store($converted);
+
+			// Said before the success message, because a language that converted
+			// with something missing is still one somebody is about to generate
+			// forms from.
+			foreach ($converted['diagnostics'] as $diagnostic) {
+				$this->app->enqueueMessage(
+					$diagnostic['message'],
+					$diagnostic['severity'] === 'error' ? 'error' : 'warning'
+				);
+			}
+
+			$this->setRedirect(
+				Route::_('index.php?option=com_metagen&task=metalanguage.edit&id=' . $id, false),
+				Text::sprintf(
+					'COM_METAGEN_LIONWEB_IMPORTED',
+					$converted['name'],
+					$converted['version'],
+					$converted['entities']
+				)
+			);
+		} catch (\Throwable $e) {
+			$this->setRedirect(Route::_($back, false), $e->getMessage(), 'error');
+		}
 	}
 }
