@@ -179,6 +179,64 @@ final class Er1ModelTest extends TestCase
     }
 
     /**
+     * A closed list is an enumeration, and comes back as the same dropdown.
+     *
+     * `page_type` offers five kinds of page. Read as a String it would generate
+     * a text box where the hand-written form has a dropdown, and the five
+     * answers would be gone - a field somebody could type anything into, which
+     * is what the vocabulary work at 2.2 called the difference between a
+     * modelling tool and a JSON editor.
+     *
+     * The literals keep the option's own value and text, so what comes out is
+     * the dropdown that went in rather than one meaning roughly the same.
+     */
+    public function testAClosedListComesBackAsTheSameDropdown(): void
+    {
+        $model    = $this->er1();
+        $pageType = null;
+
+        foreach ($model->dataTypes() as $dataType) {
+            if ($dataType->name === 'PageType') {
+                $pageType = $dataType;
+            }
+        }
+
+        $this->assertNotNull($pageType, 'page_type was not read as an enumeration');
+        $this->assertTrue($pageType->isEnumeration());
+
+        $files = new FileCollection();
+
+        (new Forms())->generate($model, $files);
+
+        $page = simplexml_load_string($files->get(MetalanguagePackage::formPath('Page')));
+
+        $this->assertNotFalse($page);
+
+        $field = $page->xpath('//field[@name="page_type"]');
+
+        $this->assertNotEmpty($field);
+        $this->assertSame('list', (string) $field[0]['type']);
+
+        $offered = [];
+
+        foreach ($field[0]->xpath('option') ?: [] as $option) {
+            $offered[(string) $option['value']] = trim((string) $option);
+        }
+
+        $this->assertSame(
+            [
+                'detailspage'  => 'Detail page',
+                'indexpage'    => 'List page',
+                'subform'      => 'Sub-form',
+                'dashboard'    => 'todo: Dashboard',
+                'detailsindex' => 'todo: Detail page with lists embedded',
+            ],
+            $offered,
+            'the generated dropdown is not the one ER1 ships'
+        );
+    }
+
+    /**
      * It generates a form per classifier, and reports nothing missing.
      */
     public function testItGeneratesAFormPerClassifierWithNothingMissing(): void

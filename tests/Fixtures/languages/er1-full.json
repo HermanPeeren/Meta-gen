@@ -28,6 +28,85 @@
             "LIonWeb_key": "LanguageEntity"
         },
         "languageEntities2": {
+            "name": "PropertyType",
+            "key": "dt-propertytype",
+            "languageEntity_type": "DataType",
+            "datatype": {
+                "dataType_type": "Enumeration",
+                "enumeration": {
+                    "literals": {
+                        "literals0": {
+                            "name": "Integer",
+                            "key": "Integer",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals1": {
+                            "name": "Boolean",
+                            "key": "Boolean",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals2": {
+                            "name": "Text",
+                            "key": "Text",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals3": {
+                            "name": "Short Text",
+                            "key": "Short_Text",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals4": {
+                            "name": "Decimal",
+                            "key": "Decimal",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals5": {
+                            "name": "Currency",
+                            "key": "Currency",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals6": {
+                            "name": "Floating point",
+                            "key": "Float",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals7": {
+                            "name": "Time",
+                            "key": "Time",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals8": {
+                            "name": "Date",
+                            "key": "Date",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals9": {
+                            "name": "DateTime",
+                            "key": "DateTime",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals10": {
+                            "name": "File",
+                            "key": "File",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals11": {
+                            "name": "Link",
+                            "key": "Link",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals12": {
+                            "name": "Image",
+                            "key": "Image",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        }
+                    },
+                    "LIonWeb_key": "DataType.Enumeration"
+                }
+            },
+            "LIonWeb_key": "LanguageEntity"
+        },
+        "languageEntities3": {
             "name": "Text",
             "key": "dt-text",
             "languageEntity_type": "DataType",
@@ -39,7 +118,70 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities3": {
+        "languageEntities4": {
+            "name": "PageType",
+            "key": "dt-pagetype",
+            "languageEntity_type": "DataType",
+            "datatype": {
+                "dataType_type": "Enumeration",
+                "enumeration": {
+                    "literals": {
+                        "literals0": {
+                            "name": "Detail page",
+                            "key": "detailspage",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals1": {
+                            "name": "List page",
+                            "key": "indexpage",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals2": {
+                            "name": "Sub-form",
+                            "key": "subform",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals3": {
+                            "name": "todo: Dashboard",
+                            "key": "dashboard",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals4": {
+                            "name": "todo: Detail page with lists embedded",
+                            "key": "detailsindex",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        }
+                    },
+                    "LIonWeb_key": "DataType.Enumeration"
+                }
+            },
+            "LIonWeb_key": "LanguageEntity"
+        },
+        "languageEntities5": {
+            "name": "LinkType",
+            "key": "dt-linktype",
+            "languageEntity_type": "DataType",
+            "datatype": {
+                "dataType_type": "Enumeration",
+                "enumeration": {
+                    "literals": {
+                        "literals0": {
+                            "name": "Link to details page for editing",
+                            "key": "Details",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        },
+                        "literals1": {
+                            "name": "Link to index page for list of items",
+                            "key": "Index",
+                            "LIonWeb_key": "EnumerationLiteral"
+                        }
+                    },
+                    "LIonWeb_key": "DataType.Enumeration"
+                }
+            },
+            "LIonWeb_key": "LanguageEntity"
+        },
+        "languageEntities6": {
             "name": "Date",
             "key": "dt-date",
             "languageEntity_type": "DataType",
@@ -51,7 +193,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities4": {
+        "languageEntities7": {
             "name": "Project",
             "key": "c-project",
             "languageEntity_type": "Classifier",
@@ -136,7 +278,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities5": {
+        "languageEntities8": {
             "name": "Entity",
             "key": "c-entity",
             "languageEntity_type": "Classifier",
@@ -236,7 +378,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities6": {
+        "languageEntities9": {
             "name": "Field",
             "key": "c-field",
             "languageEntity_type": "Classifier",
@@ -286,7 +428,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities7": {
+        "languageEntities10": {
             "name": "Property",
             "key": "c-property",
             "languageEntity_type": "Classifier",
@@ -311,8 +453,8 @@
                         "LIonWeb_key": "Feature",
                         "feature_type": "Property",
                         "property": {
-                            "type": "dt-string",
-                            "typeReference_key": "dt-string",
+                            "type": "dt-propertytype",
+                            "typeReference_key": "dt-propertytype",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -368,7 +510,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities8": {
+        "languageEntities11": {
             "name": "EntityReferenceField",
             "key": "c-entityreferencefield",
             "languageEntity_type": "Classifier",
@@ -435,7 +577,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities9": {
+        "languageEntities12": {
             "name": "CustomcodeEntity",
             "key": "c-customcodeentity",
             "languageEntity_type": "Classifier",
@@ -485,7 +627,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities10": {
+        "languageEntities13": {
             "name": "Page",
             "key": "c-page",
             "languageEntity_type": "Classifier",
@@ -526,8 +668,8 @@
                         "LIonWeb_key": "Feature",
                         "feature_type": "Property",
                         "property": {
-                            "type": "dt-string",
-                            "typeReference_key": "dt-string",
+                            "type": "dt-pagetype",
+                            "typeReference_key": "dt-pagetype",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -636,7 +778,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities11": {
+        "languageEntities14": {
             "name": "EntityReference",
             "key": "c-entityreference",
             "languageEntity_type": "Classifier",
@@ -671,7 +813,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities12": {
+        "languageEntities15": {
             "name": "EntityFieldReference",
             "key": "c-entityfieldreference",
             "languageEntity_type": "Classifier",
@@ -723,7 +865,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities13": {
+        "languageEntities16": {
             "name": "Editfield",
             "key": "c-editfield",
             "languageEntity_type": "Classifier",
@@ -791,7 +933,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities14": {
+        "languageEntities17": {
             "name": "KeyValue",
             "key": "c-keyvalue",
             "languageEntity_type": "Classifier",
@@ -841,7 +983,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities15": {
+        "languageEntities18": {
             "name": "InternalLink",
             "key": "c-internallink",
             "languageEntity_type": "Classifier",
@@ -882,8 +1024,8 @@
                         "LIonWeb_key": "Feature",
                         "feature_type": "Property",
                         "property": {
-                            "type": "dt-string",
-                            "typeReference_key": "dt-string",
+                            "type": "dt-linktype",
+                            "typeReference_key": "dt-linktype",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -925,7 +1067,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities16": {
+        "languageEntities19": {
             "name": "PageReference",
             "key": "c-pagereference",
             "languageEntity_type": "Classifier",
@@ -960,7 +1102,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities17": {
+        "languageEntities20": {
             "name": "Extensions",
             "key": "c-extensions",
             "languageEntity_type": "Classifier",
@@ -995,7 +1137,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities18": {
+        "languageEntities21": {
             "name": "Component",
             "key": "c-component",
             "languageEntity_type": "Classifier",
@@ -1096,7 +1238,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities19": {
+        "languageEntities22": {
             "name": "Sections",
             "key": "c-sections",
             "languageEntity_type": "Classifier",
@@ -1182,7 +1324,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities20": {
+        "languageEntities23": {
             "name": "Manifest",
             "key": "c-manifest",
             "languageEntity_type": "Classifier",
@@ -1344,7 +1486,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities21": {
+        "languageEntities24": {
             "name": "Language",
             "key": "c-language",
             "languageEntity_type": "Classifier",
@@ -1411,7 +1553,7 @@
             },
             "LIonWeb_key": "LanguageEntity"
         },
-        "languageEntities22": {
+        "languageEntities25": {
             "name": "LangKeyValue",
             "key": "c-langkeyvalue",
             "languageEntity_type": "Classifier",

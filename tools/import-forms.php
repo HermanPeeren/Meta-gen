@@ -124,7 +124,11 @@ final class FormSetImporter
     /** @var array<string, array<string, mixed>>  classifier key => the classifier being built */
     private array $classifiers = [];
 
-    /** @var array<string, string>  datatype name => its key */
+    /**
+     * Datatypes by name.
+     *
+     * @var array<string, array{key: string, literals: array<int, array{name: string, key: string}>}>
+     */
     private array $dataTypes = [];
 
     /** @var string[] */
@@ -159,15 +163,38 @@ final class FormSetImporter
         $entities = [];
         $index    = 0;
 
-        foreach ($this->dataTypes as $dataTypeName => $key) {
-            $entities['languageEntities' . $index++] = [
-                'name'                => $dataTypeName,
-                'key'                 => $key,
-                'languageEntity_type' => 'DataType',
-                'datatype'            => [
+        foreach ($this->dataTypes as $dataTypeName => $dataType) {
+            if ($dataType['literals'] === []) {
+                $datatype = [
                     'dataType_type' => 'PrimitiveType',
                     'primitiveType' => ['LIonWeb_key' => 'DataType.PrimitiveType'],
-                ],
+                ];
+            } else {
+                $literals = [];
+                $literal  = 0;
+
+                foreach ($dataType['literals'] as $one) {
+                    $literals['literals' . $literal++] = [
+                        'name'        => $one['name'],
+                        'key'         => $one['key'],
+                        'LIonWeb_key' => 'EnumerationLiteral',
+                    ];
+                }
+
+                $datatype = [
+                    'dataType_type' => 'Enumeration',
+                    'enumeration'   => [
+                        'literals'    => $literals,
+                        'LIonWeb_key' => 'DataType.Enumeration',
+                    ],
+                ];
+            }
+
+            $entities['languageEntities' . $index++] = [
+                'name'                => $dataTypeName,
+                'key'                 => $dataType['key'],
+                'languageEntity_type' => 'DataType',
+                'datatype'            => $datatype,
                 'LIonWeb_key'         => 'LanguageEntity',
             ];
         }
@@ -561,7 +588,8 @@ final class FormSetImporter
 
         $feature['feature_type'] = 'Property';
         $feature['property']     = [
-            'type'              => $this->dataTypeFor($type, $field, $path, $fieldName),
+            'type'              => $this->enumerationFor($field, $owner, $fieldName)
+                ?? $this->dataTypeFor($type, $field, $path, $fieldName),
             'typeReference_key' => '',
             'LIonWeb_key'       => 'Feature.Property',
         ];
@@ -569,6 +597,73 @@ final class FormSetImporter
         $feature['property']['typeReference_key'] = $feature['property']['type'];
 
         return $feature;
+    }
+
+    /**
+     * The enumeration a field's own options describe, when it has any.
+     *
+     * A `list` or `radio` that got this far is one the form offers a closed set
+     * of answers for and did not use to choose between subtypes - which is what
+     * an enumeration is. Reading it as a String would generate a text box where
+     * the hand-written form has a dropdown, and lose the answers with it.
+     *
+     * The literals keep the option's own value and text, so the generated
+     * `<option value="...">` is the one that was there.
+     *
+     * @return string|null  The datatype's key, or null when this is not a closed list.
+     */
+    private function enumerationFor(SimpleXMLElement $field, string $owner, string $fieldName): ?string
+    {
+        $options = $field->xpath('option') ?: [];
+
+        if ($options === []) {
+            return null;
+        }
+
+        $literals = [];
+
+        foreach ($options as $option) {
+            $value = (string) $option['value'];
+
+            $literals[] = [
+                'name' => trim((string) $option) === '' ? $value : trim((string) $option),
+                'key'  => $value,
+            ];
+        }
+
+        $name = $this->enumerationName($owner, $fieldName);
+
+        if (isset($this->dataTypes[$name]) && $this->dataTypes[$name]['literals'] !== $literals) {
+            // Two fields wanting one name with different answers. Keeping the
+            // first silently would give the second a dropdown holding somebody
+            // else's choices, which is worse than an ugly name.
+            $name .= 'Of' . ucfirst($owner);
+        }
+
+        if (!isset($this->dataTypes[$name])) {
+            $this->dataTypes[$name] = [
+                'key'      => 'dt-' . strtolower(preg_replace('/[^A-Za-z0-9]+/', '', $name) ?? $name),
+                'literals' => $literals,
+            ];
+        }
+
+        return $this->dataTypes[$name]['key'];
+    }
+
+    /**
+     * What to call the enumeration a field's options describe.
+     *
+     * The field's own name, in PascalCase: `page_type` is a PageType and
+     * `link_type` is a LinkType. A field whose name is one bare word is too
+     * generic to stand alone - `type` on a Property is a PropertyType, not a
+     * Type - so that one takes the owner in front.
+     */
+    private function enumerationName(string $owner, string $fieldName): string
+    {
+        $parts = array_values(array_filter(preg_split('/[^A-Za-z0-9]+/', $fieldName) ?: []));
+        $name  = implode('', array_map('ucfirst', $parts));
+
+        return \count($parts) > 1 ? $name : ucfirst($owner) . $name;
     }
 
     /**
@@ -590,10 +685,10 @@ final class FormSetImporter
         }
 
         if (!isset($this->dataTypes[$name])) {
-            $this->dataTypes[$name] = 'dt-' . strtolower($name);
+            $this->dataTypes[$name] = ['key' => 'dt-' . strtolower($name), 'literals' => []];
         }
 
-        return $this->dataTypes[$name];
+        return $this->dataTypes[$name]['key'];
     }
 
     /**
