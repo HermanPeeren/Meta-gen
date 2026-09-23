@@ -207,3 +207,45 @@ or runs generation with two constants standing in for Joomla; none of it boots
 the framework. Every naming defect described on this page passed all three and
 was found by the browser — twice as a 500, once as a dropdown holding a raw
 uuid.
+
+## Releasing
+
+Pushing a `v*` tag is the whole procedure. `.github/workflows/release.yml`
+checks the tag against the manifest, regenerates `updates.xml` and fails if that
+changes anything, runs every gate a runner can run, builds the package, asserts
+what is inside it, and publishes a GitHub release with the zip attached.
+
+Three numbers have to agree and only one of them is edited by hand:
+
+| | |
+|---|---|
+| `src/metagen.xml` `<version>` | the one you edit |
+| the tag | checked against it by the workflow |
+| `updates.xml` | generated from it by `build/update-xml.php` |
+
+So a release is: bump the manifest, run `composer update-xml`, commit, push,
+tag. Tagging a commit whose `updates.xml` is stale fails the workflow rather
+than publishing something that points at a download nobody uploaded.
+
+A fourth number lives beside them and is not part of the tag. `LIBRARY_MINIMUM`
+in `src/script.php` says which `lib_yepr_gen` release this version needs, and
+`composer.json` has to ask for the same thing — `ReleaseTest` fails when they
+disagree, which they did right up to 0.1.0: composer asked for `^0.8`, where
+`Lionweb\ChunkBuilder` arrived, while the script still said `0.6.0` from before
+the LionWeb import existed. The build reads `LIBRARY_MINIMUM` to decide what to
+bundle, so on a runner — where there is no sibling checkout — the released
+package carries exactly that library version, fetched from its own release. A
+local build takes the newest library lying beside it instead, as long as it is
+at least that, which is why the zip you build here and the zip CI publishes can
+carry different library versions and both be right.
+
+**`updates.xml` is served from `main`, not from the release.** The manifest
+points at `raw.githubusercontent.com/.../main/updates.xml`, so a site learns
+about a new version the moment the commit lands, whether or not the tag was ever
+pushed. Commit and tag together.
+
+**What the gates still cannot see.** No gate installs the package on a site that
+has never had this component. `composer install-local` builds the real zip and
+installs it, so the ordinary route is exercised — but always onto a site that
+already has the tables, which means the install SQL runs as an update. A table
+rename needs an uninstall first; the same trap as everywhere else on this page.

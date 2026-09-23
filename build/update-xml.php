@@ -40,6 +40,26 @@ if ($version === '' || $element === '') {
     exit(1);
 }
 
+// What the extension says it is, read where Joomla reads it. The manifest holds
+// a language key rather than a sentence, and this file wants the sentence - so
+// it is resolved rather than repeated. Repeated, it said "Model a Joomla
+// extension, and generate it", which is Exten-gen's description: this build
+// script was ported from there and that line came with it, describing the wrong
+// component on the one screen where somebody is deciding whether to install it.
+$description = trim((string) $xml->description);
+
+if (preg_match('/^[A-Z0-9_]+$/', $description) === 1) {
+    $sys = $root . '/src/administrator/components/' . $element . '/language/en-GB/' . $element . '.sys.ini';
+    $ini = is_file($sys) ? (parse_ini_file($sys) ?: []) : [];
+
+    if (!isset($ini[$description])) {
+        fwrite(STDERR, "The manifest describes this component as {$description}, which {$sys} does not define.\n");
+        exit(1);
+    }
+
+    $description = (string) $ini[$description];
+}
+
 // What script.php refuses to install below, so the update server cannot offer
 // this version to a site that would then reject it.
 $script      = (string) file_get_contents($root . '/src/script.php');
@@ -71,7 +91,7 @@ $updates = <<<XML
 <updates>
 	<update>
 		<name>{$name}</name>
-		<description>Model a Joomla extension, and generate it.</description>
+		<description>{$description}</description>
 		<element>{$element}</element>
 		<type>component</type>
 		<client>administrator</client>

@@ -6,7 +6,7 @@
 <updates>
 	<update>
 		<name>Meta-gen</name>
-		<description>Model a Joomla extension, and generate it.</description>
+		<description>Models modelling languages, and generates the forms a model in one is edited with.</description>
 		<element>com_metagen</element>
 		<type>component</type>
 		<client>administrator</client>

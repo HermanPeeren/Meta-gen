@@ -86,15 +86,35 @@ It is checked against JCB: 1082 nodes derived by reflection from a component
 nobody wrote for this family become 139 language entities with no diagnostics,
 and 126 forms are generated from them.
 
+## Install
+
+Download `com_metagen-<version>.zip` from
+[Releases](https://github.com/HermanPeeren/Meta-gen/releases) and install it
+through **System → Install → Extensions**. It needs Joomla 6 and PHP 8.3.
+
+The package carries the shared library, `lib_yepr_gen`, and installs it when the
+site has none or an older one — so there is one thing to install, not two. After
+that the component's update server offers new versions the ordinary way.
+
 ## Status
 
-0.1.0, and unreleased. It generates a language's forms and exports them as a
-package — a zip holding the concept model, the forms, the reference table, a
-language file and a manifest naming the language, its version and its root
-classifier. Nothing imports one yet: that is Exten-gen's and Gen-gen's side,
-and it is the next step in the shared
-[rework plan](https://github.com/HermanPeeren/Exten-gen/blob/main/docs/rework-plan.md),
-stage 3.
+0.1.0. It generates a language's forms and exports them as a package — a zip
+holding the concept model, the forms, the reference table, a language file and a
+manifest naming the language, its version and its root classifier.
+
+Both siblings read one. Exten-gen imports a package and edits projects through
+its forms; ER1 itself is now a generated package rather than twenty-four
+hand-written form files, so the language Exten-gen has always spoken goes
+through the same reader as any other. Gen-gen imports one too, and a generator
+bound to a language offers that language's concepts where a rule says what to
+select.
+
+What is not done: a generator is still written for one language at a time.
+Exten-gen refuses to run its generators over a project written in something
+other than ER1, because the rules are about ER1 by name — a refusal rather than
+a silence, and the honest edge of where this has got to. The shared
+[rework plan](https://github.com/HermanPeeren/Exten-gen/blob/main/docs/rework-plan.md)
+has the rest.
 
 ## Development
 
