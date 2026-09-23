@@ -143,6 +143,42 @@ final class Er1ModelTest extends TestCase
     }
 
     /**
+     * A surrogate identity is hidden, and a typed one is not.
+     *
+     * ER1 gives every entity an `entity_id` that nobody enters, and the
+     * hand-written form hides it. A generated form that rendered it as a text
+     * box would put an internal number on screen for somebody to type over -
+     * the one difference in the 3.5 inventory that made a generated form
+     * *wrong* rather than merely different.
+     *
+     * **"Identity" is not what decides it.** LionCore M3's identity is `key`
+     * and a person types it, in a plain visible text field. So the language
+     * says, per property, whether the value is entered or assigned - which is
+     * a fact about the language and not about how it looks.
+     */
+    public function testASurrogateIdentityIsHidden(): void
+    {
+        $files = new FileCollection();
+
+        (new Forms())->generate($this->er1(), $files);
+
+        $entity = simplexml_load_string($files->get(MetalanguagePackage::formPath('Entity')));
+
+        $this->assertNotFalse($entity);
+
+        $id = $entity->xpath('//field[@name="entity_id"]');
+
+        $this->assertNotEmpty($id, 'the identity left the form entirely');
+        $this->assertSame('hidden', (string) $id[0]['type']);
+
+        // And the name beside it is still a text box somebody fills in.
+        $name = $entity->xpath('//field[@name="entity_name"]');
+
+        $this->assertNotEmpty($name);
+        $this->assertSame('text', (string) $name[0]['type']);
+    }
+
+    /**
      * It generates a form per classifier, and reports nothing missing.
      */
     public function testItGeneratesAFormPerClassifierWithNothingMissing(): void

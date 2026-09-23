@@ -270,6 +270,21 @@ final class FormXml
         $field->setAttribute('name', $feature->name);
 
         if ($feature->isProperty()) {
+            // A value the person never enters is not a text box with an
+            // internal number in it. ER1's `entity_id` is one of these: the
+            // hand-written form hides it, and a generated form that showed it
+            // would put a surrogate key on screen for somebody to type over.
+            //
+            // It is a fact about the language rather than about presentation,
+            // which is why it is in the model and not in a defaults table.
+            // The same question has the opposite answer one language away:
+            // LionCore M3's identity is `key`, and a person types it.
+            if ($feature->assigned) {
+                $field->setAttribute('type', 'hidden');
+
+                return $field;
+            }
+
             $this->describeProperty($document, $field, $owner, $feature);
         } elseif ($feature->isContainment()) {
             if (!$this->describeContainment($field, $feature)) {

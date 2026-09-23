@@ -69,6 +69,7 @@ final class Feature
      * @param  string   $label       What a person reads instead of the name, if anybody set one.
      * @param  string   $description How it is explained under the field, if anybody set one.
      * @param  bool     $optional    Whether it may be left empty.
+     * @param  bool     $assigned    Whether the value is assigned rather than entered by a person.
      * @param  string   $kind        `Property` or `Link`.
      * @param  string   $linkKind    `Containment` or `Reference`, for a link.
      * @param  bool     $multiple    Whether a link holds more than one target.
@@ -82,6 +83,7 @@ final class Feature
         public readonly string $label,
         public readonly string $description,
         public readonly bool $optional,
+        public readonly bool $assigned,
         public readonly string $kind,
         public readonly string $linkKind,
         public readonly bool $multiple,
@@ -112,6 +114,7 @@ final class Feature
             // A checkbox that was never ticked is absent rather than "0", so
             // the question is whether it is there and true, not what it holds.
             self::flag($node, 'is_optional'),
+            self::flag($node, 'is_assigned'),
             $kind,
             $link === null ? '' : self::text($link, 'link_type'),
             $link !== null && self::flag($link, 'is_multiple'),

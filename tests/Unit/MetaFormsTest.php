@@ -401,6 +401,23 @@ final class MetaFormsTest extends TestCase
     }
 
     /**
+     * An identity somebody types stays a text box.
+     *
+     * The guard on the mistake 3.5 nearly made. ER1's `entity_id` is assigned
+     * and its form hides it, and "hide the identity" looks like the rule until
+     * you read this language: LionCore M3's identity is `key`, and a person
+     * types it into a plain visible field. So hiding is not what "identity"
+     * means - it is what *assigned* means, and the language says which per
+     * property.
+     */
+    public function testAnIdentitySomebodyTypesStaysVisible(): void
+    {
+        $key = $this->field('languageEntity', 'key');
+
+        $this->assertSame('text', (string) $key['type']);
+    }
+
+    /**
      * A property's datatype decides its input, and an unknown one is a text box.
      */
     public function testAPropertyTakesItsInputFromItsDatatype(): void

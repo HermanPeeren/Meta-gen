@@ -503,13 +503,18 @@ final class FormSetImporter
         $optional = strtolower((string) $field['required']) !== 'true';
 
         $feature = [
-            'name'          => $fieldName,
-            'key'           => $key,
-            'label'         => $this->labelOf($field),
-            'description'   => '',
-            'is_optional'   => $optional ? '1' : '0',
+            'name'           => $fieldName,
+            'key'            => $key,
+            'label'          => $this->labelOf($field),
+            'description'    => '',
+            'is_optional'    => $optional ? '1' : '0',
+            // A hidden input is a value nobody types. That is what these forms
+            // use for a surrogate identity, and a generated form has to hide it
+            // too - otherwise an internal number appears on screen in a box
+            // somebody can edit.
+            'is_assigned'    => $type === 'hidden' ? '1' : '0',
             'classifier_key' => '',
-            'LIonWeb_key'   => 'Feature',
+            'LIonWeb_key'    => 'Feature',
         ];
 
         if ($type === 'subform') {
