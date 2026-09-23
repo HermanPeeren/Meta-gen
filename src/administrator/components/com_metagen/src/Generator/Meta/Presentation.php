@@ -123,17 +123,35 @@ final class Presentation
      *
      * @since  1.4.0
      */
-    public static function forContainment(bool $multiple): array
+    public static function forContainment(bool $multiple, bool $optional = true): array
     {
         if (!$multiple) {
             return ['layout' => self::SINGLE_LAYOUT];
         }
 
-        return [
+        $attributes = [
             'multiple' => 'true',
             'buttons'  => self::REPEATING_BUTTONS,
             'layout'   => self::REPEATING_LAYOUT,
         ];
+
+        // A repeating containment that is not optional holds at least one, and
+        // the form opens with that one already there. This is multiplicity
+        // rather than presentation - LionCore has it, `is_optional` is where
+        // this language keeps it - and it arrives here because the attribute
+        // that expresses it is a Joomla form's `min`.
+        //
+        // 3.5 filed `min` under presentation and lost it, and a browser spec
+        // caught the difference: a project's `pages` is not optional, so the
+        // hand-written form opened with a page in it and the generated one
+        // opened with none. The spec said so in a comment written long before
+        // any of this, which is the second time this week a comment has been
+        // the specification.
+        if (!$optional) {
+            $attributes['min'] = '1';
+        }
+
+        return $attributes;
     }
 
     /**

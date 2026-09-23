@@ -425,7 +425,7 @@ final class FormXml
         $field->setAttribute('formsource', $this->formSourceFor($target));
         $field->setAttribute('id', $feature->name);
 
-        $this->dress($field, Presentation::forContainment($feature->multiple));
+        $this->dress($field, Presentation::forContainment($feature->multiple, $feature->optional));
 
         return true;
     }

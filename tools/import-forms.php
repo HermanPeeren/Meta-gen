@@ -536,6 +536,14 @@ final class FormSetImporter
         $key      = 'f-' . strtolower($owner) . '-' . strtolower(preg_replace('/[^A-Za-z0-9]+/', '-', $fieldName) ?? $fieldName);
         $optional = strtolower((string) $field['required']) !== 'true';
 
+        // A subform's `min` says how few rows it may have, which is
+        // multiplicity and not presentation: min="1" means the thing always has
+        // at least one of these. `is_optional` is where this language keeps
+        // that, so it is read into it rather than dropped with the widths.
+        if ($type === 'subform' && (int) ($field['min'] ?? 0) > 0) {
+            $optional = false;
+        }
+
         $feature = [
             'name'           => $fieldName,
             'key'            => $key,
