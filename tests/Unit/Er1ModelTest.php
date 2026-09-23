@@ -355,6 +355,62 @@ final class Er1ModelTest extends TestCase
     }
 
     /**
+     * What an edit field can say about the form field it describes: step 4.2.
+     *
+     * Stage 1 named three things a model written in ER1 cannot express, and 4.2
+     * says to re-measure before adding anything. The measurement was most of
+     * the answer: 1.9's reference field and 3.5's field classes had already
+     * removed the need for eight of the eleven custom classes Exten-gen
+     * carried, and the fieldset a generated form has always carried names the
+     * generated extension's own Field and Rule namespaces - so a class it
+     * declares was resolvable all along. What was missing was a way to *say*
+     * one, a way to point at a class that lives somewhere else, a validation
+     * rule, and which group of the form a field belongs to.
+     *
+     * Four optional properties, which is why this is asserted here rather than
+     * being visible in the generated forms: optional means a model that names
+     * none of them produces exactly the bytes it produced before, and the
+     * change would otherwise have no test but the absence of a diff.
+     *
+     * Optional is load-bearing beyond the tests, too. It is what makes every
+     * model stored under ER1 1.0 a valid 1.1 model, and therefore what lets
+     * Exten-gen's install script move a project forward rather than stranding
+     * it on a version the new package does not carry.
+     */
+    public function testAnEditFieldCanNameAClassARuleAndAGroup(): void
+    {
+        $editfield = null;
+
+        foreach ($this->er1()->classifiers() as $classifier) {
+            if ($classifier->name === 'Editfield') {
+                $editfield = $classifier;
+            }
+        }
+
+        $this->assertNotNull($editfield, 'ER1 has no Editfield to describe a form field with.');
+
+        $features = [];
+
+        foreach ($editfield->features as $feature) {
+            $features[$feature->name] = $feature;
+        }
+
+        foreach (['field_prefix', 'validate', 'rule_prefix', 'fieldset'] as $name) {
+            $this->assertArrayHasKey($name, $features, 'an edit field cannot say ' . $name);
+            $this->assertTrue(
+                $features[$name]->optional,
+                $name . ' is required, so every model written before 1.1 is now invalid'
+            );
+        }
+
+        // The half that was already there, and the reason only four were added:
+        // the name of the class and its parameters are `htmltype` and
+        // `parameters`, which ER1 has carried since v1.
+        $this->assertArrayHasKey('htmltype', $features);
+        $this->assertArrayHasKey('parameters', $features);
+    }
+
+    /**
      * It generates a form per classifier, and reports nothing missing.
      */
     public function testItGeneratesAFormPerClassifierWithNothingMissing(): void

@@ -1,6 +1,6 @@
 {
     "name": "ER1",
-    "version": "1.0",
+    "version": "1.1",
     "LIonWeb_key": "Language",
     "languageEntities": {
         "languageEntities0": {
@@ -957,6 +957,86 @@
                             "link_type": "Containment",
                             "is_multiple": "1",
                             "LIonWeb_key": "Feature.Link"
+                        }
+                    },
+                    "feature3": {
+                        "name": "field_prefix",
+                        "key": "f-editfield-fieldprefix",
+                        "label": "Namespace of the field class",
+                        "description": "Where the class named above lives, when the HTML type is one this extension declares rather than one of Joomla's. Joomla resolves a field type by looking for the class in every registered prefix, so a custom type with no namespace beside it silently renders as a text box.",
+                        "is_optional": "1",
+                        "is_assigned": "0",
+                        "classifier_key": "",
+                        "LIonWeb_key": "Feature",
+                        "feature_type": "Property",
+                        "property": {
+                            "type": "dt-string",
+                            "typeReference_key": "dt-string",
+                            "default_value": "",
+                            "LIonWeb_key": "Feature.Property",
+                            "field_type": "",
+                            "field_prefix": "",
+                            "field_parameters": []
+                        }
+                    },
+                    "feature4": {
+                        "name": "validate",
+                        "key": "f-editfield-validate",
+                        "label": "Validation rule",
+                        "description": "A rule the value has to pass before the form will save. Joomla ships several - \"email\", \"url\", \"options\" - and an extension may declare its own.",
+                        "is_optional": "1",
+                        "is_assigned": "0",
+                        "classifier_key": "",
+                        "LIonWeb_key": "Feature",
+                        "feature_type": "Property",
+                        "property": {
+                            "type": "dt-string",
+                            "typeReference_key": "dt-string",
+                            "default_value": "",
+                            "LIonWeb_key": "Feature.Property",
+                            "field_type": "",
+                            "field_prefix": "",
+                            "field_parameters": []
+                        }
+                    },
+                    "feature5": {
+                        "name": "rule_prefix",
+                        "key": "f-editfield-ruleprefix",
+                        "label": "Namespace of the rule class",
+                        "description": "Where the rule named above lives, when it is one this extension declares rather than one of Joomla's. The same resolution, and the same silence when it is missing: an unresolvable rule does not fail, it simply never runs.",
+                        "is_optional": "1",
+                        "is_assigned": "0",
+                        "classifier_key": "",
+                        "LIonWeb_key": "Feature",
+                        "feature_type": "Property",
+                        "property": {
+                            "type": "dt-string",
+                            "typeReference_key": "dt-string",
+                            "default_value": "",
+                            "LIonWeb_key": "Feature.Property",
+                            "field_type": "",
+                            "field_prefix": "",
+                            "field_parameters": []
+                        }
+                    },
+                    "feature6": {
+                        "name": "fieldset",
+                        "key": "f-editfield-fieldset",
+                        "label": "Group this field belongs to",
+                        "description": "Fields sharing a name are rendered together, in the order they first appear. Left empty they go in the form's main group, which is what every generated form was until now. Whether a group becomes a tab is the template's business, not the model's.",
+                        "is_optional": "1",
+                        "is_assigned": "0",
+                        "classifier_key": "",
+                        "LIonWeb_key": "Feature",
+                        "feature_type": "Property",
+                        "property": {
+                            "type": "dt-string",
+                            "typeReference_key": "dt-string",
+                            "default_value": "",
+                            "LIonWeb_key": "Feature.Property",
+                            "field_type": "",
+                            "field_prefix": "",
+                            "field_parameters": []
                         }
                     }
                 }
