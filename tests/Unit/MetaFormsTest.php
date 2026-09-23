@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Yepr\Component\Metagen\Administrator\Generator\Meta\Forms;
 use Yepr\Component\Metagen\Administrator\Generator\Meta\FormXml;
 use Yepr\Component\Metagen\Administrator\Generator\Meta\LanguageStructure;
+use Yepr\Component\Metagen\Administrator\Generator\Meta\Presentation;
 use Yepr\Component\Metagen\Administrator\Generator\Meta\ReferenceTable;
 use Yepr\Component\Metagen\Administrator\Generator\Model\ConceptModel;
 use Yepr\Gen\Core\Package\MetalanguagePackage;
@@ -415,6 +416,44 @@ final class MetaFormsTest extends TestCase
         $key = $this->field('languageEntity', 'key');
 
         $this->assertSame('text', (string) $key['type']);
+    }
+
+    /**
+     * How a generated form looks comes from one table, not from the model.
+     *
+     * 3.5's decision: a concept model says what a language *is*, and a
+     * reference dropdown being tinted is a decision about a Joomla form. A
+     * language carrying that could not be generated into anything else, so the
+     * presentation sits in `Presentation` and the model stays clean of it.
+     *
+     * What the table cannot give back it does not pretend to. Comparing the
+     * generated ER1 against the hand-written set found sixteen `size`
+     * attributes running 60, 40, 20, 2 and 1, and fourteen `min`s on seventeen
+     * of thirty-five subforms - per-field decisions somebody made one at a
+     * time. A table guessing one number would make sixteen fields differently
+     * wrong rather than uniformly plain, so those are lost, on purpose.
+     */
+    public function testHowAFormLooksComesFromTheDefaultsTable(): void
+    {
+        // Every dropdown of existing things, tinted the same way.
+        $this->assertSame(
+            Presentation::SELECT_CLASS,
+            (string) $this->field('concept', 'extends')['class']
+        );
+
+        // A repeating group can be reordered, because the order of one is part
+        // of the model rather than a convenience.
+        $entities = $this->field('language', 'languageEntities');
+
+        $this->assertSame('true', (string) $entities['multiple']);
+        $this->assertSame(Presentation::REPEATING_BUTTONS, (string) $entities['buttons']);
+        $this->assertSame(Presentation::REPEATING_LAYOUT, (string) $entities['layout']);
+
+        // And a single one is not offered buttons it has no use for.
+        $classifier = $this->field('languageEntity', 'classifier');
+
+        $this->assertSame(Presentation::SINGLE_LAYOUT, (string) $classifier['layout']);
+        $this->assertNull($classifier['buttons']);
     }
 
     /**

@@ -186,6 +186,20 @@ final class FormXml
     }
 
     /**
+     * Put a defaults table's attributes on a field.
+     *
+     * @param  array<string, string>  $attributes
+     *
+     * @since  1.4.0
+     */
+    private function dress(DOMElement $field, array $attributes): void
+    {
+        foreach ($attributes as $name => $value) {
+            $field->setAttribute($name, $value);
+        }
+    }
+
+    /**
      * The discriminator radio and one subform per subtype.
      *
      * @since  1.2.0
@@ -227,6 +241,8 @@ final class FormXml
             $radio->appendChild($option);
         }
 
+        $this->dress($radio, Presentation::forDiscriminator());
+
         $fieldset->appendChild($radio);
 
         foreach ($subtypes as $subtype) {
@@ -245,7 +261,9 @@ final class FormXml
             }
 
             $field->setAttribute('id', $group);
-            $field->setAttribute('layout', 'joomla.form.field.subform.default');
+
+            $this->dress($field, Presentation::forContainment(false));
+
             $field->setAttribute('showon', $this->structure->discriminatorOf($classifier) . ':' . $subtype->name);
 
             $fieldset->appendChild($field);
@@ -331,6 +349,8 @@ final class FormXml
         if ($datatype !== null && $datatype->isEnumeration()) {
             $field->setAttribute('type', 'list');
 
+            $this->dress($field, Presentation::forEnumeration());
+
             foreach ($datatype->literals as $literal) {
                 $option = $document->createElement('option', $literal['name']);
 
@@ -373,15 +393,7 @@ final class FormXml
         $field->setAttribute('formsource', $this->formSourceFor($target));
         $field->setAttribute('id', $feature->name);
 
-        if ($feature->multiple) {
-            $field->setAttribute('multiple', 'true');
-            $field->setAttribute('buttons', 'add,remove,move');
-            $field->setAttribute('layout', 'joomla.form.field.subform.repeatable');
-
-            return true;
-        }
-
-        $field->setAttribute('layout', 'joomla.form.field.subform.default');
+        $this->dress($field, Presentation::forContainment($feature->multiple));
 
         return true;
     }
@@ -402,6 +414,8 @@ final class FormXml
         $field->setAttribute('type', 'Reference');
         $field->setAttribute('objecttype', $target->name);
         $field->setAttribute('id', $feature->name);
+
+        $this->dress($field, Presentation::forReference());
 
         // No `scope` yet, and deliberately not guessed at. A scoped dropdown -
         // the fields of one entity - narrows itself by an element beside it,
