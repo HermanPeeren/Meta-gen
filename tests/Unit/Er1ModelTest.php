@@ -314,6 +314,47 @@ final class Er1ModelTest extends TestCase
     }
 
     /**
+     * A field class the component wrote survives being modelled.
+     *
+     * ER1 has three custom field types and two of them do real work: the Slot
+     * picker reads its choices from `SlotCatalogue` rather than from a list in
+     * the form, and HtmlTypes is the html-type picker. Generated as text boxes
+     * they stop being pickers, and 3.5 would have shipped that as the price of
+     * keeping the generated set. `SlotContractTest` in Exten-gen caught it by
+     * refusing to pass having checked nothing.
+     *
+     * So a property may name a field class, the namespace it lives in, and the
+     * attributes it reads. `owner="Entity"` is why parameters exist: without it
+     * the picker resolves and offers nothing, which reads as "there are no
+     * slots" rather than as a mistake.
+     */
+    public function testAFieldClassTheComponentWroteSurvives(): void
+    {
+        $files = new FileCollection();
+
+        (new Forms())->generate($this->er1(), $files);
+
+        $custom = simplexml_load_string($files->get(MetalanguagePackage::formPath('CustomcodeEntity')));
+
+        $this->assertNotFalse($custom);
+
+        $slot = $custom->xpath('//field[@name="slot"]');
+
+        $this->assertNotEmpty($slot);
+        $this->assertSame('Slot', (string) $slot[0]['type'], 'the picker became a text box');
+        $this->assertSame('Entity', (string) $slot[0]['owner'], 'without this it offers nothing');
+
+        // And the class is findable. Joomla collects addfieldprefix from every
+        // element in the document, not only from a fieldset, so a field may
+        // carry its own - which is what lets one form use classes from more
+        // than one place.
+        $this->assertSame(
+            'Yepr\Component\Extengen\Administrator\Field',
+            (string) $slot[0]['addfieldprefix']
+        );
+    }
+
+    /**
      * It generates a form per classifier, and reports nothing missing.
      */
     public function testItGeneratesAFormPerClassifierWithNothingMissing(): void

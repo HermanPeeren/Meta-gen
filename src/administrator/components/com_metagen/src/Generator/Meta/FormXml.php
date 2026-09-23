@@ -15,6 +15,7 @@ namespace Yepr\Component\Metagen\Administrator\Generator\Meta;
 use DOMDocument;
 use DOMElement;
 use Yepr\Component\Metagen\Administrator\Generator\Model\Classifier;
+use Yepr\Component\Metagen\Administrator\Generator\Model\CustomField;
 use Yepr\Component\Metagen\Administrator\Generator\Model\Feature;
 use Yepr\Gen\Core\Package\MetalanguagePackage;
 
@@ -352,6 +353,29 @@ final class FormXml
         // where the hand-written one opens with something.
         if ($feature->default !== '') {
             $field->setAttribute('default', $feature->default);
+        }
+
+        // A field class, when the language says a text box will not do. It
+        // wins over the datatype, because the datatype says what the value
+        // *is* and this says what edits it - `Slot` still holds a string.
+        //
+        // `addfieldprefix` goes on the field itself, which works because
+        // `Form::loadFile()` collects the attribute from every element in the
+        // document (`//*[@addfieldprefix]`) rather than only from a fieldset.
+        // So one form may use field classes from more than one place, which a
+        // language assembled out of several components will need.
+        if ($feature->customField !== null) {
+            $field->setAttribute('type', $feature->customField->type);
+
+            if ($feature->customField->prefix !== '') {
+                $field->setAttribute('addfieldprefix', $feature->customField->prefix);
+            }
+
+            foreach ($feature->customField->parameters as $parameter => $value) {
+                $field->setAttribute($parameter, $value);
+            }
+
+            return;
         }
 
         if ($datatype !== null && $datatype->isEnumeration()) {

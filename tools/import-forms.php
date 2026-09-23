@@ -303,6 +303,12 @@ final class FormSetImporter
      */
     private function featuresOf(SimpleXMLElement $form, string $path, string $owner, string $ownerKey): array
     {
+        // Where this form's own field classes live, for any field whose
+        // type no primitive matches. Read off the fieldset rather than
+        // assumed, because a form may declare more than one.
+        $prefixes = $form->xpath('//*[@addfieldprefix]/@addfieldprefix') ?: [];
+        $prefix   = $prefixes === [] ? '' : (string) $prefixes[0];
+
         $fields       = $form->xpath('//field') ?: [];
         $discriminated = $this->subtypesIn($fields, $path, $ownerKey);
         $features     = [];
@@ -342,7 +348,7 @@ final class FormSetImporter
                 }
             }
 
-            $feature = $this->featureFor($field, $path, $owner, $fieldName, $type);
+            $feature = $this->featureFor($field, $path, $owner, $fieldName, $type, $prefix);
 
             if ($feature !== null) {
                 $features[] = $feature;
@@ -524,7 +530,8 @@ final class FormSetImporter
         string $path,
         string $owner,
         string $fieldName,
-        string $type
+        string $type,
+        string $prefix = ''
     ): ?array {
         $key      = 'f-' . strtolower($owner) . '-' . strtolower(preg_replace('/[^A-Za-z0-9]+/', '-', $fieldName) ?? $fieldName);
         $optional = strtolower((string) $field['required']) !== 'true';
@@ -598,9 +605,58 @@ final class FormSetImporter
             'LIonWeb_key'       => 'Feature.Property',
         ];
 
+        // A field type no primitive matches is a class the component wrote, and
+        // generating a text box for it loses whatever it did. ER1's Slot picker
+        // reads its choices from a catalogue; a text box reads nothing.
+        if (!isset(self::DATATYPES[strtolower($type)]) && ($field->xpath('option') ?: []) === []) {
+            $feature['property']['field_type']       = $type;
+            $feature['property']['field_prefix']     = $prefix;
+            $feature['property']['field_parameters'] = $this->parametersOf($field);
+        }
+
         $feature['property']['typeReference_key'] = $feature['property']['type'];
 
         return $feature;
+    }
+
+    /**
+     * The attributes a custom field class reads.
+     *
+     * Everything that is not one of Joomla's own. `owner="Entity"` on ER1's
+     * Slot picker is the reason this exists: without it the field resolves and
+     * offers nothing, which reads as "there are no slots" rather than as a
+     * mistake.
+     *
+     * The list below is what the generator writes itself or what presentation
+     * covers. Anything else the form said, the field class asked for.
+     *
+     * @return array<string, array{name: string, value: string, LIonWeb_key: string}>
+     */
+    private function parametersOf(SimpleXMLElement $field): array
+    {
+        $own = [
+            'name', 'type', 'label', 'description', 'id', 'class', 'size', 'default',
+            'required', 'multiple', 'buttons', 'layout', 'showon', 'formsource',
+            'objecttype', 'filter', 'validate', 'min', 'max', 'hint', 'readonly',
+            'disabled', 'addfieldprefix', 'addruleprefix', 'value',
+        ];
+
+        $parameters = [];
+        $index      = 0;
+
+        foreach ($field->attributes() ?? [] as $name => $value) {
+            if (\in_array((string) $name, $own, true)) {
+                continue;
+            }
+
+            $parameters['parameter' . $index++] = [
+                'name'        => (string) $name,
+                'value'       => (string) $value,
+                'LIonWeb_key' => 'FieldParameter',
+            ];
+        }
+
+        return $parameters;
     }
 
     /**
@@ -679,11 +735,12 @@ final class FormSetImporter
 
         if ($name === null) {
             // A field type this component knows nothing about - one of the
-            // consuming component's own classes. It reads as text, and says so,
-            // because a language that silently dropped it would generate a form
-            // missing a field somebody fills in.
+            // consuming component's own classes. The property is still a string
+            // underneath, and `field_type` beside it says what edits it, so the
+            // generated form keeps the class rather than replacing it with a
+            // text box.
             $this->notes[] = 'note: ' . $path . ' uses field type "' . $type . '" for ' . $fieldName
-                . ', which no primitive matches; recorded as String.';
+                . '; the value reads as String and the field class is kept.';
 
             $name = 'String';
         }

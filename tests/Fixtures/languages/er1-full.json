@@ -617,7 +617,16 @@
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
                             "default_value": "",
-                            "LIonWeb_key": "Feature.Property"
+                            "LIonWeb_key": "Feature.Property",
+                            "field_type": "Slot",
+                            "field_prefix": "Yepr\\Component\\Extengen\\Administrator\\Field",
+                            "field_parameters": {
+                                "parameter0": {
+                                    "name": "owner",
+                                    "value": "Entity",
+                                    "LIonWeb_key": "FieldParameter"
+                                }
+                            }
                         }
                     },
                     "feature1": {
@@ -927,7 +936,10 @@
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
                             "default_value": "text",
-                            "LIonWeb_key": "Feature.Property"
+                            "LIonWeb_key": "Feature.Property",
+                            "field_type": "HtmlTypes",
+                            "field_prefix": "Yepr\\Component\\Extengen\\Administrator\\Field",
+                            "field_parameters": []
                         }
                     },
                     "feature2": {

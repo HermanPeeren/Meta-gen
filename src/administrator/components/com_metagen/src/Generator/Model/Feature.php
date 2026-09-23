@@ -75,6 +75,7 @@ final class Feature
      * @param  bool     $multiple    Whether a link holds more than one target.
      * @param  string   $typeKey     The key of the datatype or classifier it points at.
      * @param  string   $default     What a new row holds before anybody fills it in.
+     * @param  ?CustomField $customField  The field class it is edited with, when a text box will not do.
      *
      * @since  1.2.0
      */
@@ -89,7 +90,8 @@ final class Feature
         public readonly string $linkKind,
         public readonly bool $multiple,
         public readonly string $typeKey,
-        public readonly string $default
+        public readonly string $default,
+        public readonly ?CustomField $customField
     ) {
     }
 
@@ -124,7 +126,8 @@ final class Feature
             // Only a property has one. What a link would default to is a
             // reference to something that does not exist yet, which is not a
             // value anybody can write down.
-            $property === null ? '' : self::text($property, 'default_value')
+            $property === null ? '' : self::text($property, 'default_value'),
+            CustomField::fromNode($property)
         );
     }
 
