@@ -346,6 +346,14 @@ final class FormXml
     ): void {
         $datatype = $feature->typeKey === '' ? null : $this->structure->model()->dataType($feature->typeKey);
 
+        // What a new row holds before anybody fills it in. Not presentation:
+        // "a new page is a detail page unless you say otherwise" is a fact
+        // about the language, and a form without it opens with nothing chosen
+        // where the hand-written one opens with something.
+        if ($feature->default !== '') {
+            $field->setAttribute('default', $feature->default);
+        }
+
         if ($datatype !== null && $datatype->isEnumeration()) {
             $field->setAttribute('type', 'list');
 

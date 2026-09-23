@@ -18,6 +18,24 @@
 				type="hidden"
 		/>
 
+			<!--
+				What a new row holds before anybody fills it in.
+			
+				A fact about the language rather than about the form: a new page
+				being a detail page unless somebody says otherwise is part of what
+				the language means, and it is the same wherever the language is
+				generated to. Presentation went to the generator at 3.5; this did
+				not, and the difference is whether another target would want it too.
+			
+				For an enumeration it is one of the literal keys.
+			-->
+			<field
+				name="default_value"
+				type="text"
+				label="COM_METAGEN_METALANGUAGE_PROPERTY_FIELD_DEFAULT_LABEL"
+				description="COM_METAGEN_METALANGUAGE_PROPERTY_FIELD_DEFAULT_DESC"
+			/>
+
 		<field
 				name="LIonWeb_key"
 				value="Feature.Property"

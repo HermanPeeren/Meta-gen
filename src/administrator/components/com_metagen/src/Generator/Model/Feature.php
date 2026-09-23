@@ -74,6 +74,7 @@ final class Feature
      * @param  string   $linkKind    `Containment` or `Reference`, for a link.
      * @param  bool     $multiple    Whether a link holds more than one target.
      * @param  string   $typeKey     The key of the datatype or classifier it points at.
+     * @param  string   $default     What a new row holds before anybody fills it in.
      *
      * @since  1.2.0
      */
@@ -87,7 +88,8 @@ final class Feature
         public readonly string $kind,
         public readonly string $linkKind,
         public readonly bool $multiple,
-        public readonly string $typeKey
+        public readonly string $typeKey,
+        public readonly string $default
     ) {
     }
 
@@ -118,7 +120,11 @@ final class Feature
             $kind,
             $link === null ? '' : self::text($link, 'link_type'),
             $link !== null && self::flag($link, 'is_multiple'),
-            $typeFrom === null ? '' : self::text($typeFrom, 'type')
+            $typeFrom === null ? '' : self::text($typeFrom, 'type'),
+            // Only a property has one. What a link would default to is a
+            // reference to something that does not exist yet, which is not a
+            // value anybody can write down.
+            $property === null ? '' : self::text($property, 'default_value')
         );
     }
 

@@ -237,6 +237,83 @@ final class Er1ModelTest extends TestCase
     }
 
     /**
+     * A new row opens holding what the language says it holds.
+     *
+     * "A new page is a detail page unless you say otherwise" is a fact about
+     * the language, not about how the form looks - which is why this went into
+     * the model at 3.5 while `size` and `min` went to the generator's defaults
+     * table. Another target would want this and would not want those.
+     *
+     * Without it a generated form opens with nothing chosen where the
+     * hand-written one opens with something, and a page saved without touching
+     * the dropdown would have no type at all.
+     */
+    public function testANewRowOpensHoldingWhatTheLanguageSays(): void
+    {
+        $files = new FileCollection();
+
+        (new Forms())->generate($this->er1(), $files);
+
+        $page = simplexml_load_string($files->get(MetalanguagePackage::formPath('Page')));
+
+        $this->assertNotFalse($page);
+
+        $type = $page->xpath('//field[@name="page_type"]');
+
+        $this->assertNotEmpty($type);
+        $this->assertSame('detailspage', (string) $type[0]['default']);
+
+        // And a property nobody gave one to carries no empty default, which
+        // Joomla would read as a real value of "".
+        $name = $page->xpath('//field[@name="page_name"]');
+
+        $this->assertNotEmpty($name);
+        $this->assertNull($name[0]['default']);
+    }
+
+    /**
+     * A default on a closed list is one of that list's own answers.
+     *
+     * A default naming something the list does not offer renders as nothing
+     * selected - which looks exactly like having no default, so the mistake is
+     * invisible on screen and survives until somebody saves a row without
+     * touching the field.
+     */
+    public function testEveryDefaultOnAClosedListIsOneOfItsAnswers(): void
+    {
+        $model  = $this->er1();
+        $wrong  = [];
+        $looked = 0;
+
+        foreach ($model->classifiers() as $classifier) {
+            foreach ($classifier->features as $feature) {
+                if (!$feature->isProperty() || $feature->default === '') {
+                    continue;
+                }
+
+                $datatype = $model->dataType($feature->typeKey);
+
+                if ($datatype === null || !$datatype->isEnumeration()) {
+                    continue;
+                }
+
+                $looked++;
+                $keys = array_column($datatype->literals, 'key');
+
+                if (!\in_array($feature->default, $keys, true)) {
+                    $wrong[] = $classifier->name . '.' . $feature->name . ' defaults to "'
+                        . $feature->default . '", and ' . $datatype->name . ' offers '
+                        . implode(', ', $keys);
+                }
+            }
+        }
+
+        $this->assertSame([], $wrong, implode("
+  ", $wrong));
+        $this->assertGreaterThan(0, $looked, 'no list with a default was checked, so this proves nothing');
+    }
+
+    /**
      * It generates a form per classifier, and reports nothing missing.
      */
     public function testItGeneratesAFormPerClassifierWithNothingMissing(): void

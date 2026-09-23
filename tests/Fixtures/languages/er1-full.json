@@ -271,6 +271,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     }
@@ -305,6 +306,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -321,6 +323,7 @@
                         "property": {
                             "type": "dt-boolean",
                             "typeReference_key": "dt-boolean",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -371,6 +374,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     }
@@ -405,6 +409,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -421,6 +426,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     }
@@ -455,6 +461,7 @@
                         "property": {
                             "type": "dt-propertytype",
                             "typeReference_key": "dt-propertytype",
+                            "default_value": "Integer",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -471,6 +478,7 @@
                         "property": {
                             "type": "dt-boolean",
                             "typeReference_key": "dt-boolean",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -487,6 +495,7 @@
                         "property": {
                             "type": "dt-boolean",
                             "typeReference_key": "dt-boolean",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -503,6 +512,7 @@
                         "property": {
                             "type": "dt-boolean",
                             "typeReference_key": "dt-boolean",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     }
@@ -554,6 +564,7 @@
                         "property": {
                             "type": "dt-boolean",
                             "typeReference_key": "dt-boolean",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -570,6 +581,7 @@
                         "property": {
                             "type": "dt-boolean",
                             "typeReference_key": "dt-boolean",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     }
@@ -604,6 +616,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -620,6 +633,7 @@
                         "property": {
                             "type": "dt-text",
                             "typeReference_key": "dt-text",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     }
@@ -654,6 +668,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -670,6 +685,7 @@
                         "property": {
                             "type": "dt-pagetype",
                             "typeReference_key": "dt-pagetype",
+                            "default_value": "detailspage",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -771,6 +787,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     }
@@ -909,6 +926,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "text",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -960,6 +978,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -976,6 +995,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     }
@@ -1010,6 +1030,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1026,6 +1047,7 @@
                         "property": {
                             "type": "dt-linktype",
                             "typeReference_key": "dt-linktype",
+                            "default_value": "Details",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1164,6 +1186,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1180,6 +1203,7 @@
                         "property": {
                             "type": "dt-text",
                             "typeReference_key": "dt-text",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1351,6 +1375,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1367,6 +1392,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1383,6 +1409,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1399,6 +1426,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1415,6 +1443,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1431,6 +1460,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1447,6 +1477,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1463,6 +1494,7 @@
                         "property": {
                             "type": "dt-date",
                             "typeReference_key": "dt-date",
+                            "default_value": "NOW",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1479,6 +1511,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     }
@@ -1513,6 +1546,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "en",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1529,6 +1563,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "GB",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1580,6 +1615,7 @@
                         "property": {
                             "type": "dt-string",
                             "typeReference_key": "dt-string",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     },
@@ -1596,6 +1632,7 @@
                         "property": {
                             "type": "dt-text",
                             "typeReference_key": "dt-text",
+                            "default_value": "",
                             "LIonWeb_key": "Feature.Property"
                         }
                     }

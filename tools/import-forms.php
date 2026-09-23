@@ -591,6 +591,10 @@ final class FormSetImporter
             'type'              => $this->enumerationFor($field, $owner, $fieldName)
                 ?? $this->dataTypeFor($type, $field, $path, $fieldName),
             'typeReference_key' => '',
+            // A form's `default` is what a new row holds, which is a fact
+            // about the language rather than about the form - so unlike `size`
+            // and `min` it survives the trip.
+            'default_value'     => trim((string) $field['default']),
             'LIonWeb_key'       => 'Feature.Property',
         ];
 
