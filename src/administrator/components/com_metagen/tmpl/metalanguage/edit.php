@@ -69,8 +69,22 @@ $tmpl    = $isModal || $input->get('tmpl', '', 'cmd') === 'component' ? '&tmpl=c
             </div>
 		<?php endif; ?>
 
+		<?php
+		/*
+		 * Fields on this form are rendered by name, one call each - so a field
+		 * added to metalanguage.xml and not named here is a field nobody can
+		 * see. 4.5 added `dependsOn` and found that out in the browser, which is
+		 * the only gate that could: every unit test passed against a form whose
+		 * new field the screen never drew.
+		 */
+		?>
         <div class="row">
             <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12">
+						<?php echo $this->getForm()->renderField('dependsOn'); ?>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-md-12">
 						<?php echo $this->getForm()->renderField('languageEntities'); ?>

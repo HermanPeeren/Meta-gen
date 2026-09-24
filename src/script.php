@@ -43,13 +43,16 @@ class Com_MetagenInstallerScript
     /**
      * The oldest library release that has everything this version calls.
      *
-     * 0.8.0 for `Yepr\Gen\Core\Lionweb\ChunkBuilder`, which the LionWeb import
-     * reads a chunk with. `composer.json` has to ask for the same thing, and
-     * `PackageTest` is what says the two agree - this one said 0.6.0 while
-     * composer asked for ^0.8, which is a site that installs the component,
-     * accepts the library it is handed, and cannot open the import screen.
+     * 0.11.0 for `Package\AncestryCheck` and `Metalanguage\Ancestry`, which 4.5
+     * needs so a language can say what it derives from - and for the package
+     * format that carries it, which this version of Meta-gen writes.
+     *
+     * `composer.json` has to ask for the same thing, and `ReleaseTest` is what
+     * says the two agree. They did not once: this said 0.6.0 while composer
+     * asked for ^0.8, which is a site that installs the component, accepts the
+     * library it is handed, and cannot open the import screen.
      */
-    private const LIBRARY_MINIMUM = '0.8.0';
+    private const LIBRARY_MINIMUM = '0.11.0';
 
     /**
      * The oldest Joomla this runs on.

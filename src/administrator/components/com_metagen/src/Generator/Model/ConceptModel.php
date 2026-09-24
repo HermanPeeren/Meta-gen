@@ -153,6 +153,67 @@ final class ConceptModel implements ModelInterface
     }
 
     /**
+     * The languages this one derives from: step 4.5.
+     *
+     * `dependsOn` is LionWeb's own name for the relation - `Language.dependsOn`
+     * is in LionCore already - and it is what lets several languages come off
+     * one parent, each with its own purpose, and all of them still be generable
+     * by the parent's generators.
+     *
+     * Stored as a repeating group, so an object keyed `dependsOn0`,
+     * `dependsOn1` and so on rather than an array, which is what a Joomla
+     * subform produces. Each row holds one `language`, spelled `key|version`
+     * the way a project's binding is in Exten-gen - the pair, because two
+     * versions of one language are two different parents.
+     *
+     * A row that names no language, or names one without a version, is dropped
+     * rather than written into a manifest half-formed: an importer reading a
+     * parent it cannot identify would report a missing language that never
+     * existed.
+     *
+     * @return array<int, array{key: string, version: string}>
+     *
+     * @since  1.5.0
+     */
+    public function dependsOn(): array
+    {
+        $rows = $this->data->dependsOn ?? null;
+
+        if (!\is_object($rows) && !\is_array($rows)) {
+            return [];
+        }
+
+        $parents = [];
+
+        foreach ((array) $rows as $row) {
+            $binding = \is_object($row) ? ($row->language ?? '') : '';
+
+            if (!\is_scalar($binding)) {
+                continue;
+            }
+
+            $binding = trim((string) $binding);
+
+            if ($binding === '' || !str_contains($binding, '|')) {
+                continue;
+            }
+
+            [$key, $version] = explode('|', $binding, 2);
+
+            $key     = trim($key);
+            $version = trim($version);
+
+            if ($key === '' || $version === '') {
+                continue;
+            }
+
+            $parents[] = ['key' => $key, 'version' => $version];
+        }
+
+        return $parents;
+    }
+
+    /**
      * The language as it is stored, which is what a package carries.
      *
      * The same object `fromObject()` was given: a package holds the model it

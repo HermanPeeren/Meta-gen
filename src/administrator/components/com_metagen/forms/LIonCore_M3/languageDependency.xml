@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset
+		addruleprefix="Yepr\Component\Metagen\Administrator\Rule"
+		addfieldprefix="Yepr\Gen\Joomla\Form\Field"
+	>
+		<!--
+			One language this one derives from, as `key|version`.
+
+			The picker is this component's own, named on the field rather than
+			the fieldset: `Form::loadFile()` collects addfieldprefix from every
+			element in the document, so one field may carry its own without
+			widening the search for its neighbours - which matters here, because
+			the fieldset above points at the shared library.
+
+			It is on this form and deliberately *not* on the model. A generated
+			package must name no component - `PackageTest` says so, and the
+			reason is that a package is loaded by more than one of them - so the
+			generated `languageDependency.xml` has a text box where this has a
+			dropdown. Meta-gen ships this file itself, which is why it may know
+			about Meta-gen.
+		-->
+		<field
+				name="language"
+				type="Metalanguage"
+				addfieldprefix="Yepr\Component\Metagen\Administrator\Field"
+				label="COM_METAGEN_METALANGUAGE_DEPENDSON_FIELD_LANGUAGE_LABEL"
+				description="COM_METAGEN_METALANGUAGE_DEPENDSON_FIELD_LANGUAGE_DESC"
+				class="custom-select-color-state"
+				required="true"
+		/>
+
+		<field
+				name="LIonWeb_key"
+				value="LanguageDependency"
+				type="hidden"
+		/>
+
+	</fieldset>
+</form>

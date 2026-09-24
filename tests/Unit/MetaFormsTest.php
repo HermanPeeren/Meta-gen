@@ -139,6 +139,7 @@ final class MetaFormsTest extends TestCase
             'enumerationLiteral.xml',
             'feature.xml',
             'language.xml',
+            'languageDependency.xml',
             'languageEntity.xml',
             'link.xml',
             'lioncore_m3.ini',
@@ -173,7 +174,10 @@ final class MetaFormsTest extends TestCase
             $checked++;
         }
 
-        $this->assertSame(16, $checked);
+        // The model's own count, for the reason above: a literal here is a
+        // number somebody bumps without reading what it guards.
+        $this->assertSame(\count($this->metaModel()->classifiers()), $checked);
+        $this->assertGreaterThan(0, $checked);
     }
 
     /**
@@ -368,7 +372,7 @@ final class MetaFormsTest extends TestCase
     {
         $files   = $this->generate();
         $missing = [];
-        $root    = MetalanguagePackage::installRoot('LIonCore_M3', '2023.1');
+        $root    = MetalanguagePackage::installRoot('LIonCore_M3', '2023.2');
 
         foreach ($files as $path => $contents) {
             if (!str_ends_with($path, '.xml')) {

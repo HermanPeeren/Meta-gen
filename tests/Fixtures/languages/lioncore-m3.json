@@ -1,7 +1,7 @@
 {
     "id": "0",
     "name": "LIonCore_M3",
-    "version": "2023.1",
+    "version": "2023.2",
     "LIonWeb_key": "Language",
     "languageEntities": {
         "languageEntities0": {
@@ -81,6 +81,23 @@
                         },
                         "classifier_key": "",
                         "LIonWeb_key": "Feature"
+                    },
+                    "feature3": {
+                        "name": "dependsOn",
+                        "key": "f-language-dependson",
+                        "label": "Derived from",
+                        "description": "The languages this one is built on. LionWeb's own name for the relation, and the same meaning: everything they declare is available here.",
+                        "is_optional": "1",
+                        "is_assigned": "0",
+                        "classifier_key": "",
+                        "LIonWeb_key": "Feature",
+                        "feature_type": "Link",
+                        "link": {
+                            "type": "c-languagedependency",
+                            "link_type": "Containment",
+                            "is_multiple": "1",
+                            "LIonWeb_key": "Feature.Link"
+                        }
                     }
                 }
             },
@@ -685,6 +702,44 @@
                     "LIonWeb_key": "LanguageEntity.Classifier.Concept"
                 },
                 "feature": {}
+            },
+            "LIonWeb_key": "LanguageEntity"
+        },
+        "languageEntities18": {
+            "name": "LanguageDependency",
+            "key": "c-languagedependency",
+            "languageEntity_type": "Classifier",
+            "classifier": {
+                "classifier_type": "Concept",
+                "concept": {
+                    "abstract": "0",
+                    "partition": "0",
+                    "extends": "",
+                    "implements": {},
+                    "LIonWeb_key": "LanguageEntity.Classifier.Concept"
+                },
+                "feature": {
+                    "feature0": {
+                        "name": "language",
+                        "key": "f-languagedependency-language",
+                        "label": "Derived from",
+                        "description": "A language this one is built on. Everything that language declares is available here, and a generator written for it runs over models written in this one - which is what deriving is for.",
+                        "is_optional": "0",
+                        "is_assigned": "0",
+                        "classifier_key": "",
+                        "LIonWeb_key": "Feature",
+                        "feature_type": "Property",
+                        "property": {
+                            "type": "dt-string",
+                            "typeReference_key": "dt-string",
+                            "default_value": "",
+                            "LIonWeb_key": "Feature.Property",
+                            "field_type": "",
+                            "field_prefix": "",
+                            "field_parameters": []
+                        }
+                    }
+                }
             },
             "LIonWeb_key": "LanguageEntity"
         }

@@ -122,6 +122,24 @@
 
 	<fieldset name="simple-top-down">
 
+		<!--
+			What this language is built on: step 4.5. Everything a parent
+			declares is available here, and a generator written for the parent
+			runs over models written in this one - which is what deriving is
+			for, and why it sits above the entities rather than below them.
+		-->
+		<field
+				name="dependsOn"
+				type="subform"
+				formsource="administrator/components/com_metagen/forms/LIonCore_M3/languageDependency.xml"
+				multiple="true"
+				buttons="add,remove,move"
+				label="COM_METAGEN_METALANGUAGE_DEPENDSON_LABEL"
+				description="COM_METAGEN_METALANGUAGE_DEPENDSON_DESC"
+				id="dependsOn"
+				layout="joomla.form.field.subform.repeatable"
+		/>
+
 		<field
 				name="languageEntities"
 				type="subform"

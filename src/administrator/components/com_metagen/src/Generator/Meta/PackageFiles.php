@@ -153,7 +153,8 @@ final class PackageFiles implements GeneratorInterface
             $this->concepts($model),
             $hashes,
             MetalanguagePackage::FORMAT,
-            gmdate('c')
+            gmdate('c'),
+            $model->dependsOn()
         );
     }
 }

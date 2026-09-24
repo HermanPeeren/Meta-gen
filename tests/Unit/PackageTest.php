@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Yepr\Component\Metagen\Administrator\Generator\Model\ConceptModel;
 use Yepr\Component\Metagen\Administrator\Generator\Target\MetaFormsTarget;
 use Yepr\Gen\Core\Package\MetalanguagePackage;
+use Yepr\Gen\Core\Package\PackageManifest;
 use Yepr\Gen\Core\Package\PackageReader;
 use Yepr\Gen\Core\Output\FileCollection;
 use Yepr\Gen\Core\Output\ZipWriter;
@@ -125,7 +126,17 @@ final class PackageTest extends TestCase
                 && str_ends_with($p, '.xml')
         );
 
-        $this->assertCount(16, $forms, 'one form per classifier');
+        // Counted from the model rather than written down: "one form per
+        // classifier" is the rule, and a number beside it is a number somebody
+        // has to bump every time the language grows - which is a test edited
+        // without being read.
+        $this->assertCount(
+            \count($this->metaModel()->classifiers()),
+            $forms,
+            'one form per classifier'
+        );
+
+        $this->assertNotSame([], $forms, 'and there are classifiers to have forms for');
     }
 
     /**
@@ -169,10 +180,10 @@ final class PackageTest extends TestCase
 
         $this->assertSame('LIonCore_M3', $manifest->name);
         $this->assertSame('LIonCore_M3', $manifest->key);
-        $this->assertSame('2023.1', $manifest->version);
+        $this->assertSame('2023.2', $manifest->version);
         $this->assertSame('Language', $manifest->root);
         $this->assertSame(MetalanguagePackage::FORMAT, $manifest->format);
-        $this->assertSame('media/yepr_metalanguages/LIonCore_M3/2023.1/', $manifest->formRoot);
+        $this->assertSame('media/yepr_metalanguages/LIonCore_M3/2023.2/', $manifest->formRoot);
         $this->assertSame('language/en-GB/lioncore_m3.ini', $manifest->language);
     }
 
@@ -342,6 +353,91 @@ final class PackageTest extends TestCase
             PackageReader::fromZip($this->zip($first))->manifest()->files,
             PackageReader::fromZip($this->zip($again))->manifest()->files
         );
+    }
+
+    /**
+     * A language says what it derives from, and the package carries it: 4.5.
+     *
+     * The relation is not versioning. ER1 2.0 says *this replaces that*;
+     * deriving says *this is also that*, which is what lets several languages
+     * come off one parent - each with its own purpose and its own name - and
+     * all of them still be generable by the parent's generators.
+     *
+     * Stored the way a Joomla subform stores a repeating group, and spelled
+     * `key|version` the way a project's binding is in Exten-gen: the pair,
+     * because two versions of one language are two different parents.
+     */
+    public function testAPackageCarriesWhatItsLanguageDerivesFrom(): void
+    {
+        $model = json_decode(
+            (string) file_get_contents(\dirname(__DIR__) . '/Fixtures/languages/lioncore-m3.json'),
+            false,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        $model->dependsOn = (object) [
+            'dependsOn0' => (object) ['language' => 'ER1|1.1'],
+            'dependsOn1' => (object) ['language' => 'LIonCore_M3|2023.1'],
+        ];
+
+        $files = $this->package(ConceptModel::fromObject($model));
+
+        $manifest = PackageManifest::fromJson($files->get(MetalanguagePackage::MANIFEST));
+
+        $this->assertSame(
+            [
+                ['key' => 'ER1', 'version' => '1.1'],
+                ['key' => 'LIonCore_M3', 'version' => '2023.1'],
+            ],
+            $manifest->dependsOn
+        );
+    }
+
+    /**
+     * A row that cannot name a parent is dropped rather than half-written.
+     *
+     * An importer reading a parent it cannot identify would report a language
+     * missing from the site that never existed anywhere - and the person
+     * reading that message has nothing to do about it.
+     */
+    public function testAHalfWrittenParentIsDropped(): void
+    {
+        $model = json_decode(
+            (string) file_get_contents(\dirname(__DIR__) . '/Fixtures/languages/lioncore-m3.json'),
+            false,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        $model->dependsOn = (object) [
+            'dependsOn0' => (object) ['language' => ''],
+            'dependsOn1' => (object) ['language' => 'ER1'],
+            'dependsOn2' => (object) ['language' => '|1.1'],
+            'dependsOn3' => (object) ['language' => 'ER1|'],
+            'dependsOn4' => (object) ['language' => ' ER1 | 1.1 '],
+        ];
+
+        $this->assertSame(
+            [['key' => 'ER1', 'version' => '1.1']],
+            ConceptModel::fromObject($model)->dependsOn()
+        );
+    }
+
+    /**
+     * A language that derives from nothing produces the manifest it always did.
+     *
+     * The field is left out entirely rather than written empty, which matters
+     * here more than it looks: a package's files are hashed and the manifest is
+     * what says so, so a manifest that gained a key would be a package whose
+     * bytes moved for a language nobody changed.
+     */
+    public function testALanguageThatDerivesFromNothingSaysNothing(): void
+    {
+        $manifest = $this->package()->get(MetalanguagePackage::MANIFEST);
+
+        $this->assertStringNotContainsString('dependsOn', $manifest);
+        $this->assertSame([], PackageManifest::fromJson($manifest)->dependsOn);
     }
 
     /**

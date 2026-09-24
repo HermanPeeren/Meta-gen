@@ -31,6 +31,31 @@ describe('a metalanguage', () => {
   });
 
   /**
+   * A language can be told what it derives from: step 4.5.
+   *
+   * Three subforms deep is where a change stops being visible - every unit test
+   * passed against a language whose new field nothing rendered, because the
+   * generator they exercise never opens a page. So this looks for the group and
+   * for the picker inside it.
+   *
+   * The picker is Meta-gen's own, and deliberately not in the model: a
+   * generated package must name no component, so the package's
+   * `languageDependency.xml` has a text box where this screen has a dropdown.
+   * `PackageTest` is what enforces that, and it caught the first attempt.
+   */
+  it('offers the languages this one may derive from', () => {
+    cy.get('#jform_dependsOn-lbl').should('exist');
+
+    cy.document().then((doc) => {
+      const html = doc.documentElement.outerHTML;
+
+      expect(html, 'the row template carries the picker').to.contain('dependsOn');
+      expect(html, 'and it is a select rather than a text box')
+        .to.match(/dependsOn[^"]*__language"[^>]*>[\s\S]{0,80}<option/);
+    });
+  });
+
+  /**
    * The six language entities the fixture holds, each with its key and kind.
    */
   it('shows the language entities it holds', () => {
