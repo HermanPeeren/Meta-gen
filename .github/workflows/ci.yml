@@ -19,11 +19,22 @@ jobs:
           extensions: zip
           coverage: none
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
       - name: Unit tests
         run: composer test
+
+      # The browser JavaScript, with no browser: node's own runner over the
+      # rules the generate button follows. The element that calls them is the
+      # Cypress spec's half.
+      - name: Browser-side tests
+        run: composer test-js
 
       # PHPStan resolves the form fields against a real Joomla. Without it every
       # `extends ListField` is an unknown class and the analysis says nothing.

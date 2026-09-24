@@ -66,6 +66,9 @@ jobs:
       - name: Unit tests
         run: composer test
 
+      - name: Browser-side tests
+        run: composer test-js
+
       # PHPStan resolves the component's base classes against a real Joomla.
       # Without it every `extends AdminModel` is an unknown class and the
       # analysis says nothing. /joomla is git-ignored, so CI fetches its own.
