@@ -115,7 +115,26 @@ final class PackageFiles implements GeneratorInterface
         $concepts = [];
 
         foreach ($model->classifiers() as $key => $classifier) {
-            $concepts[] = ['key' => (string) $key, 'name' => $classifier->name];
+            $features = [];
+
+            // Effective, not declared: `featuresOf()` walks the extends chain
+            // and the interfaces, so a language that moved a property up to a
+            // supertype still says it has it. That matters to whoever reads
+            // this - `AncestryCheck` compares a derived language against its
+            // parent, and the hierarchy is not in a manifest to work it out
+            // from, so the resolving happens here or nowhere.
+            foreach ($model->featuresOf($classifier) as $feature) {
+                $features[] = ['key' => $feature->key, 'name' => $feature->name];
+            }
+
+            $concepts[] = [
+                'key'      => (string) $key,
+                'name'     => $classifier->name,
+                // Written even when empty, because an absent list and an empty
+                // one mean different things to the guard: "this package does
+                // not say" against "this concept has none".
+                'features' => $features,
+            ];
         }
 
         return $concepts;

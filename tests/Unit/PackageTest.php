@@ -356,6 +356,80 @@ final class PackageTest extends TestCase
     }
 
     /**
+     * Each concept says which features it has, inherited ones included.
+     *
+     * The guard that refuses a derived language reads this and nothing else -
+     * by the time a child is imported the parent's package is long gone, and
+     * only its manifest is on the row. A manifest that listed only *declared*
+     * features would refuse a child that had tidied its inheritance, so the
+     * resolving happens here, where the hierarchy still exists.
+     *
+     * LionCore M3 is its own proof: `Concept` extends `Classifier`, so a
+     * concept's list has to carry what the classifier declares as well as its
+     * own, or the two would look like different things to whatever compares
+     * them.
+     */
+    public function testEachConceptSaysWhichFeaturesItHas(): void
+    {
+        $manifest = PackageManifest::fromJson(
+            $this->package()->get(MetalanguagePackage::MANIFEST)
+        );
+
+        $byName = [];
+
+        foreach ($manifest->concepts as $concept) {
+            $byName[$concept['name']] = $concept;
+        }
+
+        $this->assertArrayHasKey('Concept', $byName);
+        $this->assertArrayHasKey('features', $byName['Concept']);
+
+        $names = array_column($byName['Concept']['features'], 'name');
+
+        // Its own.
+        $this->assertContains('abstract', $names);
+
+        // And its supertype's, which is the half that needed resolving.
+        $classifier = array_column($byName['Classifier']['features'], 'name');
+
+        $this->assertNotSame([], array_intersect($names, $classifier));
+
+        // Every feature carries both halves of its identity, for the same two
+        // reasons a concept does: a stored model keys its data by the name, and
+        // the key is what tells a rename from a removal.
+        foreach ($manifest->concepts as $concept) {
+            foreach ($concept['features'] as $feature) {
+                $this->assertArrayHasKey('key', $feature);
+                $this->assertArrayHasKey('name', $feature);
+            }
+        }
+    }
+
+    /**
+     * A concept with no features says so, rather than saying nothing.
+     *
+     * The distinction is load-bearing: the guard reads an absent list as "this
+     * package does not say" and skips the check, and an empty one as "this
+     * concept has none" and enforces it. A packager that left the key out when
+     * there was nothing to put in it would turn every such concept into an
+     * unchecked one.
+     */
+    public function testAConceptWithNoFeaturesStillSaysSo(): void
+    {
+        $manifest = PackageManifest::fromJson(
+            $this->package()->get(MetalanguagePackage::MANIFEST)
+        );
+
+        foreach ($manifest->concepts as $concept) {
+            $this->assertArrayHasKey(
+                'features',
+                $concept,
+                $concept['name'] . ' says nothing about its features.'
+            );
+        }
+    }
+
+    /**
      * A language says what it derives from, and the package carries it: 4.5.
      *
      * The relation is not versioning. ER1 2.0 says *this replaces that*;
@@ -436,7 +510,14 @@ final class PackageTest extends TestCase
     {
         $manifest = $this->package()->get(MetalanguagePackage::MANIFEST);
 
-        $this->assertStringNotContainsString('dependsOn', $manifest);
+        // Decoded rather than searched. "The string does not contain dependsOn"
+        // was a cheap proxy for "the manifest has no such key", and it stopped
+        // being true the moment concepts started listing their features - one
+        // of LionCore M3's own is called `dependsOn`, which is the feature this
+        // whole step added.
+        $decoded = json_decode($manifest, true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertArrayNotHasKey('dependsOn', $decoded);
         $this->assertSame([], PackageManifest::fromJson($manifest)->dependsOn);
     }
 
