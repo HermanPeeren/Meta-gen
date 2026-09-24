@@ -18,6 +18,12 @@ use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Session\Session;
 
+// The generate button has to tell the one modal which language it means,
+// before Bootstrap opens it. That is the whole of com_metagen's own
+// JavaScript, and it is a file rather than inline script so that
+// `composer test-js` can import it.
+$this->getDocument()->getWebAssetManager()->useScript('com_metagen.generation-modal');
+
 $canChange  = true;
 $assoc = Associations::isEnabled();
 $listOrder = $this->escape($this->state->get('list.ordering'));
@@ -178,19 +184,3 @@ if ($saveOrder && !empty($this->items))
 		</div>
 	</div>
 </form>
-<script type="text/javascript">
-    // todo: put JS in JS-file
-    // On click of all .dynbutton buttons...
-    document.querySelectorAll(".dynbutton").forEach(btn => {
-        btn.addEventListener('click', function (event) {
-            event.preventDefault();
-
-            // ... get the URL you want in the popup (i.c. the metalanguage you want to generate) ...
-            var src = event.target.getAttribute("data-href");
-
-            // ... and use the URL for the iframe in the popup.
-            let ifr = document.querySelector("#generationModal iframe");
-            ifr.setAttribute("src", src);
-        })
-    })
-</script>

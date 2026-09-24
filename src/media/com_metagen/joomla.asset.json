@@ -1,0 +1,20 @@
+{
+  "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
+  "name": "com_metagen",
+  "version": "0.1.0",
+  "description": "Metalanguage Modeller",
+  "license": "GPL-3.0-or-later",
+  "assets": [
+    {
+      "name": "com_metagen.generation-modal",
+      "type": "script",
+      "uri": "com_metagen/generation-modal.js",
+      "dependencies": [
+        "core"
+      ],
+      "attributes": {
+        "type": "module"
+      }
+    }
+  ]
+}

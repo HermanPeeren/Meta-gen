@@ -45,6 +45,33 @@ describe('generating the forms of a language', () => {
     cy.get('body', { timeout: 60000 }).should('contain.text', 'files');
   });
 
+  /**
+   * And pressing the button actually points the modal at that language.
+   *
+   * The test above reads `data-href` and visits it, which is the right way to
+   * check the URL and no check at all on the thing between the click and the
+   * dialog. There is one modal for the whole list, so the click has to say
+   * which language it means before Bootstrap opens it - and nothing had ever
+   * exercised that. It was twelve lines of inline script in the template.
+   *
+   * Now it is `media/com_metagen/js/generation-modal.js`, whose rules
+   * `composer test-js` checks over plain objects. What is left for a browser is
+   * exactly this: that the listener is attached, to the right elements, and
+   * that the iframe it finds is the one in the dialog.
+   */
+  it('points the modal at the language whose button was pressed', () => {
+    cy.visitMetagen('metalanguages');
+    cy.shouldHaveRendered();
+
+    cy.get('#adminForm a.dynbutton[data-href*="view=generateForms"]').first().then(($button) => {
+      const expected = $button.attr('data-href');
+
+      cy.wrap($button).click();
+
+      cy.get('#generationModal iframe').should('have.attr', 'src', expected);
+    });
+  });
+
   it('generates the forms and reports what it wrote', () => {
     cy.visit('/administrator/index.php?option=com_metagen&view=generateForms'
       + '&tmpl=component&metalanguage_id=1');
