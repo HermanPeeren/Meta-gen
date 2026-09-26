@@ -19,10 +19,16 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Session\Session;
 
 // The generate button has to tell the one modal which language it means,
-// before Bootstrap opens it. That is the whole of com_metagen's own
-// JavaScript, and it is a file rather than inline script so that
-// `composer test-js` can import it.
-$this->getDocument()->getWebAssetManager()->useScript('com_metagen.generation-modal');
+// before Bootstrap opens it. The library's, because Exten-gen's projects list
+// needs the same twelve lines and two copies of one rule is how three defects
+// got in.
+//
+// A library carries media but does not get its asset file registered the way
+// the active component does, so it is asked for by name first - the same two
+// lines the metalanguage edit screen uses for the reference element.
+$wa = $this->getDocument()->getWebAssetManager();
+$wa->getRegistry()->addExtensionRegistryFile('lib_yepr_gen');
+$wa->useScript('lib_yepr_gen.generation-modal');
 
 $canChange  = true;
 $assoc = Associations::isEnabled();

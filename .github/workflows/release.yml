@@ -28,10 +28,6 @@ jobs:
           extensions: zip
           coverage: none
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
 
       # Three versions have to agree, and only one of them is edited by hand.
       # The tag is checked against the manifest here; updates.xml is checked by
@@ -66,8 +62,6 @@ jobs:
       - name: Unit tests
         run: composer test
 
-      - name: Browser-side tests
-        run: composer test-js
 
       # PHPStan resolves the component's base classes against a real Joomla.
       # Without it every `extends AdminModel` is an unknown class and the

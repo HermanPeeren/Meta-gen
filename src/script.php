@@ -43,16 +43,22 @@ class Com_MetagenInstallerScript
     /**
      * The oldest library release that has everything this version calls.
      *
-     * 0.11.0 for `Package\AncestryCheck` and `Metalanguage\Ancestry`, which 4.5
-     * needs so a language can say what it derives from - and for the package
-     * format that carries it, which this version of Meta-gen writes.
+     * 0.15.0 for `lib_yepr_gen.generation-modal`, the script the metalanguages
+     * list uses to tell the generate modal which row was pressed. It was this
+     * component's own until Exten-gen turned out to need the same twelve lines,
+     * and one rule in two places is how three defects got in this year.
+     *
+     * Before that, 0.11.0 for `Package\AncestryCheck` and
+     * `Metalanguage\Ancestry`, which 4.5 needs so a language can say what it
+     * derives from - and for the package format that carries it, which this
+     * version of Meta-gen writes.
      *
      * `composer.json` has to ask for the same thing, and `ReleaseTest` is what
      * says the two agree. They did not once: this said 0.6.0 while composer
      * asked for ^0.8, which is a site that installs the component, accepts the
      * library it is handed, and cannot open the import screen.
      */
-    private const LIBRARY_MINIMUM = '0.13.0';
+    private const LIBRARY_MINIMUM = '0.15.0';
 
     /**
      * The oldest Joomla this runs on.

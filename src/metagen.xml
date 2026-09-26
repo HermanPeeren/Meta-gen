@@ -26,11 +26,6 @@
 			<schemapath type="mysql">sql/updates/mysql</schemapath>
 		</schemas>
 	</update>
-	<!-- The one piece of browser JavaScript this component owns. -->
-	<media folder="media/com_metagen" destination="com_metagen">
-		<filename>joomla.asset.json</filename>
-		<folder>js</folder>
-	</media>
 	<administration>
 		<menu view="metalanguages">COM_METAGEN</menu>
 		<files folder="administrator/components/com_metagen">
