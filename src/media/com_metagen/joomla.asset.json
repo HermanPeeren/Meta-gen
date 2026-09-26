@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
   "name": "com_metagen",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Metalanguage Modeller",
   "license": "GPL-3.0-or-later",
   "assets": [

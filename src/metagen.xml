@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <extension type="component" method="upgrade">
 	<name>com_metagen</name>
-	<creationDate>20-09-2026</creationDate>
+	<creationDate>26-09-2026</creationDate>
 	<author>Herman Peeren</author>
 	<authorEmail>herman@yepr.nl</authorEmail>
 	<authorUrl>https://yepr.nl</authorUrl>
 	<copyright>Yepr, Herman Peeren, 2026</copyright>
 	<license>GNU General Public License version 3 or later;</license>
-	<version>0.1.0</version>
+	<version>0.2.0</version>
 	<description>COM_METAGEN_XML_DESCRIPTION</description>
 	<namespace path="src">Yepr\Component\Metagen</namespace>
 	<scriptfile>script.php</scriptfile>
