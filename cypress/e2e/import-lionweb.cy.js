@@ -104,6 +104,12 @@ const openImportPanel = () => {
 
 describe('importing a metalanguage from LionWeb', () => {
   beforeEach(() => {
+    // Nothing left over from an earlier run. The import makes a new row each
+    // time rather than updating one, so the site had reached twenty of them -
+    // and a test that looks for its language in a list is satisfied by the
+    // nineteen copies already there, before the import has done anything.
+    cy.exec('php tools/forget-imported-test-languages.php');
+
     cy.writeFile(`joomla/${chunkPath}`, chunk());
     cy.visitMetagen('metalanguages');
   });
