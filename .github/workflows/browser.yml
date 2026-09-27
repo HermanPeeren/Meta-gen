@@ -124,9 +124,14 @@ jobs:
       # PHP's own server, with workers: a single-threaded one deadlocks the
       # moment a page asks the site for a second thing while the first is still
       # being served, which the generated front end does.
+      # `display_errors=stderr`, not `1`. On the CLI server `1` writes PHP
+      # notices into the HTTP response: pages that were fine came back broken,
+      # a generated front end 500ed and `cy.request()` got a deprecation
+      # notice where a package should have been. `stderr` puts them in the log
+      # this job keeps, which is where they were wanted in the first place.
       - name: Serve the site
         run: |
-          PHP_CLI_SERVER_WORKERS=4 php -d display_errors=1 -d error_reporting=-1 -S 127.0.0.1:8080 -t joomla > php-server.log 2>&1 &
+          PHP_CLI_SERVER_WORKERS=4 php -d display_errors=stderr -d error_reporting=-1 -S 127.0.0.1:8080 -t joomla > php-server.log 2>&1 &
           for i in $(seq 1 30); do
             if curl -sSf -o /dev/null "${SITE_URL}/administrator/"; then
               echo "serving after ${i}s"
