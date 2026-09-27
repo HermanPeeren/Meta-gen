@@ -38,7 +38,7 @@ class HtmlView extends BaseHtmlView
 	 */
 	public function display($tpl = null): void
 	{
-        /** @var \Yepr\Component\Metagen\Administrator\Model\GenerateFormsModel $model */
+        /** @var \Yepr\Component\Metagen\Administrator\Model\GenerateformsModel $model */
         $model = $this->getModel();
 
 		// Get the project_id and put it in the model

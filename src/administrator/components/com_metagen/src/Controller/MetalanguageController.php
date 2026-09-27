@@ -19,7 +19,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\FormController;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
-use Yepr\Component\Metagen\Administrator\Model\GenerateFormsModel;
+use Yepr\Component\Metagen\Administrator\Model\GenerateformsModel;
 use Yepr\Gen\Core\Output\ZipWriter;
 
 /**
@@ -63,7 +63,7 @@ class MetalanguageController extends FormController
 			throw new NotAllowed(Text::_('JERROR_ALERTNOAUTHOR'), 403);
 		}
 
-		/** @var GenerateFormsModel $model */
+		/** @var GenerateformsModel $model */
 		$model = $this->getModel('GenerateForms', 'Administrator', ['ignore_request' => true]);
 
 		$model->setMetalanguageId($app->getInput()->getInt('id', 0));

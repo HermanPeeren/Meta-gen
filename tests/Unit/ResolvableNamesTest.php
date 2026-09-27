@@ -121,7 +121,7 @@ final class ResolvableNamesTest extends TestCase
      * The other half of PSR-4, and the half that bit during the split. Renaming
      * `GenerateProjectForm` to `GenerateForms` moved the file and left the class
      * inside it called something else, so Joomla's MVC factory asked for a
-     * `GenerateFormsModel`, got nothing, and `AbstractView::getModel()` failed
+     * `GenerateformsModel`, got nothing, and `AbstractView::getModel()` failed
      * on an undefined array key - a 500 with no message naming either name.
      *
      * The namespace rule above cannot see it: the namespace was right and only
@@ -155,7 +155,7 @@ final class ResolvableNamesTest extends TestCase
      * somebody writes the call that needs it, and then it is a fatal naming a
      * class that left the repository months earlier.
      *
-     * The split left exactly one: `FormsDiagramModel` imported
+     * The split left exactly one: `FormsdiagramModel` imported
      * `Generator\\LanguageStringUtil`, which stayed in Exten-gen generating a
      * component's language strings. Nothing here used it, so nothing here
      * noticed.

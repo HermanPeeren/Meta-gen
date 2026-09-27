@@ -42,8 +42,20 @@ use Yepr\Gen\Core\Target\Target;
  * screen, no two of them the same.
  *
  * @since  1.2.0
+ *
+ * **The lower-case `f` is not a typo.** Joomla builds this class's name from
+ * the *view* that wants it: `AbstractView::getName()` takes the last segment
+ * of the view's namespace and lower-cases the whole thing, so `GenerateForms`
+ * becomes `generateforms`, and `MVCFactory::createModel()` then `ucfirst`s
+ * that back to `Generateforms`. The file it autoloads is whatever that spells.
+ *
+ * Named `GenerateFormsModel`, it resolved on Windows - where the filesystem
+ * does not care - and on Linux it did not exist, so no model was created, the
+ * view was handed null, and the generate screen was a 500 with a warning about
+ * an undefined array key deep inside Joomla. `ViewModelNamesTest` keeps the
+ * pair in step.
  */
-class GenerateFormsModel extends AdminModel
+class GenerateformsModel extends AdminModel
 {
     /**
      * A log of what the generators produced.

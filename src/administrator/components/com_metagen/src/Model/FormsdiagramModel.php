@@ -47,8 +47,20 @@ use Joomla\Utilities\ArrayHelper;
 
 /**
  * Forms Diagram Model: to get the project form data from the db
+ *
+ * **The lower-case `f` is not a typo.** Joomla builds this class's name from
+ * the *view* that wants it: `AbstractView::getName()` takes the last segment
+ * of the view's namespace and lower-cases the whole thing, so `FormsDiagram`
+ * becomes `formsdiagram`, and `MVCFactory::createModel()` then `ucfirst`s
+ * that back to `Formsdiagram`. The file it autoloads is whatever that spells.
+ *
+ * Named `FormsDiagramModel`, it resolved on Windows - where the filesystem
+ * does not care - and on Linux it did not exist, so no model was created, the
+ * view was handed null, and the diagram screen was a 500 with a warning about
+ * an undefined array key deep inside Joomla. `ViewModelNamesTest` keeps the
+ * pair in step.
  */
-class FormsDiagramModel extends AdminModel
+class FormsdiagramModel extends AdminModel
 {
 	/**
 	 * The (internal) id of the project forms definition from which we generate form files

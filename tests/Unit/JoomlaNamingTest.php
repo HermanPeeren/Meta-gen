@@ -47,8 +47,8 @@ final class JoomlaNamingTest extends TestCase
         return [
             'Metalanguage'  => ['MetalanguageModel', 'metalanguage'],
             'Metalanguages' => ['MetalanguagesModel', 'metalanguages'],
-            'GenerateForms' => ['GenerateFormsModel', 'generateforms'],
-            'FormsDiagram'  => ['FormsDiagramModel', 'formsdiagram'],
+            'GenerateForms' => ['GenerateformsModel', 'generateforms'],
+            'FormsDiagram'  => ['FormsdiagramModel', 'formsdiagram'],
         ];
     }
 
