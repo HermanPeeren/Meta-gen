@@ -113,4 +113,63 @@ final class ViewModelNamesTest extends TestCase
 
         $this->assertNotSame([], $models, 'No model files were found.');
     }
+
+    /**
+     * And a model asked for by name is one that can be loaded.
+     *
+     * A controller may fetch a model itself - `getModel('Generateforms')` -
+     * and `MVCFactory::createModel()` treats that string exactly as it treats
+     * a view's name: `ucfirst` it, autoload a class of that name. So the
+     * argument has to be spelled the way the file is.
+     *
+     * This is the hole the rename fell through. Renaming the model to what the
+     * *view* derives left the controller asking for the old spelling, which
+     * resolved on Windows and 500ed the export task on Linux - the same defect
+     * one layer along, found by the same gate a round later.
+     */
+    public function testAModelAskedForByNameCanBeLoaded(): void
+    {
+        $root   = $this->componentRoot();
+        $models = scandir($root . '/Model') ?: [];
+        $asked  = [];
+
+        foreach ($this->phpFilesUnder($root) as $file) {
+            preg_match_all("/getModel\(\s*'([A-Za-z0-9_]+)'/", (string) file_get_contents($file), $matches);
+
+            foreach ($matches[1] as $name) {
+                $asked[$name] = $file;
+            }
+        }
+
+        $this->assertNotSame([], $asked, 'Nothing asks for a model by name, so this checks nothing.');
+
+        foreach ($asked as $name => $file) {
+            $this->assertContains(
+                ucfirst($name) . 'Model.php',
+                $models,
+                basename($file) . " asks for '" . $name . "', so Joomla will autoload "
+                . ucfirst($name) . 'Model.php - and no file in Model/ is called that.'
+            );
+        }
+    }
+
+    /**
+     * Every PHP file in the component.
+     *
+     * @return string[]
+     */
+    private function phpFilesUnder(string $root): array
+    {
+        $found = [];
+
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root));
+
+        foreach ($files as $file) {
+            if ($file->isFile() && $file->getExtension() === 'php') {
+                $found[] = $file->getPathname();
+            }
+        }
+
+        return $found;
+    }
 }

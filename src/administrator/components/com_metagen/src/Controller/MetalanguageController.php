@@ -64,7 +64,12 @@ class MetalanguageController extends FormController
 		}
 
 		/** @var GenerateformsModel $model */
-		$model = $this->getModel('GenerateForms', 'Administrator', ['ignore_request' => true]);
+		// `Generateforms`, matching the file. `MVCFactory::createModel()`
+		// ucfirsts whatever it is given and autoloads a class of that name,
+		// so asking for `GenerateForms` looks for `GenerateFormsModel` -
+		// which is what this said, and what resolved on Windows and on no
+		// filesystem that cares about case.
+		$model = $this->getModel('Generateforms', 'Administrator', ['ignore_request' => true]);
 
 		$model->setMetalanguageId($app->getInput()->getInt('id', 0));
 
