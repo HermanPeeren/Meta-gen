@@ -110,6 +110,11 @@ jobs:
       - name: Tell Joomla where it lives
         run: |
           sed -i "s|public \$live_site = '';|public \$live_site = '${SITE_URL}';|" joomla/configuration.php
+          # And say what went wrong when something does. A fresh Joomla has
+          # debug off, so its error page is a polite sentence with nothing in it.
+          sed -i "s|public \$debug = false;|public \$debug = true;|" joomla/configuration.php
+          sed -i "s|public \$error_reporting = 'default';|public \$error_reporting = 'maximum';|" joomla/configuration.php
+
           grep -q "live_site = '${SITE_URL}'" joomla/configuration.php || {
             echo "live_site was not set - the default line has changed shape"
             grep -n live_site joomla/configuration.php
@@ -194,6 +199,27 @@ jobs:
           grep -inE 'fatal|uncaught|exception|error|warning|\[500\]' php-server.log | head -50 || true
           echo '--- last 30 lines ---'
           tail -30 php-server.log
+
+      # The server log carries the warnings that lead up to a 500 but not the
+      # exception itself: Joomla catches that and renders it into the page, and
+      # `cy.visit` aborts on the status before it can read the body. So the page
+      # is fetched here, signed in, the way the spec would have seen it.
+      - name: What the failing page actually said
+        if: failure()
+        run: |
+          jar=$(mktemp)
+          token=$(curl -s -c "$jar" "${SITE_URL}/administrator/index.php" \
+            | grep -oE 'name="[0-9a-f]{32}" value="1"' | head -1 | grep -oE '[0-9a-f]{32}')
+          echo "token: ${token:-none found}"
+          curl -s -b "$jar" -c "$jar" -o /dev/null \
+            --data-urlencode "username=${ADMIN_USERNAME}" \
+            --data-urlencode "passwd=${ADMIN_PASSWORD}" \
+            -d "option=com_login&task=login&${token}=1" \
+            "${SITE_URL}/administrator/index.php"
+          echo '--- the page the spec could not read ---'
+          curl -s -b "$jar" \
+            "${SITE_URL}/administrator/index.php?option=com_metagen&view=generateForms&tmpl=component&metalanguage_id=1" \
+            | sed -e 's/<[^>]*>/ /g' -e 's/  */ /g' | grep -viE '^\s*$' | head -40
 
       - name: The whole server log
         if: failure()
