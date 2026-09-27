@@ -121,7 +121,7 @@ jobs:
       # being served, which the generated front end does.
       - name: Serve the site
         run: |
-          PHP_CLI_SERVER_WORKERS=4 php -S 127.0.0.1:8080 -t joomla > php-server.log 2>&1 &
+          PHP_CLI_SERVER_WORKERS=4 php -d display_errors=1 -d error_reporting=-1 -S 127.0.0.1:8080 -t joomla > php-server.log 2>&1 &
           for i in $(seq 1 30); do
             if curl -sSf -o /dev/null "${SITE_URL}/administrator/"; then
               echo "serving after ${i}s"
@@ -184,6 +184,21 @@ jobs:
           path: cypress/screenshots
           if-no-files-found: ignore
 
+      # Not a tail: the interesting line is usually in the first spec and a
+      # tail shows the last one's asset requests. The whole log goes up as an
+      # artifact too, because a grep only finds what it was told to look for.
       - name: What the server said
         if: failure()
-        run: tail -100 php-server.log
+        run: |
+          echo '--- anything that looks like a failure ---'
+          grep -inE 'fatal|uncaught|exception|error|warning|\[500\]' php-server.log | head -50 || true
+          echo '--- last 30 lines ---'
+          tail -30 php-server.log
+
+      - name: The whole server log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: php-server-log
+          path: php-server.log
+          if-no-files-found: ignore
