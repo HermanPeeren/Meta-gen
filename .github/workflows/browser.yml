@@ -216,10 +216,27 @@ jobs:
             --data-urlencode "passwd=${ADMIN_PASSWORD}" \
             -d "option=com_login&task=login&${token}=1" \
             "${SITE_URL}/administrator/index.php"
-          echo '--- the page the spec could not read ---'
           curl -s -b "$jar" \
             "${SITE_URL}/administrator/index.php?option=com_metagen&view=generateForms&tmpl=component&metalanguage_id=1" \
-            | sed -e 's/<[^>]*>/ /g' -e 's/  */ /g' | grep -viE '^\s*$' | head -40
+            -o failing-page.html
+
+          echo '--- the page the spec could not read ---'
+          # Style and script blocks first: the error page is mostly inline CSS,
+          # and stripping tags without removing those leaves the message buried
+          # under it - which is how the last attempt printed forty lines of
+          # custom properties and no error.
+          sed -e '/<style/,/<\/style>/d' -e '/<script/,/<\/script>/d' failing-page.html \
+            | sed -e 's/<[^>]*>/ /g' -e 's/&nbsp;/ /g' -e 's/  */ /g' \
+            | grep -vE '^[[:space:]]*$' | head -60
+
+      # And the page itself, because a filter only finds what it was told to.
+      - name: The failing page
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failing-page
+          path: failing-page.html
+          if-no-files-found: ignore
 
       - name: The whole server log
         if: failure()
