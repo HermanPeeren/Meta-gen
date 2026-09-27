@@ -1,0 +1,189 @@
+name: Browser
+
+# The gate CLAUDE.md calls the one that matters most, and the only one that had
+# never run anywhere but a laptop.
+#
+# Everything in `CI` reads source or generates forms with Joomla replaced by a
+# couple of constants; none of it boots the framework. What only a browser can
+# say here is whether a modelled language opens, exports and imports on a real
+# Joomla - and whether a saved one still has its entities afterwards.
+#
+# It is a separate workflow rather than more steps in `CI` because it is the
+# slow one and because it can fail for reasons that are about the runner rather
+# than the code. Keeping it apart means a red browser run is legible as itself.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  cypress:
+    runs-on: ubuntu-latest
+
+    services:
+      # Joomla's installer wants a database that already exists; MYSQL_DATABASE
+      # makes it. The credentials are this container's and live nowhere else.
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: joomla
+          MYSQL_DATABASE: joomla_ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pjoomla"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      JOOMLA_VERSION: 6.1.3
+      SITE_URL: http://127.0.0.1:8080
+      # A Super User for this run only. Joomla requires twelve characters.
+      ADMIN_USERNAME: ci-admin
+      ADMIN_PASSWORD: ci-password-for-one-run
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          # What Joomla asks for, plus zip for the packages this component
+          # builds and unpacks.
+          extensions: zip, mysqli, pdo_mysql, intl, gd, mbstring, simplexml
+          coverage: none
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      # Cypress itself, from the lockfile. Its binary is a separate download
+      # that npm fetches on install; the npm cache above keeps the packages
+      # between runs.
+      - name: Install Cypress
+        run: npm ci
+
+      - name: Fetch Joomla
+        run: |
+          url="https://github.com/joomla/joomla-cms/releases/download/${JOOMLA_VERSION}/Joomla_${JOOMLA_VERSION}-Stable-Full_Package.tar.gz"
+          curl -sSL -o joomla.tar.gz "$url"
+          mkdir -p joomla
+          tar -xzf joomla.tar.gz -C joomla
+
+      # Joomla's own CLI installer, which is why the *full* package is fetched
+      # above: `installation/` is only in that one, and it removes itself when
+      # it is done.
+      - name: Install Joomla
+        run: |
+          php joomla/installation/joomla.php install \
+            --site-name="Meta-gen CI" \
+            --admin-user="CI" \
+            --admin-username="${ADMIN_USERNAME}" \
+            --admin-password="${ADMIN_PASSWORD}" \
+            --admin-email="ci@example.invalid" \
+            --db-type=mysqli \
+            --db-host=127.0.0.1 \
+            --db-user=root \
+            --db-pass=joomla \
+            --db-name=joomla_ci \
+            --db-prefix=ci_ \
+            --no-interaction
+
+      # Joomla works out its own root from the request, and under PHP's built-in
+      # server it gets it wrong: a request to /administrator/index.php leaves it
+      # believing the site root *is* /administrator, so every admin redirect
+      # comes back as /administrator/administrator/index.php and 404s. The login
+      # succeeds and the page it lands on does not exist.
+      #
+      # `$live_site` is the override Joomla provides for exactly this: when it is
+      # set, nothing is detected. Pinned to the address this run serves on, which
+      # is the address Cypress is pointed at below.
+      - name: Tell Joomla where it lives
+        run: |
+          sed -i "s|public \$live_site = '';|public \$live_site = '${SITE_URL}';|" joomla/configuration.php
+          grep -q "live_site = '${SITE_URL}'" joomla/configuration.php || {
+            echo "live_site was not set - the default line has changed shape"
+            grep -n live_site joomla/configuration.php
+            exit 1
+          }
+
+      # PHP's own server, with workers: a single-threaded one deadlocks the
+      # moment a page asks the site for a second thing while the first is still
+      # being served, which the generated front end does.
+      - name: Serve the site
+        run: |
+          PHP_CLI_SERVER_WORKERS=4 php -S 127.0.0.1:8080 -t joomla > php-server.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -sSf -o /dev/null "${SITE_URL}/administrator/"; then
+              echo "serving after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "the site never came up"
+          cat php-server.log
+          exit 1
+
+      # Git-ignored, because on a laptop it holds a real login. Here it holds
+      # the throwaway one this run just created.
+      - name: Point Cypress at it
+        run: |
+          cat > cypress.env.json <<JSON
+          {
+            "baseUrl": "${SITE_URL}",
+            "adminUser": "${ADMIN_USERNAME}",
+            "adminPassword": "${ADMIN_PASSWORD}"
+          }
+          JSON
+
+      # Builds the package and installs it through Joomla's CLI, the way a real
+      # install works.
+      - name: Install the component
+        run: composer install-local
+
+      # A fresh Joomla starts a guided tour at the admin, and a tour navigates:
+      # two seconds after a spec opens a list, the browser is on the Home
+      # Dashboard and every element the spec was about has gone. It is the
+      # single reason most of these failed - reference-fields went from 0 of 4
+      # to 4 of 4, and from a minute to fifteen seconds, with this one line.
+      #
+      # The statistics plugin goes too. It asks the administrator a question on
+      # first sight, which is a dialog over the page under test.
+      #
+      # A development site has had both dealt with long ago, which is exactly
+      # why neither showed up until this ran somewhere clean.
+      - name: Quieten a fresh Joomla
+        run: |
+          mysql -h 127.0.0.1 -uroot -pjoomla joomla_ci -e "UPDATE ci_extensions SET enabled = 0 WHERE type = 'plugin' AND element IN ('guidedtours', 'stats');"
+
+      # ER1 is what most of these open; LionCore M3 is the language that
+      # describes languages, which the forms generator and the export specs
+      # need. The specs re-seed and forget as they go, and say so where they do.
+      - name: Seed the languages
+        run: |
+          php tools/seed-metalanguage.php
+          php tools/seed-metalanguage.php lioncore-m3
+
+      - name: Browser tests
+        run: npx cypress run
+
+      - name: What it saw when it failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
+
+      - name: What the server said
+        if: failure()
+        run: tail -100 php-server.log
