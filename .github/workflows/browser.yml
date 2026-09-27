@@ -113,7 +113,6 @@ jobs:
           # And say what went wrong when something does. A fresh Joomla has
           # debug off, so its error page is a polite sentence with nothing in it.
           sed -i "s|public \$debug = false;|public \$debug = true;|" joomla/configuration.php
-          sed -i "s|public \$error_reporting = 'default';|public \$error_reporting = 'maximum';|" joomla/configuration.php
 
           grep -q "live_site = '${SITE_URL}'" joomla/configuration.php || {
             echo "live_site was not set - the default line has changed shape"
@@ -129,9 +128,17 @@ jobs:
       # a generated front end 500ed and `cy.request()` got a deprecation
       # notice where a package should have been. `stderr` puts them in the log
       # this job keeps, which is where they were wanted in the first place.
+      #
+      # And the level is left alone. `error_reporting=-1` looked harmless and
+      # was not: Joomla's handler throws an ErrorException for anything inside
+      # the current level, so raising it turned every deprecation in older
+      # code into a 500. Exten-gen went from 39 of 39 to failures in the
+      # generated front end and an export request, with nothing of its own
+      # changed. PHP's default level already reports the warnings and fatals
+      # this is here to catch - it is what found the Meta-gen bug.
       - name: Serve the site
         run: |
-          PHP_CLI_SERVER_WORKERS=4 php -d display_errors=stderr -d error_reporting=-1 -S 127.0.0.1:8080 -t joomla > php-server.log 2>&1 &
+          PHP_CLI_SERVER_WORKERS=4 php -d display_errors=stderr -S 127.0.0.1:8080 -t joomla > php-server.log 2>&1 &
           for i in $(seq 1 30); do
             if curl -sSf -o /dev/null "${SITE_URL}/administrator/"; then
               echo "serving after ${i}s"
