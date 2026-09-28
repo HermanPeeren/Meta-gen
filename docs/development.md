@@ -53,10 +53,10 @@ Neither failure names the class that caused it. The rule: **an entity name must
 not contain "model", in any case.** `JoomlaNamingTest` is that rule written
 down, over every model, table and controller in the component.
 
-## Two more naming rules, same family
+## Four more naming rules, same family
 
-Both were found the same way — by something that worked here and would not have
-worked on a Linux server.
+All four were found the same way — by something that worked here and would not
+have worked on a Linux server.
 
 - **A view class directory is `ucfirst` of the view name, exactly.** Joomla
   applies `ucfirst` and nothing else, so `view=metalanguages` needs
@@ -67,6 +67,22 @@ worked on a Linux server.
   `AbstractView::getName()` lowercases the last namespace segment, so
   `View/Metalanguages/` needs `tmpl/metalanguages/` — all lowercase, even
   though the class directory is not.
+- **A model file is named from what the view derives, not from what the view is called.**
+  The controller does not pass `view=` along: it asks the view its name, which is that same
+  `strtolower`, and hands it to `MVCFactory::createModel()`, which `ucfirst`s it back. So
+  `View/GenerateForms/` loads `Model/GenerateformsModel.php`, with a small `f`. Named the
+  obvious way it resolved on Windows and nowhere else — `createModel()` returned null, the
+  controller skipped `setModel()`, and the view called a method on null, reported as a 500 with
+  `Undefined array key ""` from inside Joomla in the log.
+- **And a model asked for by name is spelled the way its file is.** `getModel('Generateforms')`
+  goes through the same `ucfirst`-and-autoload. This is the one the rename above fell through:
+  a rename updates classes, `use` statements and docblocks, and does not touch a model fetched
+  by string. `MetalanguageController::export()` kept asking for the old spelling and 500ed on
+  Linux only, a round after the layer above it was fixed.
+
+`ViewModelNamesTest` is the last two written down, over every view that calls `getModel()` and
+every model asked for by name. It compares against a `scandir` listing as strings rather than
+calling `is_file`, because `is_file` on Windows answers the question the test exists to ask.
 
 `ResolvableNamesTest` covers the other half of PSR-4: a file declares the
 namespace its path implies, *and* a class named after the file. Both halves are
