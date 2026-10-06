@@ -260,6 +260,15 @@ points at `raw.githubusercontent.com/.../main/updates.xml`, so a site learns
 about a new version the moment the commit lands, whether or not the tag was ever
 pushed. Commit and tag together.
 
+Once the release is published, the workflow writes the download's SHA-512 into
+`updates.xml` with `php build/update-xml.php --checksum` and commits that to
+`main` itself. Joomla checks a downloaded update against it and warns when
+there is none. It has to come from the workflow because a zip built on another
+machine has different timestamps and line endings, so its hash does not match.
+Pull `main` after a release, before the next version bump. Without `--checksum`
+the script keeps a committed checksum while the download stays the same, and
+drops it when the version changes.
+
 **What the gates still cannot see.** No gate installs the package on a site that
 has never had this component. `composer install-local` builds the real zip and
 installs it, so the ordinary route is exercised — but always onto a site that
