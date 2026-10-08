@@ -124,8 +124,19 @@ jobs:
       # the category `error`, and only `log_everything` gives that category a
       # logger. Without it a run that failed with a 500 left no message at all:
       # PHP's server log sees a status code, not what Joomla caught.
+      #
+      # Added to the configuration class rather than set with `config:set`,
+      # which only changes options the file already has, and a fresh install
+      # does not write this one. Then read back, so a change in the file's
+      # shape fails here rather than leaving the next 500 silent again.
       - name: Make Joomla write down its errors
-        run: php joomla/cli/joomla.php config:set log_everything=1
+        run: |
+          php -r '$f = $argv[1]; $s = file_get_contents($f); $p = strrpos($s, "}"); file_put_contents($f, substr($s, 0, $p) . "\tpublic \$log_everything = 1;\n" . substr($s, $p));' joomla/configuration.php
+          php joomla/cli/joomla.php config:get log_everything | grep -qE 'log_everything +1' || {
+            echo 'log_everything is not on'
+            php joomla/cli/joomla.php config:get log_everything
+            exit 1
+          }
 
       # PHP's own server, with workers: a single-threaded one deadlocks the
       # moment a page asks the site for a second thing while the first is still
