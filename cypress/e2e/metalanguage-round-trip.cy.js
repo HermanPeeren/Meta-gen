@@ -62,6 +62,19 @@ describe('a saved metalanguage', () => {
   });
 
   /**
+   * A feature can name its fieldset: step 5.2.
+   *
+   * Checked on screen because 4.5 added a field to a form that the template
+   * then never drew. A feature's form is a subform, which renders every field
+   * it has, but that is the kind of reasoning this suite exists not to trust.
+   */
+  it('offers a fieldset on every feature', () => {
+    openER1();
+
+    cy.get('#metalanguage-form [name$="[fieldset]"]').should('have.length.greaterThan', 0);
+  });
+
+  /**
    * And keeps them through a save.
    *
    * The assertion that matters, and the one that is easy to write wrongly.

@@ -163,12 +163,38 @@ final class FormXml
 
         $form->appendChild($fieldset);
 
+        // Named groups after the form's own fieldset, in the order the first
+        // feature of each appears: step 5.2. A template that renders fieldsets
+        // as tabs gets one tab per group, which is how ER1's project screen
+        // gets its Entities, Pages and Extensions back. A classifier naming no
+        // group produces exactly the one fieldset it always did.
+        $groups = [];
+
         foreach ($classifier->features as $feature) {
             $field = $this->fieldFor($document, $classifier, $feature);
 
-            if ($field !== null) {
-                $fieldset->appendChild($field);
+            if ($field === null) {
+                continue;
             }
+
+            if ($feature->fieldset === '') {
+                $fieldset->appendChild($field);
+
+                continue;
+            }
+
+            if (!isset($groups[$feature->fieldset])) {
+                $group = $document->createElement('fieldset');
+
+                $group->setAttribute('name', $feature->fieldset);
+                $group->setAttribute('label', $this->fieldsetLabel($classifier, $feature->fieldset));
+
+                $form->appendChild($group);
+
+                $groups[$feature->fieldset] = $group;
+            }
+
+            $groups[$feature->fieldset]->appendChild($field);
         }
 
         $this->appendSubtypes($document, $fieldset, $classifier);
@@ -497,6 +523,22 @@ final class FormXml
         return $this->strings->add(
             $this->constantName([$this->languageName, $owner->name, 'FIELD', $feature->name, 'LABEL']),
             $feature->displayLabel()
+        );
+    }
+
+    /**
+     * The language string on a named fieldset: step 5.2.
+     *
+     * The text is the name made readable, since a fieldset is a name and has
+     * no label of its own in the model. `entities` reads as "Entities".
+     *
+     * @since  1.6.0
+     */
+    private function fieldsetLabel(Classifier $owner, string $fieldset): string
+    {
+        return $this->strings->add(
+            $this->constantName([$this->languageName, $owner->name, 'FIELDSET', $fieldset, 'LABEL']),
+            ucfirst(str_replace('_', ' ', $fieldset))
         );
     }
 

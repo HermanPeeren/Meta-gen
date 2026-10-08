@@ -1,6 +1,6 @@
 {
     "name": "ER1",
-    "version": "1.1",
+    "version": "1.2",
     "LIonWeb_key": "Language",
     "languageEntities": {
         "languageEntities0": {
@@ -212,6 +212,7 @@
                         "key": "f-project-datamodel",
                         "label": "Entities",
                         "description": "",
+                        "fieldset": "entities",
                         "is_optional": "1",
                         "is_assigned": "0",
                         "classifier_key": "",
@@ -229,6 +230,7 @@
                         "key": "f-project-pages",
                         "label": "Pages",
                         "description": "",
+                        "fieldset": "pages",
                         "is_optional": "0",
                         "is_assigned": "0",
                         "classifier_key": "",
@@ -246,6 +248,7 @@
                         "key": "f-project-extensions",
                         "label": "Extensions",
                         "description": "",
+                        "fieldset": "extensions",
                         "is_optional": "0",
                         "is_assigned": "0",
                         "classifier_key": "",

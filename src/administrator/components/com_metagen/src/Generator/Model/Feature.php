@@ -76,6 +76,7 @@ final class Feature
      * @param  string   $typeKey     The key of the datatype or classifier it points at.
      * @param  string   $default     What a new row holds before anybody fills it in.
      * @param  ?CustomField $customField  The field class it is edited with, when a text box will not do.
+     * @param  string   $fieldset    Which group of the form it goes in, or '' for the form's own.
      *
      * @since  1.2.0
      */
@@ -91,7 +92,8 @@ final class Feature
         public readonly bool $multiple,
         public readonly string $typeKey,
         public readonly string $default,
-        public readonly ?CustomField $customField
+        public readonly ?CustomField $customField,
+        public readonly string $fieldset = ''
     ) {
     }
 
@@ -127,8 +129,23 @@ final class Feature
             // reference to something that does not exist yet, which is not a
             // value anybody can write down.
             $property === null ? '' : self::text($property, 'default_value'),
-            CustomField::fromNode($property)
+            CustomField::fromNode($property),
+            self::fieldsetName(self::text($node, 'fieldset'))
         );
+    }
+
+    /**
+     * A fieldset's name, as Joomla can use it: step 5.2.
+     *
+     * It becomes `<fieldset name="...">`, and a tab's id where a template
+     * renders fieldsets as tabs, so it is held to what is safe in both - lower
+     * case, digits and underscores. "Entities" and "entities" are one group.
+     *
+     * @since  1.6.0
+     */
+    private static function fieldsetName(string $name): string
+    {
+        return trim((string) preg_replace('/[^a-z0-9_]+/', '_', strtolower(trim($name))), '_');
     }
 
     /**
