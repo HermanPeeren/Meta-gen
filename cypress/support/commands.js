@@ -64,3 +64,19 @@ Cypress.Commands.add('shouldHaveRendered', () => {
   cy.get('body').should('not.contain', 'Warning:');
   cy.get('.alert-danger, #system-message-container .alert-error').should('not.exist');
 });
+
+/**
+ * No language constant shows as itself: step 5.1.
+ *
+ * Joomla prints an undefined constant in capitals and logs nothing, so this
+ * reads what a person would read - the visible text, menu included - rather
+ * than the source. It is the only check that sees a constant built at run
+ * time, or one that is in the `.ini` but not in the `.sys.ini` the menu reads.
+ */
+Cypress.Commands.add('shouldShowNoRawConstants', () => {
+  cy.get('body').invoke('prop', 'innerText').should((text) => {
+    const raw = [...new Set(text.match(/\b(?:COM|J|YEPR|LIB|PLG|MOD)[A-Z0-9]*_[A-Z0-9_]*[A-Z0-9]\b/g) || [])];
+
+    expect(raw, 'constants shown untranslated').to.deep.equal([]);
+  });
+});

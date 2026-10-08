@@ -23,8 +23,6 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Unit tests
-        run: composer test
 
 
       # PHPStan resolves the form fields against a real Joomla. Without it every
@@ -38,6 +36,11 @@ jobs:
           tar -xzf joomla.tar.gz -C joomla
         env:
           JOOMLA_VERSION: 6.1.3
+
+      # After the fetch: LanguageStringsTest reads Joomla's own language files
+      # to tell a core string from a missing one, and skips without them.
+      - name: Unit tests
+        run: composer test
 
       - name: Static analysis
         run: composer analyse
