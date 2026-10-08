@@ -136,9 +136,17 @@ jobs:
       # generated front end and an export request, with nothing of its own
       # changed. PHP's default level already reports the warnings and fatals
       # this is here to catch - it is what found the Meta-gen bug.
+      #
+      # And the opcode cache looks at every file, every time. The specs install
+      # components through Joomla's CLI, a separate process, and Joomla rewrites
+      # its namespace map on install; with the default revalidate_freq of two
+      # seconds this server went on running the old map, so the first requests
+      # to a just-installed component 500ed and the ones a second later did not.
+      # On a real site the install runs in the web server and Joomla invalidates
+      # what it writes, so this is the test set-up's to fix, not the code's.
       - name: Serve the site
         run: |
-          PHP_CLI_SERVER_WORKERS=4 php -d display_errors=stderr -S 127.0.0.1:8080 -t joomla > php-server.log 2>&1 &
+          PHP_CLI_SERVER_WORKERS=4 php -d display_errors=stderr -d opcache.revalidate_freq=0 -S 127.0.0.1:8080 -t joomla > php-server.log 2>&1 &
           for i in $(seq 1 30); do
             if curl -sSf -o /dev/null "${SITE_URL}/administrator/"; then
               echo "serving after ${i}s"
