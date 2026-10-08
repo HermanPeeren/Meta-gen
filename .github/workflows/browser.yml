@@ -120,6 +120,13 @@ jobs:
             exit 1
           }
 
+      # Joomla logs an uncaught exception - the one behind a bare 500 - under
+      # the category `error`, and only `log_everything` gives that category a
+      # logger. Without it a run that failed with a 500 left no message at all:
+      # PHP's server log sees a status code, not what Joomla caught.
+      - name: Make Joomla write down its errors
+        run: php joomla/cli/joomla.php config:set log_everything=1
+
       # PHP's own server, with workers: a single-threaded one deadlocks the
       # moment a page asks the site for a second thing while the first is still
       # being served, which the generated front end does.
@@ -137,16 +144,14 @@ jobs:
       # changed. PHP's default level already reports the warnings and fatals
       # this is here to catch - it is what found the Meta-gen bug.
       #
-      # And the opcode cache looks at every file, every time. The specs install
-      # components through Joomla's CLI, a separate process, and Joomla rewrites
-      # its namespace map on install; with the default revalidate_freq of two
-      # seconds this server went on running the old map, so the first requests
-      # to a just-installed component 500ed and the ones a second later did not.
-      # On a real site the install runs in the web server and Joomla invalidates
-      # what it writes, so this is the test set-up's to fix, not the code's.
+      # The opcode cache is left at its defaults, as on a real site. Nothing a
+      # spec does may install from outside this server: Joomla clears the cache
+      # for the files an install writes in the process that writes them, so an
+      # install through the CLI left this server running the old namespace map
+      # for up to two seconds, and the first request to the new component 500ed.
       - name: Serve the site
         run: |
-          PHP_CLI_SERVER_WORKERS=4 php -d display_errors=stderr -d opcache.revalidate_freq=0 -S 127.0.0.1:8080 -t joomla > php-server.log 2>&1 &
+          PHP_CLI_SERVER_WORKERS=4 php -d display_errors=stderr -S 127.0.0.1:8080 -t joomla > php-server.log 2>&1 &
           for i in $(seq 1 30); do
             if curl -sSf -o /dev/null "${SITE_URL}/administrator/"; then
               echo "serving after ${i}s"
@@ -212,6 +217,19 @@ jobs:
       # Not a tail: the interesting line is usually in the first spec and a
       # tail shows the last one's asset requests. The whole log goes up as an
       # artifact too, because a grep only finds what it was told to look for.
+      - name: What Joomla logged
+        if: failure()
+        run: |
+          grep -ahE 'CRITICAL|ERROR' joomla/administrator/logs/*.php | cut -c1-2000 | head -40 || true
+
+      - name: Joomla's logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: joomla-logs
+          path: joomla/administrator/logs
+          if-no-files-found: ignore
+
       - name: What the server said
         if: failure()
         run: |
