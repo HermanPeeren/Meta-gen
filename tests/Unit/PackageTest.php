@@ -406,6 +406,58 @@ final class PackageTest extends TestCase
     }
 
     /**
+     * A link says whether it holds one value or a list; a property does not.
+     *
+     * The form has always known - `multiple="true"` on a subform - but a
+     * reader coming the other way, from a LionWeb chunk back to a stored
+     * model, has only the manifest. Without this it would have to open the
+     * generated forms to decide between `rows` and `rows0`, `rows1`.
+     *
+     * Properties are left out on purpose rather than written as `false`. One
+     * value is what a property is, so saying so for every one would grow the
+     * manifest by half to answer a question nobody asks - JCB's has 730 of
+     * them against 213 links.
+     */
+    public function testALinkSaysWhetherItHoldsAList(): void
+    {
+        // Read straight out of the JSON rather than through PackageManifest,
+        // because what is under test is what this component *writes*. Whether
+        // a reader keeps the key is the library's question and the library's
+        // test - and until a library carrying format 4 is released here, its
+        // reader would strip it and this test would be asserting the version
+        // of a dependency.
+        $manifest = json_decode(
+            $this->package()->get(MetalanguagePackage::MANIFEST),
+            true,
+            512,
+            \JSON_THROW_ON_ERROR
+        );
+
+        $links = 0;
+
+        foreach ($manifest['concepts'] as $concept) {
+            foreach ($concept['features'] as $feature) {
+                if (!\array_key_exists('multiple', $feature)) {
+                    continue;
+                }
+
+                $links++;
+
+                $this->assertIsBool(
+                    $feature['multiple'],
+                    $concept['name'] . '.' . $feature['name'] . ' says something other than a boolean.'
+                );
+            }
+        }
+
+        $this->assertGreaterThan(
+            0,
+            $links,
+            'No feature in this language says whether it holds a list.'
+        );
+    }
+
+    /**
      * A concept with no features says so, rather than saying nothing.
      *
      * The distinction is load-bearing: the guard reads an absent list as "this

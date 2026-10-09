@@ -106,7 +106,7 @@ final class PackageFiles implements GeneratorInterface
      * DataTypes are left out: a rule selects things a model can hold instances
      * of, and a datatype is what a property is, not a thing to iterate over.
      *
-     * @return array<int, array{key: string, name: string}>
+     * @return array<int, array{key: string, name: string, features: array<int, array{key: string, name: string, multiple?: bool}>}>
      *
      * @since  1.4.0
      */
@@ -124,7 +124,20 @@ final class PackageFiles implements GeneratorInterface
             // parent, and the hierarchy is not in a manifest to work it out
             // from, so the resolving happens here or nowhere.
             foreach ($model->featuresOf($classifier) as $feature) {
-                $features[] = ['key' => $feature->key, 'name' => $feature->name];
+                $written = ['key' => $feature->key, 'name' => $feature->name];
+
+                // Only where it means something. A property holds one value by
+                // construction, so saying so for every one of them would grow
+                // the manifest by half to answer a question nobody asks. For a
+                // link it is the whole question: it decides whether a model
+                // stores one group under this name or numbered ones under it,
+                // and a reader turning a LionWeb chunk back into a stored model
+                // has no other way to know.
+                if (!$feature->isProperty()) {
+                    $written['multiple'] = $feature->multiple;
+                }
+
+                $features[] = $written;
             }
 
             $concepts[] = [
