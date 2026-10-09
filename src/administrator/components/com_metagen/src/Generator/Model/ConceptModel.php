@@ -341,6 +341,37 @@ final class ConceptModel implements ModelInterface
     }
 
     /**
+     * Every feature a classifier's own form has to carry.
+     *
+     * Its own, and the ones it gets from the interfaces it implements. Not the
+     * ones it gets by extending another classifier.
+     *
+     * That asymmetry is the whole point, and it follows from where the fields
+     * end up rather than from what inheritance is called. A classifier that
+     * *extends* another is laid out inside its parent's form, so the parent's
+     * fields are already on screen above it and repeating them would post two
+     * inputs to one key. An *interface* is laid out nowhere: nothing nests a
+     * concept inside `IJcbNamed`, and no form for that interface is ever
+     * reached while editing a blueprint. Leaving its features out of the
+     * concept's own form leaves them out of every form there is.
+     *
+     * JCB is what made that visible. Its language has 93 concepts and 33
+     * interfaces, 44 concepts implement at least one, and not one of them
+     * extends anything - so `Field` was generating a form with 6 of its 24
+     * features, missing `name`, `guid` and `datatype` among them.
+     *
+     * @return Feature[]
+     *
+     * @since  1.4.0
+     */
+    public function formFeatures(Classifier $classifier): array
+    {
+        return array_values(
+            $this->resolveFeatures($classifier, $classifier->implements)['features']
+        );
+    }
+
+    /**
      * Resolve a classifier's features, and note what could not be resolved.
      *
      * Two passes, because identity and presentation are different questions.
@@ -360,15 +391,18 @@ final class ConceptModel implements ModelInterface
      * there were two passes, and they are never reported - a row with no key is
      * somebody mid-edit, not a language with a problem in it.
      *
+     * @param  string[]|null  $from  Which parents to inherit from, when not all
+     *                               of them - see {@see formFeatures()}.
+     *
      * @return array{features: array<string, Feature>, clashes: array<string, string[]>}
      *
      * @since  1.3.0
      */
-    private function resolveFeatures(Classifier $classifier): array
+    private function resolveFeatures(Classifier $classifier, ?array $from = null): array
     {
         $byKey = [];
 
-        foreach ([...$this->inheritedFeatures($classifier, []), ...$classifier->features] as $feature) {
+        foreach ([...$this->inheritedFeatures($classifier, [], $from), ...$classifier->features] as $feature) {
             // A NUL cannot occur in a key somebody typed into a form, so a
             // keyless feature can fall back to its name without colliding with
             // a real key that happens to read the same.
@@ -398,17 +432,23 @@ final class ConceptModel implements ModelInterface
     /**
      * What a classifier inherits, walking up every parent it names.
      *
-     * @param  string[]  $seen  Keys already walked, which is what stops a cycle.
+     * @param  string[]       $seen  Keys already walked, which is what stops a cycle.
+     * @param  string[]|null  $from  Which of this classifier's parents to walk,
+     *                               or null for all of them. It narrows the
+     *                               first step only: once inside an interface,
+     *                               everything that interface inherits counts,
+     *                               because none of it is laid out anywhere
+     *                               else either.
      *
      * @return Feature[]
      *
      * @since  1.2.0
      */
-    private function inheritedFeatures(Classifier $classifier, array $seen): array
+    private function inheritedFeatures(Classifier $classifier, array $seen, ?array $from = null): array
     {
         $features = [];
 
-        foreach ($classifier->parentKeys() as $key) {
+        foreach ($from ?? $classifier->parentKeys() as $key) {
             // A concept extending itself, directly or round a loop, is a model
             // somebody is in the middle of editing rather than an impossibility
             // - and without this the form for it never finishes generating.

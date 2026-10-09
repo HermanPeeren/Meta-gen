@@ -32,11 +32,19 @@ use Yepr\Gen\Core\Package\MetalanguagePackage;
  * rather than a file with holes in it. A template that emitted `<field>` would
  * be a template that had to escape attribute values itself.
  *
- * **What a form holds is the classifier's own features, and nothing inherited.**
- * Inheritance is laid out structurally - see `LanguageStructure` - so a
- * subtype's form is reached through its parent's and the parent's fields are
- * already on screen above it. Putting them in both places would post two inputs
- * to one key, and the second would win without saying so.
+ * **What a form holds is the classifier's own features and the ones it gets
+ * from the interfaces it implements - not the ones it gets by extending.**
+ * Extending is laid out structurally - see `LanguageStructure` - so a subtype's
+ * form is reached through its parent's and the parent's fields are already on
+ * screen above it. Putting them in both places would post two inputs to one
+ * key, and the second would win without saying so.
+ *
+ * An interface is laid out nowhere. Nothing nests a concept inside an interface
+ * it implements, and the form generated for that interface is never reached
+ * while editing. So the same rule applied to `implements` deleted the fields
+ * rather than relocating them: JCB's `Field` came out holding 6 of its 24,
+ * without `name`, `guid` or `datatype` among them.
+ * {@see ConceptModel::formFeatures()}
  *
  * @since  1.2.0
  */
@@ -170,7 +178,7 @@ final class FormXml
         // group produces exactly the one fieldset it always did.
         $groups = [];
 
-        foreach ($classifier->features as $feature) {
+        foreach ($this->structure->model()->formFeatures($classifier) as $feature) {
             $field = $this->fieldFor($document, $classifier, $feature);
 
             if ($field === null) {

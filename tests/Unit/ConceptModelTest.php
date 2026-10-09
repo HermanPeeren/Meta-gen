@@ -469,4 +469,113 @@ final class ConceptModelTest extends TestCase
             }
         }
     }
+
+    // -- what a form has to carry --------------------------------------------
+
+    /**
+     * A concept that both extends a parent and implements an interface.
+     *
+     * The two kinds of inheritance have to be told apart here, so the fixture
+     * has one of each and a feature of its own, all three distinguishable by
+     * name.
+     */
+    private function inheritingBothWays(): ConceptModel
+    {
+        $feature = static fn (string $key, string $name): array => ['feature0' => [
+            'name'         => $name,
+            'key'          => $key,
+            'feature_type' => 'Property',
+            'property'     => ['type' => 'dt-string'],
+        ]];
+
+        return ConceptModel::fromJson((string) json_encode([
+            'name'             => 'BothWays',
+            'languageEntities' => [
+                'languageEntities0' => [
+                    'name'                => 'INamed',
+                    'key'                 => 'ci-inamed',
+                    'languageEntity_type' => 'Classifier',
+                    'classifier'          => [
+                        'classifier_type'  => 'ConceptInterface',
+                        'conceptInterface' => ['extends' => ''],
+                        'feature'          => $feature('f-from-interface', 'fromInterface'),
+                    ],
+                ],
+                'languageEntities1' => [
+                    'name'                => 'Parent',
+                    'key'                 => 'c-parent',
+                    'languageEntity_type' => 'Classifier',
+                    'classifier'          => [
+                        'classifier_type' => 'Concept',
+                        'concept'         => ['extends' => '', 'implements' => []],
+                        'feature'         => $feature('f-from-parent', 'fromParent'),
+                    ],
+                ],
+                'languageEntities2' => [
+                    'name'                => 'Child',
+                    'key'                 => 'c-child',
+                    'languageEntity_type' => 'Classifier',
+                    'classifier'          => [
+                        'classifier_type' => 'Concept',
+                        'concept'         => [
+                            'extends'    => 'c-parent',
+                            'implements' => ['implements0' => ['conceptInterface' => 'ci-inamed']],
+                        ],
+                        'feature' => $feature('f-own', 'own'),
+                    ],
+                ],
+            ],
+        ]));
+    }
+
+    /**
+     * A form carries what it implements, because nothing else will.
+     *
+     * The parent's feature is left out because the child's form is laid out
+     * inside the parent's and the field is already on screen. The interface's
+     * is not: no form nests a concept inside an interface, so leaving it out
+     * means it appears nowhere at all. That is the difference `formFeatures()`
+     * exists to draw, and getting it wrong cost JCB's `Field` 18 of its 24
+     * fields - `name`, `guid` and `datatype` among them.
+     */
+    public function testAFormCarriesImplementedFeaturesButNotExtendedOnes(): void
+    {
+        $model = $this->inheritingBothWays();
+        $child = $model->classifier('c-child');
+
+        $this->assertNotNull($child);
+
+        $this->assertSame(
+            ['fromInterface', 'own'],
+            array_map(static fn ($f): string => $f->name, $model->formFeatures($child))
+        );
+
+        // featuresOf() is a different question with a different answer: what
+        // the concept *has*, which the manifest and the reference table want.
+        $this->assertSame(
+            ['fromParent', 'fromInterface', 'own'],
+            array_map(static fn ($f): string => $f->name, $model->featuresOf($child))
+        );
+    }
+
+    /**
+     * An interface's own inheritance counts too.
+     *
+     * Once inside an interface, nothing it holds is laid out anywhere else
+     * either - so an interface extending another contributes both.
+     */
+    public function testAnInterfaceBringsWhatItInheritsAsWell(): void
+    {
+        $model = $this->implementing([
+            'ci-one' => [['key' => 'f-one', 'name' => 'one']],
+            'ci-two' => [['key' => 'f-two', 'name' => 'two']],
+        ], [['key' => 'f-own', 'name' => 'own']]);
+
+        $thing = $this->thing($model);
+
+        $this->assertSame(
+            ['one', 'two', 'own'],
+            array_map(static fn ($f): string => $f->name, $model->formFeatures($thing))
+        );
+    }
 }
