@@ -217,6 +217,18 @@ final class FormXml
 
         $fieldset->appendChild($hidden);
 
+        // And which node it was, for a model that arrived from a chunk and may
+        // have to go back out as one. No `value`: this one is not the same for
+        // every row, it is whatever the model carried, and a form posts back
+        // only the fields it has - so without this the id would survive being
+        // imported and then disappear the first time somebody pressed Save.
+        $identity = $document->createElement('field');
+
+        $identity->setAttribute('name', 'LIonWeb_id');
+        $identity->setAttribute('type', 'hidden');
+
+        $fieldset->appendChild($identity);
+
         return (string) $document->saveXML();
     }
 

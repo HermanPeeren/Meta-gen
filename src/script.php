@@ -58,7 +58,7 @@ class Com_MetagenInstallerScript
      * asked for ^0.8, which is a site that installs the component, accepts the
      * library it is handed, and cannot open the import screen.
      */
-    private const LIBRARY_MINIMUM = '0.16.0';
+    private const LIBRARY_MINIMUM = '0.17.0';
 
     /**
      * The oldest Joomla this runs on.

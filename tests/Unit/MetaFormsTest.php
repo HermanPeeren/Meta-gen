@@ -230,7 +230,13 @@ final class MetaFormsTest extends TestCase
             $this->form('concept')->xpath('//field') ?: []
         );
 
-        $this->assertSame(['abstract', 'partition', 'extends', 'implements', 'LIonWeb_key'], $names);
+        // The two hidden ones at the end are on every form: what LionWeb calls
+        // this classifier, and which node a row was - the second so that an id
+        // which arrived from a chunk is still there after somebody saves.
+        $this->assertSame(
+            ['abstract', 'partition', 'extends', 'implements', 'LIonWeb_key', 'LIonWeb_id'],
+            $names
+        );
 
         // `name` and `key` are LanguageEntity's, two forms up, and a Concept
         // row shows them because it is a LanguageEntity row.
