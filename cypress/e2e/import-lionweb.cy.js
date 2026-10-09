@@ -92,13 +92,24 @@ const chunkPath = 'media/cypress-lionweb.json';
  * Open the import panel.
  *
  * It is a `<details>`, closed unless JcbInOut has left a language on this
- * site - and on a site without JcbInOut, which this is, that means closed. So
- * the summary is clicked the way a person would, rather than the field being
+ * site, in which case it starts open with the path already in the field. The
+ * summary is clicked the way a person would, rather than the field being
  * reached around it: a spec that types into a hidden input would keep passing
  * if the panel stopped opening.
+ *
+ * Clicking it *unconditionally* is what the earlier version did, and that only
+ * worked while no language was ever left there. The moment one was - which is
+ * the arrangement the panel exists for - the click shut the panel instead of
+ * opening it, and the next command failed against a field being collapsed out
+ * of view. So open it only when it is closed.
  */
 const openImportPanel = () => {
-  cy.contains('summary', 'Import LionWeb language').click();
+  cy.contains('summary', 'Import LionWeb language').then(($summary) => {
+    if (!$summary.closest('details').prop('open')) {
+      cy.wrap($summary).click();
+    }
+  });
+
   cy.get('#chunk').should('be.visible');
 };
 

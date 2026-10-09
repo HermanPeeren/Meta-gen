@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `#__metagen_metalanguages` (
     `catid` int(11) DEFAULT '0',
     `access` int(10) UNSIGNED DEFAULT '0',
     `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-    `form_data` text COLLATE utf8mb4_unicode_ci,
+    `form_data` mediumtext COLLATE utf8mb4_unicode_ci,
     PRIMARY KEY (`id`),
     KEY `idx_access` (`access`),
     KEY `idx_catid` (`catid`),

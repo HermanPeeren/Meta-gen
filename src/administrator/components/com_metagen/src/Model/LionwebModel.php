@@ -150,7 +150,18 @@ class LionwebModel extends BaseDatabaseModel
         }
 
         if (!$stored) {
-            throw new \RuntimeException('The metalanguage could not be saved.');
+            // `Table::store()` catches the driver's exception and keeps the
+            // reason in the deprecated error state, so there is no supported
+            // way to read it back and say what went wrong. The size is the
+            // one fact worth adding anyway: a language read in from LionWeb
+            // is orders of magnitude larger than a hand-written one, and
+            // every refusal seen here so far has been a column too narrow
+            // for it.
+            throw new \RuntimeException(sprintf(
+                'The metalanguage could not be saved. It is %s bytes;'
+                . ' a column too narrow to hold it is the usual cause.',
+                number_format(\strlen($converted['form_data']))
+            ));
         }
 
         return (int) $table->id;

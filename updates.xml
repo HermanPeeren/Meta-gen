@@ -10,11 +10,10 @@
 		<element>com_metagen</element>
 		<type>component</type>
 		<client>administrator</client>
-		<version>0.3.0</version>
+		<version>0.4.0</version>
 		<downloads>
-			<downloadurl type="full" format="zip">https://github.com/HermanPeeren/Meta-gen/releases/download/v0.3.0/com_metagen-0.3.0.zip</downloadurl>
+			<downloadurl type="full" format="zip">https://github.com/HermanPeeren/Meta-gen/releases/download/v0.4.0/com_metagen-0.4.0.zip</downloadurl>
 		</downloads>
-		<sha512>5b2ee936ad2bf1a7d1e53104c43d2e6e1d0241bb722067dece2fbd4cf3bff96e3f9ea051d925a6b56956081b950f4dcb902d230b5163eb58fd5e2b5bcf530ffe</sha512>
 		<maintainer>Herman Peeren</maintainer>
 		<maintainerurl>https://yepr.nl</maintainerurl>
 		<targetplatform name="joomla" version="6\..*"/>
