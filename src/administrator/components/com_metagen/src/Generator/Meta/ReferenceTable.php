@@ -152,12 +152,9 @@ final class ReferenceTable
             $entry['parentKey']    = $parentKey;
             $client['parentToken'] = $parentKey;
 
-            // A child's element id is its parent's with its own repeating group
-            // appended twice - once as the field, once as the row - so cutting
-            // there reaches the parent's own id input. That is how a child
-            // added a moment ago, whose parent key is still blank, finds out
-            // what it belongs to.
-            $client['parentCut'] = '_' . $placement->containment . '__' . $placement->containment;
+            // How a child added a moment ago, whose parent key is still blank,
+            // finds out what it belongs to: by position, from its element id.
+            $client['parentCut'] = $placement->parentCut();
         }
 
         if ($placement->conditions !== []) {
