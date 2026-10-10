@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <extension type="component" method="upgrade">
 	<name>com_metagen</name>
-	<creationDate>09-10-2026</creationDate>
+	<creationDate>10-10-2026</creationDate>
 	<author>Herman Peeren</author>
 	<authorEmail>herman@yepr.nl</authorEmail>
 	<authorUrl>https://yepr.nl</authorUrl>
 	<copyright>Yepr, Herman Peeren, 2026</copyright>
 	<license>GNU General Public License version 3 or later;</license>
-	<version>0.4.0</version>
+	<version>0.4.1</version>
 	<description>COM_METAGEN_XML_DESCRIPTION</description>
 	<namespace path="src">Yepr\Component\Metagen</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -40,6 +40,6 @@
 		</files>
 	</administration>
 	<updateservers>
-		<server type="extension" name="Meta-gen Updates">https://raw.githubusercontent.com/HermanPeeren/Meta-gen/main/updates.xml</server>
+		<server type="extension" name="Metalanguage Generator Updates">https://raw.githubusercontent.com/HermanPeeren/Meta-gen/main/updates.xml</server>
 	</updateservers>
 </extension>

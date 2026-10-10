@@ -284,7 +284,7 @@ $toCardinality = ' "1" ';
 		// Get the picture from PlantUML
 		$encode = $this->encodep($uml);
 		$formDiagram = "http://www.plantuml.com/plantuml/png/{$encode}";
-		// todo: caching when Project Form is unchanged
+		// todo: caching when the metalanguage is unchanged
 		echo "<h2>" . Text::_('COM_METAGEN_BUTTON_METALANGUAGE_DIAGRAM')
 		    . Text::_('COM_METAGEN_FOR')
 			. $AST->name . "</h2>";

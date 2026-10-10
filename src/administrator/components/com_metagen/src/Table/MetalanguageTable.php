@@ -21,7 +21,7 @@ use Joomla\Database\DatabaseDriver;
 use Joomla\Registry\Registry;
 
 /**
- * Project Form Table class.
+ * Metalanguage Table class.
  */
 class MetalanguageTable extends Table
 {

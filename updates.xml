@@ -5,16 +5,15 @@
 -->
 <updates>
 	<update>
-		<name>Meta-gen</name>
+		<name>Metalanguage Generator</name>
 		<description>Models modelling languages, and generates the forms a model in one is edited with.</description>
 		<element>com_metagen</element>
 		<type>component</type>
 		<client>administrator</client>
-		<version>0.4.0</version>
+		<version>0.4.1</version>
 		<downloads>
-			<downloadurl type="full" format="zip">https://github.com/HermanPeeren/Meta-gen/releases/download/v0.4.0/com_metagen-0.4.0.zip</downloadurl>
+			<downloadurl type="full" format="zip">https://github.com/HermanPeeren/Meta-gen/releases/download/v0.4.1/com_metagen-0.4.1.zip</downloadurl>
 		</downloads>
-		<sha512>edd4b644f2ee43693aeda173283717ce5dd4c6b9cb0857aab106f94350b2b733f07d42224f0390b821db1362ba0a83b69f54dfa021a00300dd26c97f43d543bf</sha512>
 		<maintainer>Herman Peeren</maintainer>
 		<maintainerurl>https://yepr.nl</maintainerurl>
 		<targetplatform name="joomla" version="6\..*"/>
