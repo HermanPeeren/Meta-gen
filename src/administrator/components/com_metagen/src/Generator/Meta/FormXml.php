@@ -229,7 +229,47 @@ final class FormXml
 
         $fieldset->appendChild($identity);
 
+        $this->appendLanguage($document, $fieldset, $classifier);
+
         return (string) $document->saveXML();
+    }
+
+    /**
+     * Which LionWeb language the model is written in, on the root's form.
+     *
+     * A chunk says it in every node's metapointer, because projectional
+     * editing can mix languages - a subform holding SQL inside a form holding
+     * PHP. Nothing models that yet, and one form is one language either way,
+     * so for now the root carries it once for the whole model and a second
+     * language would get its own field on the subform that holds it.
+     *
+     * No `value`, for the same reason the id has none, and one more: this
+     * generator does not know the answer. A language's LionWeb key is not the
+     * name its package is filed under - JCB's language calls itself `jcb` and
+     * its package `JCB` - and the Metalanguage form has `name` and `version`
+     * but no field for the key, so the only thing that ever knew it is the
+     * chunk the model arrived in. The field's job is to carry that through a
+     * Save, which without it drops both keys and leaves a model that cannot
+     * say what language to write it back out in.
+     *
+     * @since  0.5.0
+     */
+    private function appendLanguage(DOMDocument $document, DOMElement $fieldset, Classifier $classifier): void
+    {
+        $root = $this->structure->model()->root();
+
+        if ($root === null || $root->name !== $classifier->name) {
+            return;
+        }
+
+        foreach (['LIonWeb_language', 'LIonWeb_languageVersion'] as $name) {
+            $carried = $document->createElement('field');
+
+            $carried->setAttribute('name', $name);
+            $carried->setAttribute('type', 'hidden');
+
+            $fieldset->appendChild($carried);
+        }
     }
 
     /**

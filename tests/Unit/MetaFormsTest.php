@@ -511,6 +511,46 @@ final class MetaFormsTest extends TestCase
     }
 
     /**
+     * Which LionWeb language a model is written in, carried through a Save.
+     *
+     * On the root's form and nowhere else. A chunk says it in every node's
+     * metapointer, and one day a subform in a second language will need its
+     * own - projectional editing can nest SQL inside PHP - but a model is
+     * written in one language today and repeating it on 126 forms would be
+     * noise on all of them.
+     *
+     * Without it the keys did not survive: `Form::filter()` keeps the fields
+     * a form declares and drops everything else, so a project imported from a
+     * chunk lost both the first time somebody pressed Save, and writing it
+     * back out failed with "this model does not say which LionWeb language it
+     * is written in".
+     */
+    public function testTheRootFormCarriesTheLanguageTheModelIsWrittenIn(): void
+    {
+        foreach (['LIonWeb_language', 'LIonWeb_languageVersion'] as $name) {
+            $field = $this->field('language', $name);
+
+            $this->assertSame('hidden', (string) $field['type'], $name);
+
+            // No value, because this generator does not know the answer: a
+            // language's LionWeb key is not the name its package is filed
+            // under, and the Metalanguage form has no field for the key. The
+            // field carries what the model arrived with.
+            $this->assertNull($field['value'], $name . ' asserts a value.');
+        }
+
+        $root = MetalanguagePackage::FORMS . 'language.xml';
+
+        foreach ($this->generate() as $path => $contents) {
+            if ($path === $root) {
+                continue;
+            }
+
+            $this->assertStringNotContainsString('LIonWeb_language', $contents, $path);
+        }
+    }
+
+    /**
      * The table is written beside the forms, as JSON somebody can read.
      */
     public function testTheReferenceTableIsWrittenBesideTheForms(): void
