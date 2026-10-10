@@ -265,6 +265,93 @@ final class MetaReferenceTableTest extends TestCase
     }
 
     /**
+     * A repeating group inside a single one is one step, dotted through it.
+     *
+     * A single containment is stored as the group itself, so an entity's one
+     * state machine holds its states at `datamodel0.state_machine.states`. A
+     * path of `['datamodel', 'states']` - which is what leaving the single
+     * group out produced - finds nothing once the model is saved, and a saved
+     * transition loses the names of the states it runs between.
+     */
+    public function testARepeatingGroupInsideASingleOneIsDottedThroughIt(): void
+    {
+        $model = ConceptModel::fromJson((string) json_encode([
+            'name'             => 'Ledger',
+            'languageEntities' => [
+                'languageEntities0' => $this->datatype('String', 'dt-string'),
+                'languageEntities1' => $this->concept('Ledger', 'c-ledger', [
+                    $this->link('datamodel', 'c-entity', 'Containment', true),
+                ], ['partition' => '1']),
+                'languageEntities2' => $this->concept('Entity', 'c-entity', [
+                    $this->property('entity_id', 'dt-string'),
+                    $this->property('entity_name', 'dt-string'),
+                    $this->link('state_machine', 'c-machine', 'Containment'),
+                ]),
+                'languageEntities3' => $this->concept('StateMachine', 'c-machine', [
+                    $this->property('machine_id', 'dt-string'),
+                    $this->link('states', 'c-state', 'Containment', true),
+                    $this->link('transitions', 'c-transition', 'Containment', true),
+                ]),
+                'languageEntities4' => $this->concept('State', 'c-state', [
+                    $this->property('state_id', 'dt-string'),
+                    $this->property('state_name', 'dt-string'),
+                    $this->property('machine_id', 'dt-string'),
+                ]),
+                'languageEntities5' => $this->concept('Transition', 'c-transition', [
+                    $this->link('from', 'c-state', 'Reference'),
+                    $this->link('to', 'c-state', 'Reference'),
+                ]),
+            ],
+        ]));
+
+        $generated = (new ReferenceTable(LanguageStructure::of($model)))->build();
+
+        $this->assertSame([
+            'path'      => ['datamodel', 'state_machine.states'],
+            'idKey'     => 'state_id',
+            'nameKey'   => 'state_name',
+            'parentKey' => 'machine_id',
+            'client'    => [
+                'selector'    => 'stateName',
+                'nameToken'   => 'state_name',
+                'idToken'     => 'state_id',
+                'parentToken' => 'machine_id',
+                // The parent is the state machine, whose own inputs are inside
+                // its group already, so the cut is the plain one:
+                // `…__state_machine__states__states0__state_name` cut here
+                // and given `_machine_id` is the state machine's id input.
+                'parentCut'   => '_states__states',
+            ],
+        ], $generated['State']);
+    }
+
+    /**
+     * A subtype's own repeating group sits in the subtype's group.
+     *
+     * LionCore M3 is the case: a feature belongs to a Classifier, which is one
+     * kind of language entity, so it is stored at
+     * `languageEntities0.classifier.feature` - the same nesting the condition
+     * `classifier.classifier_type` reads.
+     */
+    public function testASubtypesOwnRepeatingGroupIsDottedThroughItsGroup(): void
+    {
+        $structure = LanguageStructure::of($this->metaModel());
+        $feature   = null;
+
+        foreach ($this->metaModel()->classifiers() as $classifier) {
+            if ($classifier->name === 'Feature') {
+                $feature = $structure->placementOf($classifier);
+            }
+        }
+
+        $this->assertNotNull($feature);
+        $this->assertSame(['languageEntities', 'classifier.feature'], $feature->path);
+        // And the cut that reaches the language entity's own inputs starts
+        // at that group, not at the feature group inside it.
+        $this->assertSame('_classifier__feature__feature', $feature->parentCut());
+    }
+
+    /**
      * A stored `languageEntities` row holding a concept.
      *
      * @param  array<int, array<string, mixed>>  $features

@@ -41,7 +41,11 @@ use Yepr\Component\Metagen\Administrator\Generator\Model\ConceptModel;
  * subform, which is a group a reader walks into. A single one is stored as the
  * group itself rather than as one keyed row - that is what `SubformField::filter()`
  * does with `multiple` - so it is read as a dotted path and never walked, which
- * is why `classifier.classifier_type` is one condition rather than a step.
+ * is why `classifier.classifier_type` is one condition rather than a step. A
+ * repeating group *inside* single ones is one step, dotted through them: the
+ * states of an entity's one state machine are `state_machine.states`, and a
+ * feature of a classifier is `classifier.feature`, because a subtype's own
+ * fields sit in its group too.
  *
  * **Two naming conventions, both read off the hand-written model.** A subtype's
  * subform group is `lcfirst` of its name - `concept`, `conceptInterface`,
@@ -227,13 +231,18 @@ final class LanguageStructure
     /**
      * Place one classifier, then everything it discriminates into or contains.
      *
-     * @param  string[]                                        $path        Repeating groups walked so far.
-     * @param  string[]                                        $prefix      Subform groups the conditions sit under.
+     * @param  string[]                                        $path        Steps walked so far, one per repeating group.
+     * @param  string[]                                        $prefix      Single groups between the current row and here.
      * @param  array<int, array{path: string, value: string}>  $conditions  What the row must say it is.
      * @param  ?Classifier                                     $rowType     The type owning the current row's name input.
      * @param  string                                          $containment The current repeating group's field name.
      * @param  ?Classifier                                     $container   The classifier holding that group.
      * @param  string[]                                        $seen        Keys already on this branch.
+     * @param  bool                                            $asSubtype   Reached as a subtype, inside its parent's row.
+     * @param  string[]                                        $within      Groups between the container's own inputs and
+     *                                                                      the current containment field.
+     * @param  string[]                                        $local       Subtype groups between the row type's own
+     *                                                                      inputs and here.
      *
      * @since  1.2.0
      */
@@ -245,7 +254,10 @@ final class LanguageStructure
         ?Classifier $rowType,
         string $containment,
         ?Classifier $container,
-        array $seen
+        array $seen,
+        bool $asSubtype = false,
+        array $within = [],
+        array $local = []
     ): void {
         // A containment cycle - a concept that contains itself, directly or
         // round a loop - is a legitimate language and an infinite form. It
@@ -264,7 +276,8 @@ final class LanguageStructure
                 $conditions,
                 $rowType,
                 $containment,
-                $container
+                $container,
+                $within
             );
         }
 
@@ -284,14 +297,23 @@ final class LanguageStructure
                 $rowType,
                 $containment,
                 $container,
-                $seen
+                $seen,
+                true,
+                $within,
+                [...$local, $this->groupOf($subtype)]
             );
         }
 
-        // Inherited containments included: a subtype holds what its parent
-        // holds, and a reference to one of those children says nothing about
-        // which subtype it came from.
-        foreach ($this->model->featuresOf($classifier) as $feature) {
+        // Inherited containments included, when this is the type of the row
+        // itself: a reference to one of those children says nothing about which
+        // subtype it came from. A subtype reached inside its parent's row
+        // leaves them out, because they are stored in the parent's group, not
+        // in its own, and the parent places them from there.
+        $features = $asSubtype
+            ? $this->model->formFeatures($classifier)
+            : $this->model->featuresOf($classifier);
+
+        foreach ($features as $feature) {
             if (!$feature->isContainment() || $feature->typeKey === '') {
                 continue;
             }
@@ -302,15 +324,20 @@ final class LanguageStructure
                 continue;
             }
 
+            // A repeating group is the next step, spelled through the single
+            // groups it sits in, because a single group is stored as the group
+            // itself: `state_machine.states`, never `states` on its own.
             $this->walk(
                 $target,
-                $feature->multiple ? [...$path, $feature->name] : $path,
+                $feature->multiple ? [...$path, implode('.', [...$prefix, $feature->name])] : $path,
                 $feature->multiple ? [] : [...$prefix, $feature->name],
                 $feature->multiple ? [] : $conditions,
                 $target,
                 $feature->name,
                 $rowType ?? $classifier,
-                $seen
+                $seen,
+                false,
+                $local
             );
         }
     }

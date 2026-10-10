@@ -39,11 +39,15 @@ final class Placement
 {
     /**
      * @param  Classifier                           $classifier   What is placed.
-     * @param  string[]                             $path         Repeating groups to walk, from the root.
+     * @param  string[]                             $path         Repeating groups to walk, from the root,
+     *                                                            each dotted through the single groups it is in.
      * @param  array<int, array{path: string, value: string}>  $conditions   What a row must say it is.
      * @param  Classifier                           $rowType      The type whose form owns the row's name input.
      * @param  string                               $containment  The repeating group's field name.
      * @param  ?Classifier                          $parent       The classifier that contains it, if any.
+     * @param  string[]                             $within       Groups between the parent's own inputs and the
+     *                                                            containment field: the subtype groups it is
+     *                                                            declared in.
      *
      * @since  1.2.0
      */
@@ -53,8 +57,26 @@ final class Placement
         public readonly array $conditions,
         public readonly Classifier $rowType,
         public readonly string $containment,
-        public readonly ?Classifier $parent
+        public readonly ?Classifier $parent,
+        public readonly array $within = []
     ) {
+    }
+
+    /**
+     * Where to cut this row's element id to reach its parent's row.
+     *
+     * A child's element id is its parent's with its own repeating group
+     * appended twice - once as the field, once as the row - and before that any
+     * group the field is declared in: a Classifier's features sit in its
+     * `classifier` group, so the cut is `_classifier__feature__feature`. A
+     * single containment is not one of those. What it holds is the parent, and
+     * that parent's inputs are inside its group already.
+     *
+     * @since  1.6.0
+     */
+    public function parentCut(): string
+    {
+        return '_' . implode('__', [...$this->within, $this->containment]) . '__' . $this->containment;
     }
 
     /**
