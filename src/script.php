@@ -43,7 +43,12 @@ class Com_MetagenInstallerScript
     /**
      * The oldest library release that has everything this version calls.
      *
-     * 0.18.0 for package format 5, which is what this version writes: a
+     * 0.19.0 for a reference path that reads through a single group: the
+     * reference table this version generates spells a repeating containment
+     * inside a single one as a dotted step, `state_machine.states`, and an
+     * older library finds no rows there, so a saved reference loses its name.
+     *
+     * Before that, 0.18.0 for package format 5, which is what this version writes: a
      * manifest carrying `lionwebKey`, the key the language calls itself by.
      * A site on an older library refuses a package it cannot read, which is
      * the right answer and a confusing one to arrive at by surprise.
@@ -64,7 +69,7 @@ class Com_MetagenInstallerScript
      * asked for ^0.8, which is a site that installs the component, accepts the
      * library it is handed, and cannot open the import screen.
      */
-    private const LIBRARY_MINIMUM = '0.18.0';
+    private const LIBRARY_MINIMUM = '0.19.0';
 
     /**
      * The oldest Joomla this runs on.
