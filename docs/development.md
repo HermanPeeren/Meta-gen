@@ -209,6 +209,47 @@ the same version as an update, and update SQL comes from `sql/updates/mysql/`.
 After changing a table name, uninstall the component before installing it again
 or the table will not be there.
 
+## LedgerLang, the demo language
+
+`tests/Fixtures/languages/ledgerlang.json` is a language that derives from ER1
+and adds accounting to it, made for the JWC 2026 talk. It holds ER1 unchanged
+plus `AccountRole`, `PostingRule`, `PostingLine`, `LocalisationPack`, and a
+`StateMachine` with `State` and `Transition` on ER1's Entity. On Project, the
+three containments that hold these get fieldsets of their own, so Exten-gen
+opens a LedgerLang project on six tabs: ER1's three, then Account roles,
+Posting rules and Localisation.
+
+**It is generated, not edited.** `tools/make-ledgerlang.php` builds it from
+`er1-full.json`, because a derived language has to keep every concept and
+feature of its parent or the ancestry guard refuses it. When ER1 moves,
+`LedgerLangTest` fails until the tool is run again.
+
+```bash
+php tools/make-ledgerlang.php
+php tools/export-language.php tests/Fixtures/languages/ledgerlang.json
+php tools/seed-ledger-demo.php build/LedgerLang-0.1.zip ../Exten-gen/joomla
+php tools/seed-metalanguage.php ledgerlang      # and on this site
+```
+
+The last two are the rehearsal reset. `seed-ledger-demo.php` imports the
+package through the same `MetalanguageImporter` the Import button calls, so
+the guard runs, and it stores the BalloonLedger project
+(`tests/Fixtures/projects/balloonledger.json`) bound to the language. That
+project is stored in the spelling the screens write, and `LedgerLangTest`
+walks it against the language, so a misspelt key fails a test instead of
+leaving a tab empty.
+
+**A gap it found: a single containment is not a step in a reference path.**
+`LanguageStructure` walks only repeating containments, so a list inside a
+single containment is looked for one level too high. With a single
+`state_machine` on Entity, the reference table put State at
+`datamodel.states` while the model stores it at
+`datamodel.state_machine.states`. The dropdown still works while a form is
+open, because the browser half finds rows in the page, but after a save the
+server half finds no states and a transition loses their names. LedgerLang
+makes `state_machine` repeating, which avoids the gap. Fixing it means a path
+step for a single group, which the library's `ReferenceIndex` does not have.
+
 ## Quality gates
 
 ```

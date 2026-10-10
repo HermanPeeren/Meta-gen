@@ -1,0 +1,859 @@
+{
+    "name": "BalloonLedger",
+    "datamodel": {
+        "datamodel0": {
+            "entity_name": "Account",
+            "field": {
+                "field0": {
+                    "field_name": "code",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text",
+                        "isunique": "1",
+                        "isprimary": "1",
+                        "default_ref_display": "1"
+                    },
+                    "field_id": "bd2cf951-4f84-4df5-a94d-8c25d52ac16f"
+                },
+                "field1": {
+                    "field_name": "name",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text"
+                    },
+                    "field_id": "721266ed-906e-44aa-a4a3-393c1564e891"
+                },
+                "field2": {
+                    "field_name": "nature",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text"
+                    },
+                    "field_id": "cf31c64a-48d4-4c8c-aea8-c75d5f6eeec6"
+                },
+                "field3": {
+                    "field_name": "normal_balance",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text"
+                    },
+                    "field_id": "c98bdeaf-b1bc-467f-a764-69f522c56f31"
+                },
+                "field4": {
+                    "field_name": "postable",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Boolean"
+                    },
+                    "field_id": "d6b75b56-8a1a-4b48-ae8f-94af438ef939"
+                },
+                "field5": {
+                    "field_name": "reconcilable",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Boolean"
+                    },
+                    "field_id": "afba17c3-5c3a-4c51-a035-29424a5f1536"
+                },
+                "field6": {
+                    "field_name": "active",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Boolean"
+                    },
+                    "field_id": "7ccac17c-fdba-4734-a9e4-88725e374eaf"
+                }
+            },
+            "entity_id": "413f886e-a4b3-4e35-ab52-51b314239c0e"
+        },
+        "datamodel1": {
+            "entity_name": "Journal",
+            "field": {
+                "field0": {
+                    "field_name": "code",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text",
+                        "isunique": "1",
+                        "isprimary": "1",
+                        "default_ref_display": "1"
+                    },
+                    "field_id": "084b2be5-4d50-4036-aeef-804ef251c49a"
+                },
+                "field1": {
+                    "field_name": "name",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text"
+                    },
+                    "field_id": "c387aa80-7f28-4891-a74d-bde27e529d6f"
+                },
+                "field2": {
+                    "field_name": "journal_type",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text"
+                    },
+                    "field_id": "0e442f16-2c1f-4966-a56f-485bf9788649"
+                },
+                "field3": {
+                    "field_name": "gapless",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Boolean"
+                    },
+                    "field_id": "306ed5df-9e9b-4f99-a52b-241df4ea2e25"
+                }
+            },
+            "entity_id": "98038bfd-029a-419c-a211-3997e8a01794"
+        },
+        "datamodel2": {
+            "entity_name": "Party",
+            "field": {
+                "field0": {
+                    "field_name": "name",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text",
+                        "default_ref_display": "1"
+                    },
+                    "field_id": "eab0b87f-7b1a-46a5-ab30-a0215cd5ec0e"
+                },
+                "field1": {
+                    "field_name": "party_type",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text"
+                    },
+                    "field_id": "fb9b5275-e587-46a1-afdc-5da0fe989e5c"
+                },
+                "field2": {
+                    "field_name": "email",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text"
+                    },
+                    "field_id": "3a055ea3-9252-4605-a5c5-ac3e15317985"
+                }
+            },
+            "entity_id": "be059bc7-b846-44fa-a7ba-c929d364cf46"
+        },
+        "datamodel3": {
+            "entity_name": "TaxCode",
+            "field": {
+                "field0": {
+                    "field_name": "code",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text",
+                        "isunique": "1",
+                        "isprimary": "1",
+                        "default_ref_display": "1"
+                    },
+                    "field_id": "86160a43-5b71-4b37-a641-94cef9ac914d"
+                },
+                "field1": {
+                    "field_name": "name",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text"
+                    },
+                    "field_id": "697e5b93-9331-4fea-a0c0-b9c275faacb6"
+                },
+                "field2": {
+                    "field_name": "rate",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Decimal"
+                    },
+                    "field_id": "a1f4dc31-c79f-4161-ac9b-9d4ecdb616b2"
+                },
+                "field3": {
+                    "field_name": "tax_type",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text"
+                    },
+                    "field_id": "11d6db31-c2e2-4f7a-a2b6-cb45c16f5e53"
+                },
+                "field4": {
+                    "field_name": "valid_from",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Date"
+                    },
+                    "field_id": "326f022f-df49-4eb7-ab6c-2127ec0b47ea"
+                },
+                "field5": {
+                    "field_name": "valid_until",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Date"
+                    },
+                    "field_id": "9255a1b7-1660-4e3d-a06c-7f1f3cf78dc0"
+                }
+            },
+            "entity_id": "84fc0766-a277-423e-a7bf-ff173bf8c0ad"
+        },
+        "datamodel4": {
+            "entity_name": "JournalEntry",
+            "field": {
+                "field0": {
+                    "field_name": "number",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text",
+                        "default_ref_display": "1"
+                    },
+                    "field_id": "bcb97c4f-8c66-43de-a75d-90f8af7ec6e7"
+                },
+                "field1": {
+                    "field_name": "entry_date",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Date"
+                    },
+                    "field_id": "2366278e-c7a8-452a-a362-2568c5221f46"
+                },
+                "field2": {
+                    "field_name": "journal",
+                    "field_type": "EntityReferenceField",
+                    "entityReferenceField": {
+                        "reference": "98038bfd-029a-419c-a211-3997e8a01794",
+                        "isrequired": "1"
+                    },
+                    "field_id": "8d45528c-df08-4d3f-af62-6249728ef0f4"
+                },
+                "field3": {
+                    "field_name": "description",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Text"
+                    },
+                    "field_id": "f4294cfa-45b1-4991-a5d1-6fb464fc5eef"
+                },
+                "field4": {
+                    "field_name": "status",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text"
+                    },
+                    "field_id": "340de718-a700-48f2-a645-842793115640"
+                },
+                "field5": {
+                    "field_name": "origin",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text"
+                    },
+                    "field_id": "d37ed70c-1e57-4c55-ae03-5d66bbfea80e"
+                },
+                "field6": {
+                    "field_name": "external_id",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text"
+                    },
+                    "field_id": "f1682c10-2b67-4474-aaca-e6bc82ac7569"
+                }
+            },
+            "state_machine": {
+                "state_machine0": {
+                    "name": "status",
+                    "initial_state": "draft",
+                    "states": {
+                        "states0": {
+                            "key": "draft",
+                            "name": "Draft"
+                        },
+                        "states1": {
+                            "key": "posted",
+                            "name": "Posted"
+                        },
+                        "states2": {
+                            "key": "reversed",
+                            "name": "Reversed"
+                        }
+                    },
+                    "transitions": {
+                        "transitions0": {
+                            "name": "post",
+                            "from": "draft",
+                            "to": "posted"
+                        },
+                        "transitions1": {
+                            "name": "reverse",
+                            "from": "posted",
+                            "to": "reversed"
+                        }
+                    }
+                }
+            },
+            "entity_id": "b69c0af9-ca56-455e-a49f-3050196231d5"
+        },
+        "datamodel5": {
+            "entity_name": "EntryLine",
+            "field": {
+                "field0": {
+                    "field_name": "entry",
+                    "field_type": "EntityReferenceField",
+                    "entityReferenceField": {
+                        "reference": "b69c0af9-ca56-455e-a49f-3050196231d5",
+                        "isrequired": "1"
+                    },
+                    "field_id": "33ae0376-900b-4280-abc2-4e0c8b9d2fd5"
+                },
+                "field1": {
+                    "field_name": "account",
+                    "field_type": "EntityReferenceField",
+                    "entityReferenceField": {
+                        "reference": "413f886e-a4b3-4e35-ab52-51b314239c0e",
+                        "isrequired": "1"
+                    },
+                    "field_id": "0dcf96ed-217d-4d52-ac59-4cb234499f8f"
+                },
+                "field2": {
+                    "field_name": "description",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Short_Text",
+                        "default_ref_display": "1"
+                    },
+                    "field_id": "b4ad81a7-5ef8-4c7a-a12c-c0924f227795"
+                },
+                "field3": {
+                    "field_name": "debit",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Currency"
+                    },
+                    "field_id": "481d9e6c-e55f-4e45-a23c-2cab30ab0793"
+                },
+                "field4": {
+                    "field_name": "credit",
+                    "field_type": "Property",
+                    "property": {
+                        "type": "Currency"
+                    },
+                    "field_id": "5b91533a-0e18-4eae-a912-9d478ad494fe"
+                },
+                "field5": {
+                    "field_name": "tax_code",
+                    "field_type": "EntityReferenceField",
+                    "entityReferenceField": {
+                        "reference": "84fc0766-a277-423e-a7bf-ff173bf8c0ad"
+                    },
+                    "field_id": "4c0bd979-b5a4-413c-a0db-d81fd180c109"
+                },
+                "field6": {
+                    "field_name": "party",
+                    "field_type": "EntityReferenceField",
+                    "entityReferenceField": {
+                        "reference": "be059bc7-b846-44fa-a7ba-c929d364cf46"
+                    },
+                    "field_id": "7c288ad3-7fdd-44e1-af29-a548823a2b6d"
+                }
+            },
+            "entity_id": "af50be2e-55bf-45d0-a37b-77f66f5de57e"
+        }
+    },
+    "pages": {
+        "pages0": {
+            "page_name": "Accounts",
+            "page_type": "indexpage",
+            "entity_ref": {
+                "entity_ref0": {
+                    "reference": "413f886e-a4b3-4e35-ab52-51b314239c0e"
+                }
+            },
+            "filters": [],
+            "presentationcolumns": [],
+            "editfields": [],
+            "links": {
+                "links0": {
+                    "link_name": "Account details",
+                    "link_type": "Details",
+                    "target_page": {
+                        "page_reference": "08b7552d-96e9-4a36-ad60-2bc88c7aae97"
+                    },
+                    "entity_field_reference": {
+                        "entity_reference": "413f886e-a4b3-4e35-ab52-51b314239c0e",
+                        "field_reference": "bd2cf951-4f84-4df5-a94d-8c25d52ac16f"
+                    }
+                }
+            },
+            "page_id": "258d8a82-578c-481e-acbf-9914a03f9467"
+        },
+        "pages1": {
+            "page_name": "Account",
+            "page_type": "detailspage",
+            "entity_ref": {
+                "entity_ref0": {
+                    "reference": "413f886e-a4b3-4e35-ab52-51b314239c0e"
+                }
+            },
+            "filters": [],
+            "presentationcolumns": [],
+            "editfields": [],
+            "links": {
+                "links0": {
+                    "link_name": "List of accounts",
+                    "link_type": "Index",
+                    "target_page": {
+                        "page_reference": "258d8a82-578c-481e-acbf-9914a03f9467"
+                    },
+                    "entity_field_reference": {
+                        "entity_reference": "413f886e-a4b3-4e35-ab52-51b314239c0e"
+                    }
+                }
+            },
+            "page_id": "08b7552d-96e9-4a36-ad60-2bc88c7aae97"
+        },
+        "pages2": {
+            "page_name": "Journals",
+            "page_type": "indexpage",
+            "entity_ref": {
+                "entity_ref0": {
+                    "reference": "98038bfd-029a-419c-a211-3997e8a01794"
+                }
+            },
+            "filters": [],
+            "presentationcolumns": [],
+            "editfields": [],
+            "links": {
+                "links0": {
+                    "link_name": "Journal details",
+                    "link_type": "Details",
+                    "target_page": {
+                        "page_reference": "1341b0cc-e393-4898-a2d6-fad7e457c44c"
+                    },
+                    "entity_field_reference": {
+                        "entity_reference": "98038bfd-029a-419c-a211-3997e8a01794",
+                        "field_reference": "084b2be5-4d50-4036-aeef-804ef251c49a"
+                    }
+                }
+            },
+            "page_id": "3b8f73c5-7186-498b-aa42-90148da61fde"
+        },
+        "pages3": {
+            "page_name": "Journal",
+            "page_type": "detailspage",
+            "entity_ref": {
+                "entity_ref0": {
+                    "reference": "98038bfd-029a-419c-a211-3997e8a01794"
+                }
+            },
+            "filters": [],
+            "presentationcolumns": [],
+            "editfields": [],
+            "links": {
+                "links0": {
+                    "link_name": "List of journals",
+                    "link_type": "Index",
+                    "target_page": {
+                        "page_reference": "3b8f73c5-7186-498b-aa42-90148da61fde"
+                    },
+                    "entity_field_reference": {
+                        "entity_reference": "98038bfd-029a-419c-a211-3997e8a01794"
+                    }
+                }
+            },
+            "page_id": "1341b0cc-e393-4898-a2d6-fad7e457c44c"
+        },
+        "pages4": {
+            "page_name": "Parties",
+            "page_type": "indexpage",
+            "entity_ref": {
+                "entity_ref0": {
+                    "reference": "be059bc7-b846-44fa-a7ba-c929d364cf46"
+                }
+            },
+            "filters": [],
+            "presentationcolumns": [],
+            "editfields": [],
+            "links": {
+                "links0": {
+                    "link_name": "Party details",
+                    "link_type": "Details",
+                    "target_page": {
+                        "page_reference": "435142af-a598-4d11-a4c4-ed1b102887b4"
+                    },
+                    "entity_field_reference": {
+                        "entity_reference": "be059bc7-b846-44fa-a7ba-c929d364cf46",
+                        "field_reference": "eab0b87f-7b1a-46a5-ab30-a0215cd5ec0e"
+                    }
+                }
+            },
+            "page_id": "05134c2c-e9ab-442e-a0cb-279ed1315ac3"
+        },
+        "pages5": {
+            "page_name": "Party",
+            "page_type": "detailspage",
+            "entity_ref": {
+                "entity_ref0": {
+                    "reference": "be059bc7-b846-44fa-a7ba-c929d364cf46"
+                }
+            },
+            "filters": [],
+            "presentationcolumns": [],
+            "editfields": [],
+            "links": {
+                "links0": {
+                    "link_name": "List of parties",
+                    "link_type": "Index",
+                    "target_page": {
+                        "page_reference": "05134c2c-e9ab-442e-a0cb-279ed1315ac3"
+                    },
+                    "entity_field_reference": {
+                        "entity_reference": "be059bc7-b846-44fa-a7ba-c929d364cf46"
+                    }
+                }
+            },
+            "page_id": "435142af-a598-4d11-a4c4-ed1b102887b4"
+        },
+        "pages6": {
+            "page_name": "TaxCodes",
+            "page_type": "indexpage",
+            "entity_ref": {
+                "entity_ref0": {
+                    "reference": "84fc0766-a277-423e-a7bf-ff173bf8c0ad"
+                }
+            },
+            "filters": [],
+            "presentationcolumns": [],
+            "editfields": [],
+            "links": {
+                "links0": {
+                    "link_name": "TaxCode details",
+                    "link_type": "Details",
+                    "target_page": {
+                        "page_reference": "a007bc5b-ae1e-4c4f-aed8-cf61e0a16680"
+                    },
+                    "entity_field_reference": {
+                        "entity_reference": "84fc0766-a277-423e-a7bf-ff173bf8c0ad",
+                        "field_reference": "86160a43-5b71-4b37-a641-94cef9ac914d"
+                    }
+                }
+            },
+            "page_id": "bb65227e-3e11-4e3d-a757-3c92b826e4e9"
+        },
+        "pages7": {
+            "page_name": "TaxCode",
+            "page_type": "detailspage",
+            "entity_ref": {
+                "entity_ref0": {
+                    "reference": "84fc0766-a277-423e-a7bf-ff173bf8c0ad"
+                }
+            },
+            "filters": [],
+            "presentationcolumns": [],
+            "editfields": [],
+            "links": {
+                "links0": {
+                    "link_name": "List of taxcodes",
+                    "link_type": "Index",
+                    "target_page": {
+                        "page_reference": "bb65227e-3e11-4e3d-a757-3c92b826e4e9"
+                    },
+                    "entity_field_reference": {
+                        "entity_reference": "84fc0766-a277-423e-a7bf-ff173bf8c0ad"
+                    }
+                }
+            },
+            "page_id": "a007bc5b-ae1e-4c4f-aed8-cf61e0a16680"
+        },
+        "pages8": {
+            "page_name": "JournalEntries",
+            "page_type": "indexpage",
+            "entity_ref": {
+                "entity_ref0": {
+                    "reference": "b69c0af9-ca56-455e-a49f-3050196231d5"
+                }
+            },
+            "filters": [],
+            "presentationcolumns": [],
+            "editfields": [],
+            "links": {
+                "links0": {
+                    "link_name": "JournalEntry details",
+                    "link_type": "Details",
+                    "target_page": {
+                        "page_reference": "103c7730-12ca-4518-a0f8-9796de404962"
+                    },
+                    "entity_field_reference": {
+                        "entity_reference": "b69c0af9-ca56-455e-a49f-3050196231d5",
+                        "field_reference": "bcb97c4f-8c66-43de-a75d-90f8af7ec6e7"
+                    }
+                }
+            },
+            "page_id": "6242d972-1f65-4e19-a4ba-37d263ca3146"
+        },
+        "pages9": {
+            "page_name": "JournalEntry",
+            "page_type": "detailspage",
+            "entity_ref": {
+                "entity_ref0": {
+                    "reference": "b69c0af9-ca56-455e-a49f-3050196231d5"
+                }
+            },
+            "filters": [],
+            "presentationcolumns": [],
+            "editfields": [],
+            "links": {
+                "links0": {
+                    "link_name": "List of journalentries",
+                    "link_type": "Index",
+                    "target_page": {
+                        "page_reference": "6242d972-1f65-4e19-a4ba-37d263ca3146"
+                    },
+                    "entity_field_reference": {
+                        "entity_reference": "b69c0af9-ca56-455e-a49f-3050196231d5"
+                    }
+                }
+            },
+            "page_id": "103c7730-12ca-4518-a0f8-9796de404962"
+        },
+        "pages10": {
+            "page_name": "EntryLines",
+            "page_type": "indexpage",
+            "entity_ref": {
+                "entity_ref0": {
+                    "reference": "af50be2e-55bf-45d0-a37b-77f66f5de57e"
+                }
+            },
+            "filters": [],
+            "presentationcolumns": [],
+            "editfields": [],
+            "links": {
+                "links0": {
+                    "link_name": "EntryLine details",
+                    "link_type": "Details",
+                    "target_page": {
+                        "page_reference": "739ed70e-50f9-4f12-a297-432864ec6926"
+                    },
+                    "entity_field_reference": {
+                        "entity_reference": "af50be2e-55bf-45d0-a37b-77f66f5de57e",
+                        "field_reference": "33ae0376-900b-4280-abc2-4e0c8b9d2fd5"
+                    }
+                }
+            },
+            "page_id": "e8e52c5d-e572-42b3-a8b5-195752cfde78"
+        },
+        "pages11": {
+            "page_name": "EntryLine",
+            "page_type": "detailspage",
+            "entity_ref": {
+                "entity_ref0": {
+                    "reference": "af50be2e-55bf-45d0-a37b-77f66f5de57e"
+                }
+            },
+            "filters": [],
+            "presentationcolumns": [],
+            "editfields": [],
+            "links": {
+                "links0": {
+                    "link_name": "List of entrylines",
+                    "link_type": "Index",
+                    "target_page": {
+                        "page_reference": "e8e52c5d-e572-42b3-a8b5-195752cfde78"
+                    },
+                    "entity_field_reference": {
+                        "entity_reference": "af50be2e-55bf-45d0-a37b-77f66f5de57e"
+                    }
+                }
+            },
+            "page_id": "739ed70e-50f9-4f12-a297-432864ec6926"
+        }
+    },
+    "extensions": {
+        "component": {
+            "component_name": "BalloonLedger",
+            "component_description": "The books of a hot air balloon company: accounts, journals and entries.",
+            "Sections": {
+                "frontendsection": {
+                    "frontendsection0": {
+                        "page_reference": "258d8a82-578c-481e-acbf-9914a03f9467"
+                    }
+                },
+                "frontenddefaultpage": {
+                    "page_reference": "258d8a82-578c-481e-acbf-9914a03f9467"
+                },
+                "backendsection": {
+                    "backendsection0": {
+                        "page_reference": "258d8a82-578c-481e-acbf-9914a03f9467"
+                    },
+                    "backendsection1": {
+                        "page_reference": "08b7552d-96e9-4a36-ad60-2bc88c7aae97"
+                    },
+                    "backendsection2": {
+                        "page_reference": "3b8f73c5-7186-498b-aa42-90148da61fde"
+                    },
+                    "backendsection3": {
+                        "page_reference": "1341b0cc-e393-4898-a2d6-fad7e457c44c"
+                    },
+                    "backendsection4": {
+                        "page_reference": "05134c2c-e9ab-442e-a0cb-279ed1315ac3"
+                    },
+                    "backendsection5": {
+                        "page_reference": "435142af-a598-4d11-a4c4-ed1b102887b4"
+                    },
+                    "backendsection6": {
+                        "page_reference": "bb65227e-3e11-4e3d-a757-3c92b826e4e9"
+                    },
+                    "backendsection7": {
+                        "page_reference": "a007bc5b-ae1e-4c4f-aed8-cf61e0a16680"
+                    },
+                    "backendsection8": {
+                        "page_reference": "6242d972-1f65-4e19-a4ba-37d263ca3146"
+                    },
+                    "backendsection9": {
+                        "page_reference": "103c7730-12ca-4518-a0f8-9796de404962"
+                    },
+                    "backendsection10": {
+                        "page_reference": "e8e52c5d-e572-42b3-a8b5-195752cfde78"
+                    },
+                    "backendsection11": {
+                        "page_reference": "739ed70e-50f9-4f12-a297-432864ec6926"
+                    }
+                },
+                "backenddefaultpage": {
+                    "page_reference": "6242d972-1f65-4e19-a4ba-37d263ca3146"
+                }
+            },
+            "manifest": {
+                "copyright": "Yepr, Herman Peeren",
+                "license": "GPL3",
+                "link": "",
+                "version": "0.1.0",
+                "author_name": "Herman Peeren",
+                "author_email": "herman@yepr.nl",
+                "author_url": "https://hermanpeeren.nl",
+                "creation_date": "2026-10-16",
+                "company_namespace": "Yepr"
+            },
+            "languages": {
+                "languages0": {
+                    "language_code": "en",
+                    "country_code": "GB",
+                    "key_value_pairs": []
+                }
+            }
+        }
+    },
+    "account_roles": {
+        "account_roles0": {
+            "key": "bank.psp",
+            "name": "Bank: payment provider",
+            "nature": "asset",
+            "normal_balance": "debit"
+        },
+        "account_roles1": {
+            "key": "cash",
+            "name": "Cash",
+            "nature": "asset",
+            "normal_balance": "debit"
+        },
+        "account_roles2": {
+            "key": "liability.vouchers",
+            "name": "Liability: vouchers",
+            "nature": "liability",
+            "normal_balance": "credit"
+        },
+        "account_roles3": {
+            "key": "vat.output.standard",
+            "name": "VAT payable (standard rate)",
+            "nature": "liability",
+            "normal_balance": "credit"
+        },
+        "account_roles4": {
+            "key": "revenue.flights",
+            "name": "Revenue: flights",
+            "nature": "income",
+            "normal_balance": "credit"
+        },
+        "account_roles5": {
+            "key": "revenue.breakage",
+            "name": "Revenue: breakage",
+            "nature": "income",
+            "normal_balance": "credit"
+        },
+        "account_roles6": {
+            "key": "expense.landowner",
+            "name": "Expense: landowner compensation",
+            "nature": "expense",
+            "normal_balance": "debit"
+        }
+    },
+    "posting_rules": {
+        "posting_rules0": {
+            "event_name": "VoucherSold",
+            "description": "A gift voucher is paid for. Nothing is earned yet: the company owes a flight.",
+            "lines": {
+                "lines0": {
+                    "role": "bank.psp",
+                    "side": "debit",
+                    "amount": "amount"
+                },
+                "lines1": {
+                    "role": "liability.vouchers",
+                    "side": "credit",
+                    "amount": "amount"
+                }
+            }
+        },
+        "posting_rules1": {
+            "event_name": "FlightFlown",
+            "description": "The voucher is redeemed by flying. Now it is revenue, and VAT is due.",
+            "lines": {
+                "lines0": {
+                    "role": "liability.vouchers",
+                    "side": "debit",
+                    "amount": "amount"
+                },
+                "lines1": {
+                    "role": "revenue.flights",
+                    "side": "credit",
+                    "amount": "amount - vat"
+                },
+                "lines2": {
+                    "role": "vat.output.standard",
+                    "side": "credit",
+                    "amount": "vat"
+                }
+            }
+        },
+        "posting_rules2": {
+            "event_name": "VoucherExpired",
+            "description": "The voucher was never used. What was owed becomes breakage revenue.",
+            "lines": {
+                "lines0": {
+                    "role": "liability.vouchers",
+                    "side": "debit",
+                    "amount": "amount"
+                },
+                "lines1": {
+                    "role": "revenue.breakage",
+                    "side": "credit",
+                    "amount": "amount"
+                }
+            }
+        },
+        "posting_rules3": {
+            "event_name": "FlightCancelledDueToWind",
+            "description": "No entry: the voucher stays a liability until it is flown or expires.",
+            "lines": []
+        }
+    },
+    "localisation_packs": {
+        "localisation_packs0": {
+            "code": "NL-RGS",
+            "name": "Netherlands (RGS)",
+            "terminology_locale": "nl-NL"
+        },
+        "localisation_packs1": {
+            "code": "UK-GAAP",
+            "name": "United Kingdom (UK GAAP)",
+            "terminology_locale": "en-GB"
+        }
+    }
+}
