@@ -43,8 +43,14 @@ class Com_MetagenInstallerScript
     /**
      * The oldest library release that has everything this version calls.
      *
-     * 0.15.0 for `lib_yepr_gen.generation-modal`, the script the metalanguages
-     * list uses to tell the generate modal which row was pressed. It was this
+     * 0.18.0 for package format 5, which is what this version writes: a
+     * manifest carrying `lionwebKey`, the key the language calls itself by.
+     * A site on an older library refuses a package it cannot read, which is
+     * the right answer and a confusing one to arrive at by surprise.
+     *
+     * Before that, 0.15.0 for `lib_yepr_gen.generation-modal`, the script the
+     * metalanguages list uses to tell the generate modal which row was
+     * pressed. It was this
      * component's own until Exten-gen turned out to need the same twelve lines,
      * and one rule in two places is how three defects got in this year.
      *
@@ -58,7 +64,7 @@ class Com_MetagenInstallerScript
      * asked for ^0.8, which is a site that installs the component, accepts the
      * library it is handed, and cannot open the import screen.
      */
-    private const LIBRARY_MINIMUM = '0.17.0';
+    private const LIBRARY_MINIMUM = '0.18.0';
 
     /**
      * The oldest Joomla this runs on.
