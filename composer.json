@@ -52,6 +52,7 @@
         "seed": "php tools/seed-metalanguage.php"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "process-timeout": 0
     }
 }
