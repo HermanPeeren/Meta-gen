@@ -177,7 +177,7 @@ class HtmlView extends BaseHtmlView
 			}
 
 			if ($this->state->get('filter.published') != -2) {
-				$childBar->trash('metagen.trash')->listCheck(true);
+				$childBar->trash('metalanguages.trash')->listCheck(true);
 			}
 		}
 
