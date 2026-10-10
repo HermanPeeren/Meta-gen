@@ -551,6 +551,53 @@ final class MetaFormsTest extends TestCase
     }
 
     /**
+     * A property is stored as it was typed, markup and all.
+     *
+     * Joomla cleans a field with no `filter` on the way in, and a model is
+     * not web content: JCB's `xml` holds a whole `<field/>` element and its
+     * `default` holds a template with `<?php` in it. One save over Hello
+     * World changed 10 of its 595 property values and emptied 5 outright,
+     * with both the import and the export reporting success.
+     *
+     * Properties only. A containment's rows are filtered by the form that
+     * describes them, and a reference holds an id.
+     */
+    public function testAPropertyIsKeptAsItWasTyped(): void
+    {
+        foreach (['name', 'key'] as $property) {
+            $this->assertSame('raw', (string) $this->field('languageEntity', $property)['filter'], $property);
+        }
+
+        $this->assertNull($this->field('language', 'languageEntities')['filter'], 'a containment');
+        $this->assertNull($this->field('property', 'type')['filter'], 'a reference');
+
+        // And nothing is left to the cleaning by accident.
+        $inputs = ['text', 'textarea', 'number', 'url', 'email', 'calendar', 'checkbox', 'media', 'file'];
+
+        foreach ($this->generate() as $path => $contents) {
+            if (!str_ends_with($path, '.xml')) {
+                continue;
+            }
+
+            $xml = simplexml_load_string($contents);
+
+            $this->assertNotFalse($xml, $path);
+
+            foreach ($xml->xpath('//field') ?: [] as $field) {
+                if (!\in_array((string) $field['type'], $inputs, true)) {
+                    continue;
+                }
+
+                $this->assertSame(
+                    'raw',
+                    (string) $field['filter'],
+                    $path . ': ' . (string) $field['name']
+                );
+            }
+        }
+    }
+
+    /**
      * The table is written beside the forms, as JSON somebody can read.
      */
     public function testTheReferenceTableIsWrittenBesideTheForms(): void

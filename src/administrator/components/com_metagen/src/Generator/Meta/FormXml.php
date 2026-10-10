@@ -375,6 +375,27 @@ final class FormXml
         $field->setAttribute('name', $feature->name);
 
         if ($feature->isProperty()) {
+            // Kept as it was typed. Without this Joomla cleans a property on
+            // the way in, and a model is not web content: JCB's `xml` holds a
+            // whole `<field/>` element, its `default` holds a Joomla template
+            // with `<?php` in it, and `php_preflight_install` holds PHP. One
+            // save over Hello World changed 10 of its 595 property values and
+            // emptied 5 of them outright - 1,809 bytes gone, silently, with
+            // the import and the export both reporting success.
+            //
+            // `raw` and not `safehtml`, which strips `<?php` and keeps the
+            // tags around it - the worst of the three answers, because it
+            // leaves something that still looks like code. The input type has
+            // nothing to do with it: a textarea is cleaned exactly as a text
+            // box is. JCB's own forms say `filter="raw"` 152 times, on these
+            // fields among them.
+            //
+            // Every property rather than the ones that look like code,
+            // because this generator cannot tell: `xml` and `default` arrive
+            // from JcbInOut as plain strings. A language saying which of its
+            // properties hold code is the better answer and a later one.
+            $field->setAttribute('filter', 'raw');
+
             // A value the person never enters is not a text box with an
             // internal number in it. ER1's `entity_id` is one of these: the
             // hand-written form hides it, and a generated form that showed it
