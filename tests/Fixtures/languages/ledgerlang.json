@@ -443,8 +443,8 @@
                     "feature5": {
                         "name": "state_machine",
                         "key": "f-entity-state-machine",
-                        "label": "State machines",
-                        "description": "The states a row of this entity goes through, and the transitions between them. One per status an entity has.",
+                        "label": "State machine",
+                        "description": "The states a row of this entity goes through, and the transitions between them.",
                         "is_optional": "1",
                         "is_assigned": "0",
                         "classifier_key": "",
@@ -453,7 +453,7 @@
                         "link": {
                             "type": "c-statemachine",
                             "link_type": "Containment",
-                            "is_multiple": "1",
+                            "is_multiple": "0",
                             "LIonWeb_key": "Feature.Link"
                         }
                     }

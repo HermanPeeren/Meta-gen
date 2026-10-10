@@ -258,34 +258,32 @@
                 }
             },
             "state_machine": {
-                "state_machine0": {
-                    "name": "status",
-                    "initial_state": "draft",
-                    "states": {
-                        "states0": {
-                            "key": "draft",
-                            "name": "Draft"
-                        },
-                        "states1": {
-                            "key": "posted",
-                            "name": "Posted"
-                        },
-                        "states2": {
-                            "key": "reversed",
-                            "name": "Reversed"
-                        }
+                "name": "status",
+                "initial_state": "draft",
+                "states": {
+                    "states0": {
+                        "key": "draft",
+                        "name": "Draft"
                     },
-                    "transitions": {
-                        "transitions0": {
-                            "name": "post",
-                            "from": "draft",
-                            "to": "posted"
-                        },
-                        "transitions1": {
-                            "name": "reverse",
-                            "from": "posted",
-                            "to": "reversed"
-                        }
+                    "states1": {
+                        "key": "posted",
+                        "name": "Posted"
+                    },
+                    "states2": {
+                        "key": "reversed",
+                        "name": "Reversed"
+                    }
+                },
+                "transitions": {
+                    "transitions0": {
+                        "name": "post",
+                        "from": "draft",
+                        "to": "posted"
+                    },
+                    "transitions1": {
+                        "name": "reverse",
+                        "from": "posted",
+                        "to": "reversed"
                     }
                 }
             },

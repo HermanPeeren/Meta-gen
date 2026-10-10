@@ -17,6 +17,7 @@ use Yepr\Gen\Core\Package\MetalanguagePackage;
 use Yepr\Gen\Core\Package\PackageManifest;
 use Yepr\Gen\Core\Package\PackageReader;
 use Yepr\Gen\Core\Pipeline;
+use Yepr\Gen\Core\Reference\ReferenceIndex;
 use Yepr\Gen\Core\Target\Target;
 
 /**
@@ -203,9 +204,9 @@ final class LedgerLangTest extends TestCase
     /**
      * A posting line's role dropdown offers the roles, keyed by the role's own key.
      *
-     * And a transition's states are found where they are stored, which is the
-     * reason `state_machine` repeats: a single containment is not a step in a
-     * reference path, and the states would be looked for one level too high.
+     * And a transition's states are found where they are stored: inside the
+     * entity's one state machine, which is a single group and so part of the
+     * step rather than a step of its own.
      */
     public function testTheReferenceDropdownsFindWhatTheyPointAt(): void
     {
@@ -220,8 +221,17 @@ final class LedgerLangTest extends TestCase
         $this->assertSame('key', $table['AccountRole']['idKey']);
         $this->assertSame('name', $table['AccountRole']['nameKey']);
 
-        $this->assertSame(['datamodel', 'state_machine', 'states'], $table['State']['path']);
+        $this->assertSame(['datamodel', 'state_machine.states'], $table['State']['path']);
         $this->assertSame('key', $table['State']['idKey']);
+
+        // And the server half finds them in a saved model, which is what a
+        // transition's from and to need to keep their names after a save.
+        $saved = json_decode(json_encode(self::demo(), \JSON_THROW_ON_ERROR), false, 512, \JSON_THROW_ON_ERROR);
+
+        $this->assertSame(
+            [['id' => 'draft', 'name' => 'Draft'], ['id' => 'posted', 'name' => 'Posted'], ['id' => 'reversed', 'name' => 'Reversed']],
+            ReferenceIndex::fromTable($table)->index($saved)['State']
+        );
     }
 
     /**

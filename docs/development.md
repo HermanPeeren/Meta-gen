@@ -239,16 +239,14 @@ project is stored in the spelling the screens write, and `LedgerLangTest`
 walks it against the language, so a misspelt key fails a test instead of
 leaving a tab empty.
 
-**A gap it found: a single containment is not a step in a reference path.**
-`LanguageStructure` walks only repeating containments, so a list inside a
-single containment is looked for one level too high. With a single
-`state_machine` on Entity, the reference table put State at
-`datamodel.states` while the model stores it at
-`datamodel.state_machine.states`. The dropdown still works while a form is
-open, because the browser half finds rows in the page, but after a save the
-server half finds no states and a transition loses their names. LedgerLang
-makes `state_machine` repeating, which avoids the gap. Fixing it means a path
-step for a single group, which the library's `ReferenceIndex` does not have.
+**What it found: a repeating list inside a single containment.** Entity's
+`state_machine` is single and holds a repeating `states`, stored at
+`datamodel.state_machine.states`. The reference table used to place State
+at `datamodel.states`, which the browser half got away with and the server
+half did not: after a save a transition lost the names of its states. A
+path step is now dotted through the single groups it sits in -
+`['datamodel', 'state_machine.states']` - and the library reads one from
+0.19.0 on.
 
 ## Quality gates
 

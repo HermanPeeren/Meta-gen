@@ -30,11 +30,9 @@
  * It only adds. Three features on Project, each on a fieldset of its own so
  * that Exten-gen shows them as tabs beside ER1's three, and one on Entity.
  *
- * `state_machine` is a repeating containment, and not only because an entity
- * may have more than one status. A single containment is not a step in a
- * reference path (see `LanguageStructure`), so a State inside a single
- * StateMachine would be looked for at `datamodel.states` while it is stored at
- * `datamodel.state_machine.states`, and a saved transition would lose the
+ * `state_machine` is a single containment: an entity has one life cycle. Its
+ * states are a repeating group inside it, which the reference table spells as
+ * one dotted step, `state_machine.states`, so a saved transition keeps the
  * names of its states.
  */
 
@@ -218,11 +216,11 @@ foreach ($entities as $entity) {
         append($entity, linkTo(
             'entity',
             'state_machine',
-            'State machines',
+            'State machine',
             'c-statemachine',
             'Containment',
-            true,
-            'The states a row of this entity goes through, and the transitions between them. One per status an entity has.'
+            false,
+            'The states a row of this entity goes through, and the transitions between them.'
         ));
     }
 }
