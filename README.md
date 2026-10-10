@@ -1,6 +1,6 @@
-# Meta-gen
+# Metalanguage Generator (Meta-gen)
 
-A Joomla 6 component that models **metalanguages** — and generates the forms a
+The Metalanguage Generator (Meta-gen) is a Joomla 6 component that models **metalanguages** — and generates the forms a
 model written in one is edited with.
 
 ```
@@ -12,17 +12,17 @@ Part of a family of four:
 
 | | |
 |---|---|
-| [Exten-gen](https://github.com/HermanPeeren/Exten-gen) | models extensions, generates them |
-| **Meta-gen** | models metalanguages, generates their forms |
-| [Gen-gen](https://github.com/HermanPeeren/Gen-gen) | models generators |
+| [Extension Generator](https://github.com/HermanPeeren/Exten-gen) (Exten-gen) | models extensions, generates them |
+| **Metalanguage Generator** (Meta-gen) | models metalanguages, generates their forms |
+| [Generator Generator](https://github.com/HermanPeeren/Gen-gen) (Gen-gen) | models generators |
 | [generator-core](https://github.com/HermanPeeren/generator-core) | the shared engine, `Yepr\Gen`, installed as `lib_yepr_gen` |
 
 ## What a metalanguage is
 
-Exten-gen holds *projects*, and a project is written in a language: ER1, whose
-vocabulary is entities, fields and pages. Meta-gen holds the languages
-themselves. A metalanguage says what kinds of object exist, what each one holds,
-and what may point at what — and from that, Meta-gen generates the forms
+The Extension Generator holds *projects*, and a project is written in a language: ER1, whose
+vocabulary is entities, fields and pages. The Metalanguage Generator
+holds the languages themselves. A metalanguage says what kinds of object exist, what each one holds,
+and what may point at what — and from that, it generates the forms
 somebody edits a model of that language with.
 
 It is modelled in **LionCore M3**, which is the LionWeb meta-metamodel: a
@@ -52,15 +52,15 @@ contract are what drift.
 **It is checked against itself.** `tests/Fixtures/languages/lioncore-m3.json`
 is LionCore M3 modelled in LionCore M3, so the expected output already exists:
 the meta-model this component ships, written by hand. Generating from it
-reproduces that table exactly, and an ER1-shaped language reproduces Exten-gen's
-too.
+reproduces that table exactly, and an ER1-shaped language reproduces the Extension
+Generator's too.
 
 ## A language can come from somewhere else
 
 **Import LionWeb language**, on the metalanguages list, reads a LionWeb
 serialization chunk and stores it as a metalanguage. From then on it is a
 metalanguage like any other - forms are generated from it, a package carries
-it, Exten-gen imports that - and nothing downstream can tell where it came
+it, the Extension Generator imports that - and nothing downstream can tell where it came
 from, which is the point.
 
 [LionWeb](https://lionweb.io) is how a model moves between tools that were not
@@ -68,7 +68,7 @@ written for each other. Both it and this component model LionCore M3, but a
 chunk is a flat list of nodes addressed by metapointer while a stored
 metalanguage is a Joomla form's shape, so the two could not read each other
 until there was a translation. That lives in the shared library, as
-`Yepr\Gen\Core\Lionweb`, because Exten-gen needs the same reader for the models
+`Yepr\Gen\Core\Lionweb`, because the Extension Generator needs the same reader for the models
 written in these languages and two implementations of one format drift.
 
 It reads a path under the site rather than an upload: JcbInOut writes JCB's
@@ -102,15 +102,15 @@ that the component's update server offers new versions the ordinary way.
 holding the concept model, the forms, the reference table, a language file and a
 manifest naming the language, its version and its root classifier.
 
-Both siblings read one. Exten-gen imports a package and edits projects through
+Both siblings read one. The Extension Generator imports a package and edits projects through
 its forms; ER1 itself is now a generated package rather than twenty-four
-hand-written form files, so the language Exten-gen has always spoken goes
-through the same reader as any other. Gen-gen imports one too, and a generator
+hand-written form files, so the language the Extension Generator has always spoken goes
+through the same reader as any other. The Generator Generator imports one too, and a generator
 bound to a language offers that language's concepts where a rule says what to
 select.
 
 What is not done: a generator is still written for one language at a time.
-Exten-gen refuses to run its generators over a project written in something
+The Extension Generator refuses to run its generators over a project written in something
 other than ER1, because the rules are about ER1 by name — a refusal rather than
 a silence, and the honest edge of where this has got to. The shared
 [rework plan](https://github.com/HermanPeeren/Exten-gen/blob/main/docs/rework-plan.md)

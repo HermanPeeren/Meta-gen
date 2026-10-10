@@ -1,12 +1,12 @@
-# Developing Meta-gen
+# Developing the Metalanguage Generator (Meta-gen)
 
-What Meta-gen is *for* is in the [README](../README.md); where the family is
+What the Metalanguage Generator is *for* is in the [README](../README.md); where the family is
 going, step by step, is in Exten-gen's
 [rework-plan.md](https://github.com/HermanPeeren/Exten-gen/blob/main/docs/rework-plan.md).
 
 ## Where this came from
 
-Meta-gen was split out of Exten-gen. Everything about modelling a language
+The Metalanguage Generator was split out of the Extension Generator (Exten-gen). Everything about modelling a language
 lived there: the LionCore M3 forms, the CRUD around a stored language, the
 reference index for it, and the forms generator built at step 3.2. None of it
 was coupled to Exten-gen's own side — the ER1 tree referenced it exactly once,
@@ -172,8 +172,8 @@ bytes still parses far enough for Joomla to render a fieldset with nothing in
 it, and reports nothing anywhere.
 
 **The format itself lives in the library**, as `Yepr\Gen\Core\Package\*`. It
-was written here at 3.3 and moved at 3.4, when Exten-gen and Gen-gen became
-readers too — a format three components agree on is a mechanism, which is
+was written here at 3.3 and moved at 3.4, when the Extension Generator and the
+Generator Generator became readers too — a format three components agree on is a mechanism, which is
 where the reference dropdown went for the same reason.
 
 `PackageReader` reads one back, from a zip or from an unpacked tree, and
