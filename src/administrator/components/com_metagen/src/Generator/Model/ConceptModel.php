@@ -136,6 +136,26 @@ final class ConceptModel implements ModelInterface
     }
 
     /**
+     * What the language calls itself in a LionWeb metapointer.
+     *
+     * Not `name()`, which is what its package and its forms are filed under.
+     * JCB's language is `jcb` and its package is `JCB`, and a chunk written
+     * in it has to say the first - so a language that does not carry this
+     * produces models nothing can write back out.
+     *
+     * Empty for a language typed in by hand and never given one, and for
+     * every language imported before the importer kept it.
+     *
+     * @since  0.5.0
+     */
+    public function key(): string
+    {
+        $key = $this->data->key ?? '';
+
+        return \is_scalar($key) ? trim((string) $key) : '';
+    }
+
+    /**
      * The language's version, as somebody typed it on the root form.
      *
      * Free text rather than a checked semantic version, because that is what

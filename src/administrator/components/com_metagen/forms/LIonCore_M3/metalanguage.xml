@@ -24,6 +24,21 @@
 			required="true"
 		 />
 
+		<!--
+			What the language calls itself, as against what it is called.
+			A LionWeb metapointer carries this one: JCB's language is `jcb`
+			and its name is `JCB`. Without a field for it the importer could
+			read a key off a chunk and the first Save would drop it again,
+			because a form posts back only the fields it has.
+		-->
+		<field
+			name="key"
+			type="text"
+			label="COM_METAGEN_METALANGUAGE_FIELD_KEY_LABEL"
+			description="COM_METAGEN_METALANGUAGE_FIELD_KEY_DESC"
+			size="40"
+		 />
+
 		<field
 			name="version"
 			type="text"

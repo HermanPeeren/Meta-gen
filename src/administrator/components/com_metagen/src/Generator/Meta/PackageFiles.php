@@ -186,7 +186,13 @@ final class PackageFiles implements GeneratorInterface
             $hashes,
             MetalanguagePackage::FORMAT,
             gmdate('c'),
-            $model->dependsOn()
+            $model->dependsOn(),
+            // What the language calls itself, beside the name its package is
+            // filed under. A metapointer has to carry this one exactly, and
+            // until format 5 no package said it - so a component holding a
+            // model written in this language had to guess that `jcb` and
+            // `JCB` were the same thing, which they are only by convention.
+            $model->key()
         );
     }
 }

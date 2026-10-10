@@ -256,6 +256,56 @@ final class PackageTest extends TestCase
     }
 
     /**
+     * The manifest says what the language calls itself, beside what it is
+     * called.
+     *
+     * `key` is the name the package is filed under - `JCB`. `lionwebKey` is
+     * the key a metapointer carries - `jcb`. Until format 5 only the first
+     * was recorded, so a component holding a model written in this language
+     * had to guess the two were one another in a different case, and a model
+     * built here rather than imported could not be written out at all.
+     */
+    public function testTheManifestSaysWhatTheLanguageCallsItself(): void
+    {
+        $model = ConceptModel::fromObject((object) [
+            'name'             => 'JCB',
+            'key'              => 'jcb',
+            'version'          => '6.2.0',
+            'languageEntities' => [
+                (object) [
+                    'key'                 => 'c-blueprint',
+                    'languageEntity_type' => 'Classifier',
+                    'name'                => 'Blueprint',
+                    'classifier'          => (object) [
+                        'classifier_type' => 'Concept',
+                        'concept'         => (object) ['partition' => '1'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $manifest = PackageReader::fromZip($this->zip($this->package($model)))->manifest();
+
+        $this->assertSame('JCB', $manifest->key);
+        $this->assertSame('jcb', $manifest->lionwebKey);
+    }
+
+    /**
+     * A language nobody gave one says nothing, rather than claiming its name.
+     *
+     * A language typed in on the screen rather than imported from a chunk has
+     * no LionWeb key until somebody fills the field in, and writing its name
+     * there would be inventing an answer: `LIonCore_M3` is not what LionCore
+     * calls itself.
+     */
+    public function testALanguageWithNoKeyOfItsOwnSaysNothing(): void
+    {
+        $manifest = PackageReader::fromZip($this->zip())->manifest();
+
+        $this->assertSame('', $manifest->lionwebKey);
+    }
+
+    /**
      * Every subform in the package resolves once it is where it says it goes.
      *
      * This is the claim the whole layout rests on. Joomla reads a `formsource`
