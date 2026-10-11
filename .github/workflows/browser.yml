@@ -39,7 +39,7 @@ jobs:
           --health-retries=10
 
     env:
-      JOOMLA_VERSION: 6.1.3
+      JOOMLA_VERSION: 6.1.4
       SITE_URL: http://127.0.0.1:8080
       # A Super User for this run only. Joomla requires twelve characters.
       ADMIN_USERNAME: ci-admin
