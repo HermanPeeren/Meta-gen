@@ -758,8 +758,8 @@
             "normal_balance": "credit"
         },
         "account_roles3": {
-            "key": "vat.output.standard",
-            "name": "VAT payable (standard rate)",
+            "key": "vat.output.low",
+            "name": "VAT payable 9%",
             "nature": "liability",
             "normal_balance": "credit"
         },
@@ -785,7 +785,7 @@
     "posting_rules": {
         "posting_rules0": {
             "event_name": "TicketSold",
-            "description": "A ticket is paid for. Nothing is earned yet: the company owes a flight.",
+            "description": "A ticket is paid for. VAT at the low rate is due now; the rest is owed as a flight.",
             "lines": {
                 "lines0": {
                     "role": "bank.psp",
@@ -795,13 +795,18 @@
                 "lines1": {
                     "role": "liability.tickets",
                     "side": "credit",
-                    "amount": "amount"
+                    "amount": "amount - vat"
+                },
+                "lines2": {
+                    "role": "vat.output.low",
+                    "side": "credit",
+                    "amount": "vat"
                 }
             }
         },
         "posting_rules1": {
             "event_name": "FlightFlown",
-            "description": "The ticket is used by flying. Now it is revenue, and VAT is due.",
+            "description": "The ticket is used by flying. What was owed is now revenue; the VAT was due at the sale.",
             "lines": {
                 "lines0": {
                     "role": "liability.tickets",
@@ -811,18 +816,13 @@
                 "lines1": {
                     "role": "revenue.flights",
                     "side": "credit",
-                    "amount": "amount - vat"
-                },
-                "lines2": {
-                    "role": "vat.output.standard",
-                    "side": "credit",
-                    "amount": "vat"
+                    "amount": "amount"
                 }
             }
         },
         "posting_rules2": {
             "event_name": "TicketExpired",
-            "description": "The ticket was never used. What was owed becomes breakage revenue.",
+            "description": "The ticket was never used. What was owed becomes breakage revenue; the VAT was due at the sale.",
             "lines": {
                 "lines0": {
                     "role": "liability.tickets",
