@@ -752,8 +752,8 @@
             "normal_balance": "debit"
         },
         "account_roles2": {
-            "key": "liability.vouchers",
-            "name": "Liability: vouchers",
+            "key": "liability.tickets",
+            "name": "Liability: tickets not yet flown",
             "nature": "liability",
             "normal_balance": "credit"
         },
@@ -771,7 +771,7 @@
         },
         "account_roles5": {
             "key": "revenue.breakage",
-            "name": "Revenue: breakage",
+            "name": "Revenue: breakage (expired tickets)",
             "nature": "income",
             "normal_balance": "credit"
         },
@@ -784,8 +784,8 @@
     },
     "posting_rules": {
         "posting_rules0": {
-            "event_name": "VoucherSold",
-            "description": "A gift voucher is paid for. Nothing is earned yet: the company owes a flight.",
+            "event_name": "TicketSold",
+            "description": "A ticket is paid for. Nothing is earned yet: the company owes a flight.",
             "lines": {
                 "lines0": {
                     "role": "bank.psp",
@@ -793,7 +793,7 @@
                     "amount": "amount"
                 },
                 "lines1": {
-                    "role": "liability.vouchers",
+                    "role": "liability.tickets",
                     "side": "credit",
                     "amount": "amount"
                 }
@@ -801,10 +801,10 @@
         },
         "posting_rules1": {
             "event_name": "FlightFlown",
-            "description": "The voucher is redeemed by flying. Now it is revenue, and VAT is due.",
+            "description": "The ticket is used by flying. Now it is revenue, and VAT is due.",
             "lines": {
                 "lines0": {
-                    "role": "liability.vouchers",
+                    "role": "liability.tickets",
                     "side": "debit",
                     "amount": "amount"
                 },
@@ -821,11 +821,11 @@
             }
         },
         "posting_rules2": {
-            "event_name": "VoucherExpired",
-            "description": "The voucher was never used. What was owed becomes breakage revenue.",
+            "event_name": "TicketExpired",
+            "description": "The ticket was never used. What was owed becomes breakage revenue.",
             "lines": {
                 "lines0": {
-                    "role": "liability.vouchers",
+                    "role": "liability.tickets",
                     "side": "debit",
                     "amount": "amount"
                 },
@@ -838,7 +838,7 @@
         },
         "posting_rules3": {
             "event_name": "FlightCancelledDueToWind",
-            "description": "No entry: the voucher stays a liability until it is flown or expires.",
+            "description": "No entry: the ticket stays a liability until it is flown or expires.",
             "lines": []
         }
     },

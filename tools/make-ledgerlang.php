@@ -11,7 +11,7 @@
  * accounting. LedgerLang derives from ER1 (step 4.5) and adds the concepts the
  * accounting domain model is built on:
  *
- * - `AccountRole`: a stable key such as `liability.vouchers`, with a nature and
+ * - `AccountRole`: a stable key such as `liability.tickets`, with a nature and
  *   a normal balance. A posting rule posts to a role, never to an account
  *   number, which is what keeps a plugin working with every chart of accounts.
  * - `PostingRule` and `PostingLine`: a business event and the entry it becomes,
@@ -229,13 +229,13 @@ $added = [
     enumeration('Nature', ['asset' => 'Asset', 'liability' => 'Liability', 'equity' => 'Equity', 'income' => 'Income', 'expense' => 'Expense']),
     enumeration('Side', ['debit' => 'Debit', 'credit' => 'Credit']),
     concept('AccountRole', [
-        property('accountrole', 'key', 'Key', 'dt-string', false, '', 'A stable key such as liability.vouchers. Posting rules point at it.'),
+        property('accountrole', 'key', 'Key', 'dt-string', false, '', 'A stable key such as liability.tickets. Posting rules point at it.'),
         property('accountrole', 'name', 'Name', 'dt-string', false, '', ''),
         property('accountrole', 'nature', 'Nature', 'dt-nature', false, 'asset', ''),
         property('accountrole', 'normal_balance', 'Normal balance', 'dt-side', false, 'debit', ''),
     ]),
     concept('PostingRule', [
-        property('postingrule', 'event_name', 'Event', 'dt-string', false, '', 'The business event, such as VoucherSold.'),
+        property('postingrule', 'event_name', 'Event', 'dt-string', false, '', 'The business event, such as TicketSold.'),
         property('postingrule', 'description', 'Description', 'dt-text', true, '', ''),
         linkTo('postingrule', 'lines', 'Lines', 'c-postingline', 'Containment', true, 'No lines means the event posts nothing.'),
     ]),

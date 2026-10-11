@@ -260,8 +260,8 @@ final class LedgerLangTest extends TestCase
         $roles = array_column(array_values($demo['account_roles']), 'key');
         $rules = array_column(array_values($demo['posting_rules']), null, 'event_name');
 
-        $this->assertSame(['VoucherSold', 'FlightFlown', 'VoucherExpired', 'FlightCancelledDueToWind'], array_keys($rules));
-        $this->assertSame([], $rules['FlightCancelledDueToWind']['lines'], 'wind posts nothing: the voucher stays a liability');
+        $this->assertSame(['TicketSold', 'FlightFlown', 'TicketExpired', 'FlightCancelledDueToWind'], array_keys($rules));
+        $this->assertSame([], $rules['FlightCancelledDueToWind']['lines'], 'wind posts nothing: the ticket stays a liability');
 
         foreach ($rules as $event => $rule) {
             $debit  = 0;
