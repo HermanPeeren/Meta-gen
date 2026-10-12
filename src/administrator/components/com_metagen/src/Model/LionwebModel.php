@@ -17,6 +17,7 @@ namespace Yepr\Component\Metagen\Administrator\Model;
 // phpcs:enable PSR1.Files.SideEffects
 
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Yepr\Component\Metagen\Administrator\Lionweb\EditorAnnotation;
 use Yepr\Gen\Core\Lionweb\Chunk;
 use Yepr\Gen\Core\Lionweb\LionCoreLanguage;
 
@@ -94,8 +95,13 @@ class LionwebModel extends BaseDatabaseModel
      */
     public function convert(string $json): array
     {
-        $reader = new LionCoreLanguage(Chunk::fromJson($json));
-        $stored = $reader->toStoredModel();
+        $chunk  = Chunk::fromJson($json);
+        $reader = new LionCoreLanguage($chunk);
+
+        // Which properties are edited over several lines, said by annotation
+        // because LionCore M3 has no word for it: step 6.4.
+        $editors = new EditorAnnotation($chunk);
+        $stored  = $editors->applyTo($reader->toStoredModel());
 
         if ($stored['name'] === '') {
             throw new \RuntimeException('The language in this chunk has no name, so there is nothing to call it.');
@@ -112,7 +118,7 @@ class LionwebModel extends BaseDatabaseModel
             'version'     => (string) $stored['version'],
             'form_data'   => $encoded,
             'entities'    => \count($stored['languageEntities']),
-            'diagnostics' => $reader->diagnostics(),
+            'diagnostics' => array_merge($reader->diagnostics(), $editors->diagnostics()),
         ];
     }
 

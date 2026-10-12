@@ -37,6 +37,34 @@
 			/>
 
 			<!--
+				Whether the value is one line, several lines, or code: step 6.4.
+
+				A fact about the language, like the default: a JCB method body holds
+				line breaks wherever it is edited, and a text box drops every one of
+				them. Several lines becomes a textarea; code is a textarea in a
+				monospace font that is not spellchecked.
+
+				Not part of LionWeb's M3. A chunk carries it as an annotation on the
+				Property node - see `EditorAnnotation` - and a language without one
+				is one line everywhere, which is what every property was before.
+
+				Ignored when "Edited with" names a field class, which decides the
+				input on its own, and for a datatype that is not text.
+			-->
+			<field
+				name="editor"
+				type="radio"
+				default="line"
+				layout="joomla.form.field.radio.buttons"
+				label="COM_METAGEN_METALANGUAGE_PROPERTY_FIELD_EDITOR_LABEL"
+				description="COM_METAGEN_METALANGUAGE_PROPERTY_FIELD_EDITOR_DESC"
+			>
+				<option value="line">COM_METAGEN_METALANGUAGE_PROPERTY_EDITOR_LINE</option>
+				<option value="text">COM_METAGEN_METALANGUAGE_PROPERTY_EDITOR_TEXT</option>
+				<option value="code">COM_METAGEN_METALANGUAGE_PROPERTY_EDITOR_CODE</option>
+			</field>
+
+			<!--
 				The field class this property is edited with, when a text box will not do.
 			
 				Empty for almost everything: the datatype decides the input, and that is

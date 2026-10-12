@@ -75,6 +75,41 @@ describe('a saved metalanguage', () => {
   });
 
   /**
+   * A property can say it runs over lines, or holds code: step 6.4.
+   *
+   * Through the real form and a real save, because the choice is a radio in a
+   * subform inside a repeatable subform, and a field that renders is not yet a
+   * field that posts. The generated half - a textarea where the flag is set -
+   * is `MultilineTest`'s.
+   */
+  it('keeps how a property is edited through a save', () => {
+    openER1();
+
+    cy.get('#metalanguage-form input[type="radio"][value="code"][name$="[property][editor]"]')
+      .should('have.length.greaterThan', 0)
+      .first()
+      .then(($radio) => {
+        const name = $radio.attr('name');
+
+        // Joomla's button layout hides the input behind its label.
+        cy.wrap($radio).check({ force: true });
+
+        cy.window().then((win) => {
+          win.__beforeSave = true;
+          win.Joomla.submitbutton('metalanguage.apply');
+        });
+
+        cy.window({ timeout: 20000 }).should((win) => {
+          expect(win.__beforeSave, 'the save has reloaded the page').to.be.undefined;
+        });
+
+        openER1();
+
+        cy.get(`#metalanguage-form input[name="${name}"]:checked`).should('have.value', 'code');
+      });
+  });
+
+  /**
    * And keeps them through a save.
    *
    * The assertion that matters, and the one that is easy to write wrongly.

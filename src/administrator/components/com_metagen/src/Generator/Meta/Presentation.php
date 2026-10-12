@@ -155,6 +155,54 @@ final class Presentation
     }
 
     /**
+     * How many lines a multi-line property opens with.
+     *
+     * A starting height, not a limit: a textarea grows with its handle and
+     * scrolls past it. Code gets more, because a method body is longer than a
+     * description and reading one through a five-line slot is work.
+     *
+     * @since  0.7.0
+     */
+    public const TEXT_ROWS = '5';
+
+    /**
+     * @since  0.7.0
+     */
+    public const CODE_ROWS = '12';
+
+    /**
+     * The class a code property carries: Bootstrap's own monospace utility,
+     * which Joomla's administrator already loads, so indentation lines up.
+     *
+     * @since  0.7.0
+     */
+    public const CODE_CLASS = 'font-monospace';
+
+    /**
+     * What a multi-line property looks like: step 6.4.
+     *
+     * Code is also not spellchecked. A browser underlining every `$this` in
+     * red is noise, and on some systems it offers to "correct" what it marks.
+     *
+     * A plain textarea and not Joomla's `editor` field with CodeMirror in it,
+     * on purpose: the demo blueprint has 284 code values on one screen, and
+     * one editor instance each is a page that does not load. A class to find
+     * them by is what a later step needs to upgrade them one at a time.
+     *
+     * @return array<string, string>
+     *
+     * @since  0.7.0
+     */
+    public static function forText(bool $code): array
+    {
+        if (!$code) {
+            return ['rows' => self::TEXT_ROWS];
+        }
+
+        return ['rows' => self::CODE_ROWS, 'class' => self::CODE_CLASS, 'spellcheck' => 'false'];
+    }
+
+    /**
      * What the radio that asks which kind of thing a row is looks like.
      *
      * Nothing. It is a short list of words and Joomla renders it fine; saying

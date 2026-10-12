@@ -64,6 +64,28 @@ final class Feature
     public const REFERENCE = 'Reference';
 
     /**
+     * A property whose value is one line: a text box. What a property is
+     * unless its language says otherwise.
+     *
+     * @since  0.7.0
+     */
+    public const EDITOR_LINE = 'line';
+
+    /**
+     * A property whose value may run over several lines: a textarea.
+     *
+     * @since  0.7.0
+     */
+    public const EDITOR_TEXT = 'text';
+
+    /**
+     * A property whose value is code: several lines, and kept exactly as typed.
+     *
+     * @since  0.7.0
+     */
+    public const EDITOR_CODE = 'code';
+
+    /**
      * @param  string   $name        The feature's name, which is the form field's name.
      * @param  string   $key         Its LionWeb key.
      * @param  string   $label       What a person reads instead of the name, if anybody set one.
@@ -77,6 +99,7 @@ final class Feature
      * @param  string   $default     What a new row holds before anybody fills it in.
      * @param  ?CustomField $customField  The field class it is edited with, when a text box will not do.
      * @param  string   $fieldset    Which group of the form it goes in, or '' for the form's own.
+     * @param  string   $editor      How a property's value is edited: one of the `EDITOR_*` constants.
      *
      * @since  1.2.0
      */
@@ -93,7 +116,8 @@ final class Feature
         public readonly string $typeKey,
         public readonly string $default,
         public readonly ?CustomField $customField,
-        public readonly string $fieldset = ''
+        public readonly string $fieldset = '',
+        public readonly string $editor = self::EDITOR_LINE
     ) {
     }
 
@@ -130,8 +154,28 @@ final class Feature
             // value anybody can write down.
             $property === null ? '' : self::text($property, 'default_value'),
             CustomField::fromNode($property),
-            self::fieldsetName(self::text($node, 'fieldset'))
+            self::fieldsetName(self::text($node, 'fieldset')),
+            $property === null ? self::EDITOR_LINE : self::editorName(self::text($property, 'editor'))
         );
+    }
+
+    /**
+     * How a property's value is edited, as one of the three this generator knows.
+     *
+     * Absent is one line, which is what every property was before 0.7.0, so a
+     * language stored before then - and one read in from LionWeb without the
+     * annotation that says otherwise - generates exactly the form it did.
+     * A word this generator does not know is one line too: a property that
+     * should have been a textarea is a smaller mistake than a value nobody can
+     * see the whole of turning into one nobody asked for.
+     *
+     * @since  0.7.0
+     */
+    private static function editorName(string $editor): string
+    {
+        $editor = strtolower(trim($editor));
+
+        return \in_array($editor, [self::EDITOR_TEXT, self::EDITOR_CODE], true) ? $editor : self::EDITOR_LINE;
     }
 
     /**
@@ -160,6 +204,30 @@ final class Feature
     public function displayLabel(): string
     {
         return $this->label !== '' ? $this->label : $this->name;
+    }
+
+    /**
+     * Whether this property's value may hold line breaks.
+     *
+     * A text box cannot: the browser drops every line break in it, and a save
+     * of JCB's Hello World lost them in 30 values, PHP among them. Code is
+     * multi-line too, which is why this asks about both.
+     *
+     * @since  0.7.0
+     */
+    public function isMultiline(): bool
+    {
+        return $this->isProperty() && $this->editor !== self::EDITOR_LINE;
+    }
+
+    /**
+     * Whether this property's value is code.
+     *
+     * @since  0.7.0
+     */
+    public function holdsCode(): bool
+    {
+        return $this->isProperty() && $this->editor === self::EDITOR_CODE;
     }
 
     /**

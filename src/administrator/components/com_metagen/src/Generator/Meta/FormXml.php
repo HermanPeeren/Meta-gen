@@ -390,10 +390,13 @@ final class FormXml
             // box is. JCB's own forms say `filter="raw"` 152 times, on these
             // fields among them.
             //
-            // Every property rather than the ones that look like code,
-            // because this generator cannot tell: `xml` and `default` arrive
-            // from JcbInOut as plain strings. A language saying which of its
-            // properties hold code is the better answer and a later one.
+            // Every property rather than the ones that look like code. Since
+            // 6.4 a language can say which of its properties hold code, but
+            // one that does not say is not thereby saying "none": JCB's `xml`
+            // and `default` arrived from JcbInOut as plain strings, and
+            // narrowing the filter to flagged properties would clean them
+            // again until every language that carries markup has been
+            // flagged. The flag decides the input; it does not decide this.
             $field->setAttribute('filter', 'raw');
 
             // A value the person never enters is not a text box with an
@@ -501,17 +504,36 @@ final class FormXml
             return;
         }
 
-        $field->setAttribute(
-            'type',
-            $datatype === null ? 'text' : (self::PRIMITIVES[strtolower($datatype->name)] ?? 'text')
-        );
+        $type = $datatype === null ? 'text' : (self::PRIMITIVES[strtolower($datatype->name)] ?? 'text');
+
+        // Several lines, when the language says the value has them: step 6.4.
+        // A text box cannot hold a line break - the browser drops each one -
+        // so a property holding PHP, SQL or a paragraph came back from its
+        // first Save as one long line: 860 values of JCB's demo blueprint.
+        //
+        // Only over a text box or a textarea. The flag says what a string
+        // looks like; a number or a date marked multi-line is a mistake in
+        // the language, and the datatype's own input is the better answer to
+        // it than a textarea with a date in it.
+        if ($feature->isMultiline() && ($type === 'text' || $type === 'textarea')) {
+            $type = 'textarea';
+
+            $this->dress($field, Presentation::forText($feature->holdsCode()));
+        }
+
+        $field->setAttribute('type', $type);
 
         // The class the browser finds this row by. It goes on the name input
         // of whichever classifier declares it, which is the one whose form
         // this is - a subtype's form must not carry it, or one row would be
-        // found twice and the second read would overwrite the first.
+        // found twice and the second read would overwrite the first. Beside a
+        // code property's own class, should a language ever name its rows by
+        // one.
         if ($this->isDisplayNameOf($owner, $feature)) {
-            $field->setAttribute('class', Naming::selectorOf($owner));
+            $field->setAttribute(
+                'class',
+                trim($field->getAttribute('class') . ' ' . Naming::selectorOf($owner))
+            );
         }
     }
 

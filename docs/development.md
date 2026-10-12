@@ -248,6 +248,89 @@ path step is now dotted through the single groups it sits in -
 `['datamodel', 'state_machine.states']` - and the library reads one from
 0.19.0 on.
 
+## A property that runs over lines
+
+Every string property used to generate as `<input type="text">`, and a text
+box cannot hold a line break: the browser drops each one. A browser save of
+JCB's demo blueprint lost them in 860 values, PHP among them (Exten-gen's plan,
+6.4). A language now says which of its properties run over lines.
+
+**On the Metalanguage form** a property has a *Value* radio: *One line*,
+*Several lines* or *Code*. It is stored as `editor` on the feature's
+`property` group - `line`, `text` or `code` - and read by `Feature::fromNode()`
+into `Feature::$editor`. Absent, or a word the generator does not know, is one
+line, so every language stored before this generates exactly what it did.
+
+**In a generated form** several lines is `type="textarea" rows="5"`, and code
+is `type="textarea" rows="12" class="font-monospace" spellcheck="false"`
+(`Presentation::forText()`). Only over a text box or a textarea: a number or a
+date marked multi-line keeps its own input, and a field class named under
+*Edited with* wins over the flag the way it wins over the datatype. A plain
+textarea rather than Joomla's `editor` field with CodeMirror, because the demo
+blueprint has 284 code values on one screen; the class is there for a later
+step to upgrade them by.
+
+**`filter="raw"` stays on every property.** The flag decides the input, not the
+filter. A language that flags nothing is not saying "nothing here is markup" -
+JCB's `xml` and `default` hold markup and arrive unflagged - so narrowing
+`raw` to code properties would clean them again.
+
+**In LionWeb** there is no M3 word for it, so it travels as an annotation on
+the Property node, read by `Lionweb\EditorAnnotation` when a chunk is imported:
+
+```
+language   yepr-forms, version 1                (listed in the chunk's languages)
+annotation yepr-forms-Editor                    on a LionCore-M3 Property node
+property   yepr-forms-Editor-value              "text" or "code"
+```
+
+The annotation node's `parent` is the Property node and its id is in that
+node's `annotations`. `EditorAnnotation::node()` builds one, which is the shape
+a writer has to emit. A chunk without annotations is a language whose strings
+are all one line - which is every chunk JcbInOut has written so far. It is
+read here rather than in the library's `LionCoreLanguage`, because only this
+component reads it (Exten-gen gets the textareas through the generated forms in
+the package) and moving it costs a library release; it can move with the next
+one. There is no LionWeb *export* of a language yet; when there is one, it
+writes this annotation for every property whose `editor` is not `line`.
+
+**What JcbInOut has to do** to flag JCB's language when it derives it: the
+derived metamodel keeps JCB's widget for every property (`jcbType`), and all
+868 multi-line values of the demo blueprint sit in three kinds of field -
+`editor` (284), `textarea` (579) and the hidden raw `xml` of a field (5). So
+`LanguageBuilder::emitFeature()` annotates a String property `code` when
+`jcbType` is `editor`, or `hidden` on a `TEXT`/`MEDIUMTEXT` column, and `text`
+when it is `textarea`. Re-export the language, import it here, export the
+package, install it in Exten-gen.
+
+**Line endings are Exten-gen's half.** A textarea keeps line breaks, but a
+browser posts every line ending as CRLF, and some JCB values are LF only (9 of
+the 868 in the blueprint on the JcbInOut dev site, 5 of Hello World's 30). The
+generated form deliberately carries no marker for it - no hidden companion
+field, no data attribute. A companion field would be one more key in the stored
+model, which `Form::filter()` keeps only if declared and which the LionWeb
+export would then have to know is not a feature, the way `tags` was not (6.1).
+And it is not needed: what the line ending was is in the stored model the save
+replaces. So on save, for every string value Exten-gen receives, matched to
+the stored node by `LIonWeb_id` and to its property by name:
+
+1. If the posted value holds no `\r\n`, leave it alone.
+2. If the stored value of the same property holds `\r\n`, leave it alone: it
+   was CRLF and comes back CRLF.
+3. Otherwise - the stored value had only LF, had no line break, or the node or
+   the property is new - replace every `\r\n` with `\n`. LF is what JCB writes
+   and what a new value should be.
+4. Joomla's textarea layout writes the value straight after `>`, and HTML drops
+   one newline there, so a value that began with a line break loses it. If the
+   stored value is the posted one with a leading `\n` (or `\r\n`) in front,
+   keep the stored one. None of the blueprint's values begin with one; it is a
+   guard, not a repair anybody has needed.
+
+A text box cannot carry a line break at all, so restricting the rule to
+textareas changes nothing, and it needs to know nothing about the form. A value
+that mixed CRLF and LF cannot be told apart once posted; none of the
+blueprint's do.
+
 ## Quality gates
 
 ```
