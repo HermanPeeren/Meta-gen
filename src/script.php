@@ -43,7 +43,11 @@ class Com_MetagenInstallerScript
     /**
      * The oldest library release that has everything this version calls.
      *
-     * 0.19.0 for a reference path that reads through a single group: the
+     * 0.19.1 for the uninstall guard: the library refuses to be uninstalled
+     * while this component is installed, so a site cannot lose it from under
+     * this one and fail on the next page with a missing class.
+     *
+     * Before that, 0.19.0 for a reference path that reads through a single group: the
      * reference table this version generates spells a repeating containment
      * inside a single one as a dotted step, `state_machine.states`, and an
      * older library finds no rows there, so a saved reference loses its name.
@@ -69,7 +73,7 @@ class Com_MetagenInstallerScript
      * asked for ^0.8, which is a site that installs the component, accepts the
      * library it is handed, and cannot open the import screen.
      */
-    private const LIBRARY_MINIMUM = '0.19.0';
+    private const LIBRARY_MINIMUM = '0.19.1';
 
     /**
      * The oldest Joomla this runs on.
