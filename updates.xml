@@ -14,6 +14,7 @@
 		<downloads>
 			<downloadurl type="full" format="zip">https://github.com/HermanPeeren/Meta-gen/releases/download/v0.6.2/com_metagen-0.6.2.zip</downloadurl>
 		</downloads>
+		<sha512>78f0d308f8a92172438c5c3ffd9560da5ac5815d0d683feb21f3cf99d03f9fde538edf042a6b2a0d8d9eeda34c082adcb3ed723ef0e3cce123b177571b77b6cd</sha512>
 		<maintainer>Herman Peeren</maintainer>
 		<maintainerurl>https://yepr.nl</maintainerurl>
 		<targetplatform name="joomla" version="6\..*"/>
